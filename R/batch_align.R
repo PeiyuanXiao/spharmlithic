@@ -32,7 +32,7 @@
 align_scar_batch <- function(data, id_col = "ID") {
   data %>%
     dplyr::group_by(.data[[id_col]]) %>%
-    dplyr::group_modify(~ align_svd(.x)) %>%
+    dplyr::group_modify(~ align_scar(.x)) %>%
     dplyr::ungroup()
 }
 
@@ -62,6 +62,6 @@ align_scar_batch <- function(data, id_col = "ID") {
 align_morph_batch <- function(data, id_col = "ID") {
   data %>%
     dplyr::group_by(.data[[id_col]]) %>%
-    dplyr::group_modify(~ align_lin2024(.x)) %>%
+    dplyr::group_modify(~ align_morph(.x)) %>%
     dplyr::ungroup()
 }

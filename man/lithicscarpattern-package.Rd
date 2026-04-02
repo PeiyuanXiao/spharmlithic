@@ -24,7 +24,7 @@ longest-scar translation).
 }
 }
 
-\subsection{Circular / fabric statistics}{
+\subsection{Scar pattern statistics}{
 \itemize{
 \item \code{\link[=compute_SPI]{compute_SPI()}} — Scar Pattern Index (Clarkson method).
 \item \code{\link[=compute_EI]{compute_EI()}} — Elongation (E) and Isotropy (I) from the orientation tensor.

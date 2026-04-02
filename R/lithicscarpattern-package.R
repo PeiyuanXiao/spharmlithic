@@ -15,7 +15,7 @@
 #' * [compute_plane_angle()] — Angle between morphological and SVD planes.
 #' * [compute_scar_plane()] — Mean perpendicular distance of scar endpoints from morphological plane.
 #'
-#' ### Circular / fabric statistics
+#' ### Scar pattern statistics
 #' * [compute_SPI()] — Scar Pattern Index (Clarkson method).
 #' * [compute_EI()] — Elongation (E) and Isotropy (I) from the orientation tensor.
 #'
