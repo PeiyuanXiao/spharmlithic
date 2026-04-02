@@ -1,0 +1,28 @@
+Package: lithicscarpattern
+Title: Lithic Flaking Scar Orientation Alignment and Analysis
+Version: 0.1.0
+Authors@R: 
+    person("Author", "Name", email = "author@example.com", role = c("aut", "cre"))
+Description: Provides tools for aligning and analysing 3-D lithic flaking scar
+    orientation data. Implements two alignment pipelines (SVD-based and
+    Lin 2024), plane-deviation diagnostics, circular-statistics descriptors
+    (Mean Resultant Length R, Elongation E, Isotropy I), and Plotly-based
+    interactive 3-D visualisations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    dplyr,
+    plotly,
+    htmltools,
+    jsonlite,
+    readr
+Suggests:
+    readxl,
+    here,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+VignetteBuilder: knitr
