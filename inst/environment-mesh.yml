@@ -1,0 +1,13 @@
+name: r-lithicscarpattern
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9,<3.13
+  - numpy
+  - scipy
+  - pandas
+  - trimesh
+  - pip
+  - pip:
+    - pyshtools
+    - open3d

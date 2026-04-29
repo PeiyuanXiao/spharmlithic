@@ -1,23 +1,34 @@
-#' lithicscarpattern: Lithic Flaking Scar Orientation Alignment and Analysis
+#' lithicscarpattern: Lithic Flaking Scar Orientation Alignment and SPHARM Analysis
 #'
 #' @description
-#' `lithicscarpattern` provides a complete toolkit for the geometric alignment
-#' and statistical analysis of 3-D lithic flaking scar orientation data.
+#' `lithicscarpattern` provides a complete toolkit for the geometric alignment,
+#' spherical harmonic decomposition, and statistical analysis of 3-D lithic
+#' flaking scar orientation data.
 #'
 #' ## Main components
 #'
 #' ### Alignment pipelines
-#' * [align_scar()] — Three-step SVD pipeline (rotate → translate → in-plane rotate).
-#' * [align_morph()] — Two-step Lin 2024 pipeline (morphological normal rotation →
-#'   longest-scar translation).
+#' * [align_scar()] / [align_scar_batch()] — Three-step SVD pipeline
+#'   (rotate → translate → in-plane rotate).
+#' * [align_morph()] / [align_morph_batch()] — Two-step Lin 2024 pipeline
+#'   (morphological normal rotation → longest-scar translation).
 #'
 #' ### Plane deviation analysis
 #' * [compute_plane_angle()] — Angle between morphological and SVD planes.
-#' * [compute_scar_plane()] — Mean perpendicular distance of scar endpoints from morphological plane.
+#' * [compute_scar_plane()] — Mean perpendicular distance of scar endpoints
+#'   from morphological plane.
 #'
-#' ### Scar pattern statistics
+#' ### Classical orientation statistics
 #' * [compute_SPI()] — Scar Pattern Index (Clarkson method).
-#' * [compute_EI()] — Elongation (E) and Isotropy (I) from the orientation tensor.
+#' * [compute_EI()] — Elongation (E) and Isotropy (I) from the
+#'   orientation tensor.
+#'
+#' ### Spherical harmonic analysis (Python-backed)
+#' * [install_lithicscarpattern_python()] — One-time Python backend setup.
+#' * [use_lithicscarpattern_python()] — Point at an existing Python env.
+#' * [spharm_from_directions()] — Directions → vMF KDE → SPHARM.
+#' * [spharm_from_meshes()] — STL meshes → spherical interpolation → SPHARM.
+#' * [spharm_to_dataframe()] — Flatten results for CSV export.
 #'
 #' ### 3-D visualisation (Plotly helpers)
 #' * [add_scars_3d()], [add_arrow_3d()], [add_tilted_plane_3d()],

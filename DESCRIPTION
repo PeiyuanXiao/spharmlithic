@@ -1,28 +1,34 @@
 Package: lithicscarpattern
-Title: Lithic Flaking Scar Orientation Alignment and Analysis
-Version: 0.1.0
-Authors@R: 
-    person("Author", "Name", email = "author@example.com", role = c("aut", "cre"))
-Description: Provides tools for aligning and analysing 3-D lithic flaking scar
-    orientation data. Implements two alignment pipelines (SVD-based and
-    Lin 2024), plane-deviation diagnostics, circular-statistics descriptors
-    (Mean Resultant Length R, Elongation E, Isotropy I), and Plotly-based
-    interactive 3-D visualisations.
+Title: Lithic Flaking Scar Orientation Alignment and Spherical Harmonic Analysis
+Version: 0.2.0
+Authors@R:
+    person("Your", "Name", , "you@example.com", role = c("aut", "cre"))
+Description: A complete toolkit for the geometric alignment, spherical
+    harmonic decomposition, and statistical analysis of three-dimensional
+    lithic flaking scar orientation data. Provides two alignment pipelines
+    (SVD and Lin 2024), classical orientation statistics (SPI, E, I), and
+    spherical harmonic analysis via a Python backend (von Mises-Fisher
+    kernel density estimation followed by Driscoll-Healy spherical harmonic
+    expansion using pyshtools).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+RoxygenNote: 7.3.1
+Depends:
+    R (>= 4.1.0)
 Imports:
     dplyr,
-    plotly,
     htmltools,
     jsonlite,
-    readr
+    magrittr,
+    plotly,
+    reticulate (>= 1.41),
+    rlang,
+    tibble,
+    utils
 Suggests:
-    readxl,
-    here,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+SystemRequirements: Python (>= 3.9)
