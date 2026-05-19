@@ -1,0 +1,1 @@
+usethis::create_package("H:/lithicscarpattern/lithicscarpattern", open = FALSE)
