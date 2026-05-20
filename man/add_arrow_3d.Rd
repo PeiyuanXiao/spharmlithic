@@ -29,9 +29,13 @@ a cone arrowhead at the tip.
 \dontrun{
 library(plotly)
 fig <- plot_ly()
-fig <- add_arrow_3d(fig, origin = c(0,0,0), direction = c(0,0,1),
+fig <- add_arrow_3d(fig, origin = c(0, 0, 0), direction = c(0, 0, 1),
                     scale = 1, color = "red")
 fig
 }
 
+}
+\seealso{
+\code{\link[=add_scars_3d]{add_scars_3d()}}, \code{\link[=add_plane_3d]{add_plane_3d()}}, \code{\link[=build_panel_scar]{build_panel_scar()}},
+\code{\link[=build_panels_morph]{build_panels_morph()}}
 }

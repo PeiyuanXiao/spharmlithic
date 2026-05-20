@@ -17,3 +17,23 @@ Builds the Plotly figure object and returns a JSON string containing
 both the \code{data} and \code{layout} fields, ready to be embedded inside a
 \verb{<script>} block in a standalone HTML page.
 }
+\details{
+Standalone HTML export (see \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}} and
+\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}) serialises all specimen panels to
+JSON at build time so that the resulting file requires no R session or
+server to render.  This function handles the per-panel serialisation,
+producing a compact \verb{\{"data": ..., "layout": ...\}} string that is
+assigned to a JavaScript variable and later consumed by \code{Plotly.react()}.
+}
+\examples{
+\dontrun{
+library(plotly)
+fig  <- plot_ly() \%>\% add_scars_3d(0, 0, 0, 1, 0, 0)
+json <- get_panel_json(fig)
+cat(substr(json, 1, 120))
+}
+
+}
+\seealso{
+\code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}, \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
+}

@@ -1,6 +1,6 @@
 # ==============================================================================
 # batch_align.R
-# 批量对齐包装函数 — 直接传入完整数据框，一步完成
+# Batch alignment wrappers — process a complete multi-specimen data frame
 # ==============================================================================
 
 #' Batch SVD alignment for all specimens
@@ -20,9 +20,15 @@
 #'   \item{d_x, d_y, d_z}{Aligned unit direction vectors.}
 #' }
 #'
+#' @details
+#' Specimens are processed independently: the SVD plane and in-plane
+#' rotation are estimated separately for each group defined by `id_col`.
+#' Row order within each group is preserved; the output is ungrouped.
+#'
 #' @examples
 #' \dontrun{
-#' aligned <- align_svd_batch(my_scar)
+#' aligned <- align_scar_batch(raw_data)
+#' head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 #' }
 #'
 #' @seealso [align_scar()], [align_morph_batch()]
@@ -50,9 +56,16 @@ align_scar_batch <- function(data, id_col = "ID") {
 #' @return The input data frame with nine additional columns
 #'   (`s_x/y/z`, `e_x/y/z`, `d_x/y/z`).
 #'
+#' @details
+#' Specimens are processed independently: the morphological plane normal
+#' and the longest-scar anchor are determined separately for each group
+#' defined by `id_col`.  Row order within each group is preserved; the
+#' output is ungrouped.
+#'
 #' @examples
 #' \dontrun{
-#' aligned <- align_lin2024_batch(my_scar)
+#' aligned <- align_morph_batch(raw_data)
+#' head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 #' }
 #'
 #' @seealso [align_morph()], [align_scar_batch()]

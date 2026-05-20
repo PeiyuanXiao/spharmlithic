@@ -20,4 +20,19 @@ The modified \code{plotly} figure object.
 }
 \description{
 Draws a semi-transparent flat plane at height \code{z0}, centred at (\code{cx}, \code{cy}).
+Used to visualise the XY reference plane after the rotation step has aligned
+the scar pattern normal to the Z-axis.
+}
+\examples{
+\dontrun{
+library(plotly)
+fig <- plot_ly()
+fig <- add_plane_3d(fig, cx = 0, cy = 0, z0 = 0, half_size = 2)
+fig
+}
+
+}
+\seealso{
+\code{\link[=add_tilted_plane_3d]{add_tilted_plane_3d()}}, \code{\link[=add_arrow_3d]{add_arrow_3d()}}, \code{\link[=build_panel_scar]{build_panel_scar()}},
+\code{\link[=build_panels_morph]{build_panels_morph()}}
 }

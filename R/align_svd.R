@@ -1,6 +1,6 @@
 # ==============================================================================
 # align_svd.R
-# 片疤方向对齐 — SVD 法
+# Scar orientation alignment — SVD pipeline
 # ==============================================================================
 
 #' Align scar orientation data using SVD (three-step pipeline)
@@ -26,48 +26,68 @@
 #'   \item{d_x, d_y, d_z}{Aligned unit direction vectors.}
 #' }
 #'
-#' @seealso [get_rot_matrix()], [align_morph()]
+#' @details
+#' This is the **data-driven** alignment method: no externally measured plane
+#' normal is required.  The best-fit plane is estimated directly from the
+#' scar direction vectors using SVD, making it suitable when morphological
+#' normals (`Norm_X/Y/Z`) are unavailable.  At least three valid scars
+#' (length > `1e-10`) are needed for the SVD step.
+#'
+#' For the morphology-based alternative that uses a pre-measured plane normal,
+#' see [align_morph()].
+#'
+#' @examples
+#' \dontrun{
+#' # Single specimen
+#' df_one <- subset(raw_data, ID == "S001")
+#' aligned_one <- align_scar(df_one)
+#'
+#' # All specimens via the batch wrapper
+#' aligned_all <- align_scar_batch(raw_data)
+#' }
+#'
+#' @seealso [get_rot_matrix()], [align_morph()], [align_scar_batch()]
 #'
 #' @importFrom dplyr mutate
 #' @export
 align_scar <- function(df_group) {
-
-  # --- Step 1: 旋转 — 将 SVD 法线对齐到 Z 轴 ---
+  
+  # --- Step 1: Rotate — align SVD normal to the Z-axis ---
   dx  <- df_group$End_X - df_group$Start_X
   dy  <- df_group$End_Y - df_group$Start_Y
   dz  <- df_group$End_Z - df_group$Start_Z
   len <- sqrt(dx^2 + dy^2 + dz^2)
   valid <- len > 1e-10
-
+  
   df_group$Direct_X <- ifelse(valid, dx / len, 0)
   df_group$Direct_Y <- ifelse(valid, dy / len, 0)
   df_group$Direct_Z <- ifelse(valid, dz / len, 0)
-
+  
   if (sum(valid) >= 3) {
     U      <- cbind(dx[valid] / len[valid],
                     dy[valid] / len[valid],
                     dz[valid] / len[valid])
     normal <- svd(U)$v[, 3]
   }
-
+  
   normal <- normal / sqrt(sum(normal^2))
   if (normal[3] < 0) normal <- -normal
-
+  
   R1 <- get_rot_matrix(normal, c(0, 0, 1))
-
+  
   S <- as.matrix(df_group[, c("Start_X", "Start_Y", "Start_Z")]) %*% t(R1)
   E <- as.matrix(df_group[, c("End_X",   "End_Y",   "End_Z"  )]) %*% t(R1)
   D <- as.matrix(df_group[, c("Direct_X","Direct_Y","Direct_Z")]) %*% t(R1)
-
+  
   df_group$s_x <- S[, 1]; df_group$s_y <- S[, 2]; df_group$s_z <- S[, 3]
   df_group$e_x <- E[, 1]; df_group$e_y <- E[, 2]; df_group$e_z <- E[, 3]
   df_group$d_x <- D[, 1]; df_group$d_y <- D[, 2]; df_group$d_z <- D[, 3]
-
-  # --- Step 2: 平移 — 将点云质心移至原点 ---
+  
+  # --- Step 2: Translate — shift point-cloud centroid to the origin ---
   global_center_x <- mean(c(df_group$s_x, df_group$e_x))
   global_center_y <- mean(c(df_group$s_y, df_group$e_y))
   global_center_z <- mean(c(df_group$s_z, df_group$e_z))
-
+  
   df_group <- df_group %>%
     dplyr::mutate(
       s_x = s_x - global_center_x,
@@ -77,26 +97,26 @@ align_scar <- function(df_group) {
       e_y = e_y - global_center_y,
       e_z = e_z - global_center_z
     )
-
-  # --- Step 3: XY 内旋转 — 将刮痕主方向对齐到 X 轴 ---
+  
+  # --- Step 3: In-plane rotation — align main scar direction to the X-axis ---
   xy_dirs  <- cbind(df_group$d_x, df_group$d_y)
   main_dir <- svd(xy_dirs)$v[, 1]
   mean_dir <- colMeans(xy_dirs)
   if (sum(main_dir * mean_dir) < 0) main_dir <- -main_dir
-
+  
   theta <- atan2(main_dir[2], main_dir[1])
   R2    <- matrix(c( cos(-theta), -sin(-theta), 0,
                      sin(-theta),  cos(-theta), 0,
                      0,            0,           1), 3, 3, byrow = TRUE)
-
+  
   S2 <- as.matrix(df_group[, c("s_x", "s_y", "s_z")]) %*% t(R2)
   E2 <- as.matrix(df_group[, c("e_x", "e_y", "e_z")]) %*% t(R2)
   D2 <- as.matrix(df_group[, c("d_x", "d_y", "d_z")]) %*% t(R2)
-
+  
   df_group$s_x <- S2[, 1]; df_group$s_y <- S2[, 2]; df_group$s_z <- S2[, 3]
   df_group$e_x <- E2[, 1]; df_group$e_y <- E2[, 2]; df_group$e_z <- E2[, 3]
   df_group$d_x <- D2[, 1]; df_group$d_y <- D2[, 2]; df_group$d_z <- D2[, 3]
-
+  
   return(df_group)
 }
 
@@ -114,29 +134,41 @@ align_scar <- function(df_group) {
 #'
 #' @return A named list with elements `p0`, `p1`, `p2`, `p3` (Plotly figures).
 #'
-#' @seealso [export_alignment_html_svd()]
+#' @details
+#' This function is primarily called by [export_alignment_html_svd()] to
+#' assemble the full multi-specimen HTML report.  It can also be called
+#' directly to inspect a single specimen's alignment interactively.
+#'
+#' @examples
+#' \dontrun{
+#' panels <- build_panel_scar("S001", raw_data)
+#' panels$p0  # raw data
+#' panels$p3  # fully aligned
+#' }
+#'
+#' @seealso [align_scar()], [export_alignment_html_svd()]
 #'
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
 #' @export
 build_panel_scar <- function(demo_id, raw_data) {
   df <- dplyr::filter(raw_data, .data$ID == demo_id)
-
+  
   s0 <- as.matrix(df[, c("Start_X", "Start_Y", "Start_Z")])
   e0 <- as.matrix(df[, c("End_X",   "End_Y",   "End_Z"  )])
-
+  
   center_raw <- c(mean(c(s0[, 1], e0[, 1])),
                   mean(c(s0[, 2], e0[, 2])),
                   mean(c(s0[, 3], e0[, 3])))
   arr_scale  <- max(dist(s0)) * 0.25
   half_sz    <- max(dist(s0)) * 0.55
-
+  
   dx  <- e0[, 1] - s0[, 1]
   dy  <- e0[, 2] - s0[, 2]
   dz  <- e0[, 3] - s0[, 3]
   len <- sqrt(dx^2 + dy^2 + dz^2)
   valid <- len > 1e-10
-
+  
   if (sum(valid) >= 3) {
     U          <- cbind(dx[valid] / len[valid],
                         dy[valid] / len[valid],
@@ -147,17 +179,17 @@ build_panel_scar <- function(demo_id, raw_data) {
   }
   normal_svd <- normal_svd / sqrt(sum(normal_svd^2))
   if (normal_svd[3] < 0) normal_svd <- -normal_svd
-
+  
   R1        <- get_rot_matrix(normal_svd, c(0, 0, 1))
   s1        <- s0 %*% t(R1)
   e1        <- e0 %*% t(R1)
   center_r1 <- c(mean(c(s1[, 1], e1[, 1])),
                  mean(c(s1[, 2], e1[, 2])),
                  mean(c(s1[, 3], e1[, 3])))
-
+  
   s2 <- sweep(s1, 2, center_r1, "-")
   e2 <- sweep(e1, 2, center_r1, "-")
-
+  
   d2       <- e2 - s2
   len2     <- sqrt(rowSums(d2^2))
   valid2   <- len2 > 1e-10
@@ -171,32 +203,32 @@ build_panel_scar <- function(demo_id, raw_data) {
                         0,            0,           1), 3, 3, byrow = TRUE)
   s3 <- s2 %*% t(R2)
   e3 <- e2 %*% t(R2)
-
+  
   p0 <- plotly::plot_ly() %>%
     add_scars_3d(s0[,1], s0[,2], s0[,3], e0[,1], e0[,2], e0[,3]) %>%
     add_arrow_3d(center_raw, normal_svd, arr_scale) %>%
     add_tilted_plane_3d(center_raw, normal_svd, half_sz) %>%
     plotly::layout(panel_layout("<b>Step 0</b>: Raw data — SVD normal shown"))
-
+  
   p1 <- plotly::plot_ly() %>%
     add_scars_3d(s1[,1], s1[,2], s1[,3], e1[,1], e1[,2], e1[,3]) %>%
     add_arrow_3d(center_r1, c(0, 0, 1), arr_scale) %>%
     add_plane_3d(center_r1[1], center_r1[2], center_r1[3], half_sz) %>%
     plotly::layout(panel_layout("<b>Step 1</b>: Rotate — SVD normal aligned to Z-axis"))
-
+  
   p2 <- plotly::plot_ly() %>%
     add_scars_3d(s2[,1], s2[,2], s2[,3], e2[,1], e2[,2], e2[,3]) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
     plotly::layout(panel_layout("<b>Step 2</b>: Translate — center moved to origin"))
-
+  
   p3 <- plotly::plot_ly() %>%
     add_scars_3d(s3[,1], s3[,2], s3[,3], e3[,1], e3[,2], e3[,3]) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_arrow_3d(c(0, 0, 0), c(1, 0, 0), arr_scale, color = "orange") %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
     plotly::layout(panel_layout("<b>Step 3</b>: Rotate XY — PCA main axis aligned to X-axis"))
-
+  
   list(p0 = p0, p1 = p1, p2 = p2, p3 = p3)
 }
 
@@ -213,7 +245,20 @@ build_panel_scar <- function(demo_id, raw_data) {
 #'
 #' @return Invisibly, the `out_path` string.
 #'
-#' @seealso [build_panel_scar()]
+#' @details
+#' The exported HTML is fully self-contained (Plotly loaded from CDN) and
+#' requires no R session to view.  All specimen panels are serialised to
+#' JSON at export time; switching specimens in the browser is instant.
+#'
+#' For the Lin 2024 morphology-based equivalent, see
+#' [export_alignment_html_lin2024()].
+#'
+#' @examples
+#' \dontrun{
+#' export_alignment_html_svd(raw_data, "output/alignment_svd.html")
+#' }
+#'
+#' @seealso [build_panel_scar()], [export_alignment_html_lin2024()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON
@@ -223,7 +268,7 @@ export_alignment_html_svd <- function(raw_data, out_path) {
   panels_list <- lapply(as.character(all_ids), build_panel_scar,
                         raw_data = raw_data)
   names(panels_list) <- as.character(all_ids)
-
+  
   js_data_lines <- sapply(as.character(all_ids), function(id) {
     ps <- panels_list[[id]]
     paste0(
@@ -237,21 +282,21 @@ export_alignment_html_svd <- function(raw_data, out_path) {
   })
   js_data_block <- paste(js_data_lines, collapse = "\n")
   ids_json      <- jsonlite::toJSON(as.character(all_ids), auto_unbox = FALSE)
-
+  
   grid <- htmltools::browsable(
     htmltools::tagList(
       htmltools::tags$script(
         src = "https://cdn.plot.ly/plotly-2.27.0.min.js"),
-
+      
       htmltools::tags$h3(
         style = "font-family:sans-serif; text-align:center; margin:16px 0 4px;",
         "Core Alignment Pipeline (SVD normal)"
       ),
-
+      
       htmltools::tags$div(
         style = "text-align:center; margin-bottom:10px;",
         htmltools::tags$label("Select specimen: ",
-                   style = "font-family:sans-serif; font-size:13px;"),
+                              style = "font-family:sans-serif; font-size:13px;"),
         htmltools::tags$select(
           id    = "specimenSelect",
           style = "font-size:13px; padding:3px 8px;",
@@ -259,7 +304,7 @@ export_alignment_html_svd <- function(raw_data, out_path) {
             htmltools::tags$option(value = id, id))
         )
       ),
-
+      
       htmltools::tags$p(
         style = "font-family:sans-serif; text-align:center; color:#666;
                  margin:0 0 12px; font-size:13px;",
@@ -269,7 +314,7 @@ export_alignment_html_svd <- function(raw_data, out_path) {
            <b style='color:orange'>Orange arrow</b> = PCA main axis (X) &nbsp;|&nbsp;
            <b style='color:lightgray'>Gray plane</b> = SVD best-fit plane")
       ),
-
+      
       htmltools::tags$div(
         style = "display:grid; grid-template-columns:1fr 1fr 1fr 1fr;
                  gap:8px; padding:0 12px 12px;",
@@ -318,7 +363,7 @@ export_alignment_html_svd <- function(raw_data, out_path) {
           )
         )
       ),
-
+      
       htmltools::tags$script(htmltools::HTML(paste0(
         "var allPanels = {};\n",
         "var allIds = ", ids_json, ";\n",
@@ -337,7 +382,7 @@ export_alignment_html_svd <- function(raw_data, out_path) {
       )))
     )
   )
-
+  
   htmltools::save_html(grid, out_path)
   invisible(out_path)
 }

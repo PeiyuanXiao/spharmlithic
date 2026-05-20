@@ -124,6 +124,11 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
 #'     `plotly::plot_ly(type = "surface", surfacecolor = ...)`.}
 #' }
 #'
+#' @references
+#' Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working
+#' with spherical harmonics. \emph{Geochemistry, Geophysics, Geosystems},
+#' \strong{19}(8), 2574--2592.
+#'
 #' @examples
 #' \dontrun{
 #' result <- spharm_from_directions(my_aligned_data, lmax = 20)

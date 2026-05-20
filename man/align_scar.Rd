@@ -30,6 +30,27 @@ best-fit plane normal; rotate it onto the Z-axis via
 scar direction and rotates it onto the X-axis.
 }
 }
+\details{
+This is the \strong{data-driven} alignment method: no externally measured plane
+normal is required.  The best-fit plane is estimated directly from the
+scar direction vectors using SVD, making it suitable when morphological
+normals (\code{Norm_X/Y/Z}) are unavailable.  At least three valid scars
+(length > \code{1e-10}) are needed for the SVD step.
+
+For the morphology-based alternative that uses a pre-measured plane normal,
+see \code{\link[=align_morph]{align_morph()}}.
+}
+\examples{
+\dontrun{
+# Single specimen
+df_one <- subset(raw_data, ID == "S001")
+aligned_one <- align_scar(df_one)
+
+# All specimens via the batch wrapper
+aligned_all <- align_scar_batch(raw_data)
+}
+
+}
 \seealso{
-\code{\link[=get_rot_matrix]{get_rot_matrix()}}, \code{\link[=align_morph]{align_morph()}}
+\code{\link[=get_rot_matrix]{get_rot_matrix()}}, \code{\link[=align_morph]{align_morph()}}, \code{\link[=align_scar_batch]{align_scar_batch()}}
 }

@@ -19,6 +19,19 @@ Invisibly, the \code{out_path} string.
 Builds three-panel Lin 2024 alignment visualisations for every specimen in
 \code{raw_data} and writes a standalone interactive HTML file to \code{out_path}.
 }
+\details{
+The exported HTML is fully self-contained (Plotly loaded from CDN) and
+requires no R session to view.  All specimen panels are serialised to
+JSON at export time; switching specimens in the browser is instant.
+
+For the SVD-based equivalent, see \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}.
+}
+\examples{
+\dontrun{
+export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
+}
+
+}
 \seealso{
-\code{\link[=build_panels_morph]{build_panels_morph()}}
+\code{\link[=build_panels_morph]{build_panels_morph()}}, \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
 }

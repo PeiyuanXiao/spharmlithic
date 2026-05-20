@@ -25,9 +25,15 @@ A convenience wrapper around \code{\link[=align_scar]{align_scar()}} that accept
 multi-specimen data frame and handles the grouping internally.
 Equivalent to calling \code{group_by(ID) \%>\% group_modify(~ align_scar(.x))}.
 }
+\details{
+Specimens are processed independently: the SVD plane and in-plane
+rotation are estimated separately for each group defined by \code{id_col}.
+Row order within each group is preserved; the output is ungrouped.
+}
 \examples{
 \dontrun{
-aligned <- align_svd_batch(my_scar)
+aligned <- align_scar_batch(raw_data)
+head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 }
 
 }

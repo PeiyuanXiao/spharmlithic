@@ -29,9 +29,33 @@ the Z-axis.
 the longest scar lies at the XY origin.
 }
 }
+\details{
+This is the \strong{morphology-driven} alignment method: the plane normal is
+supplied externally (e.g. measured in Geomagic) rather than estimated from
+the scar data.  This makes the rotation step independent of scar
+configuration, which can be advantageous for cores with few or poorly
+distributed scars.
+
+For the data-driven alternative that estimates the plane normal from the
+scars themselves, see \code{\link[=align_scar]{align_scar()}}.
+}
+\examples{
+\dontrun{
+# Single specimen
+df_one <- subset(raw_data, ID == "S001")
+aligned_one <- align_morph(df_one)
+
+# All specimens via the batch wrapper
+aligned_all <- align_morph_batch(raw_data)
+}
+
+}
 \references{
-Lin, S. C., et al. (2024). \emph{Journal reference here.}
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
+T. (2024). A new method for quantifying flake scar organisation on cores
+using orientation statistics. \emph{Journal of Archaeological Science},
+\strong{167}, 105998.
 }
 \seealso{
-\code{\link[=align_scar]{align_scar()}}, \code{\link[=get_scar_length]{get_scar_length()}}
+\code{\link[=align_scar]{align_scar()}}, \code{\link[=get_scar_length]{get_scar_length()}}, \code{\link[=align_morph_batch]{align_morph_batch()}}
 }

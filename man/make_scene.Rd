@@ -13,3 +13,15 @@ A named list for use in \code{plotly::layout(scene = make_scene())}.
 Returns a list suitable for the \code{scene} element of \code{plotly::layout()},
 with sensible camera angle, axis titles, and equal aspect ratio.
 }
+\examples{
+\dontrun{
+library(plotly)
+fig <- plot_ly() \%>\%
+  plotly::layout(scene = make_scene())
+fig
+}
+
+}
+\seealso{
+\code{\link[=panel_layout]{panel_layout()}}
+}

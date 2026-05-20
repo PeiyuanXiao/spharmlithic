@@ -1,9 +1,8 @@
-#' lithicscarpattern: Lithic Flaking Scar Orientation Alignment and SPHARM Analysis
+#' spharmlithic: SPHARM framework for stone artifact shape and scar pattern analysis
 #'
 #' @description
-#' `lithicscarpattern` provides a complete toolkit for the geometric alignment,
-#' spherical harmonic decomposition, and statistical analysis of 3-D lithic
-#' flaking scar orientation data.
+#' `spharmlithic` provides a complete toolkit for the geometric alignment,
+#' spherical harmonic decomposition for artifact shape and flaking scar vector
 #'
 #' ## Main components
 #'
@@ -14,16 +13,16 @@
 #'   (morphological normal rotation -> longest-scar translation).
 #'
 #' ### Classical orientation statistics
-#' * [compute_SPI()] — Scar Pattern Index (Clarkson 2013); supports both
-#'   unit-vector and length-weighted variants.
+#' * [compute_SPI()] — Scar Pattern Index (Clarkson et al. 2006); supports
+#'   both unit-vector and length-weighted variants.
 #' * [compute_spi_angle()] — SPI converted to expected pairwise angle
-#'   (Clarkson 2013).
+#'   (Clarkson et al. 2006).
 #' * [compute_EI()] — Elongation (E) and Isotropy (I) from the
-#'   orientation tensor.
+#'   orientation tensor (Lin et al. 2024).
 #'
 #' ### Spherical harmonic analysis (Python-backed)
-#' * [install_lithicscarpattern_python()] — One-time Python backend setup.
-#' * [use_lithicscarpattern_python()] — Point at an existing Python env.
+#' * [install_spharmlithic_python()] — One-time Python backend setup.
+#' * [use_spharmlithic_python()] — Point at an existing Python env.
 #' * [spharm_from_directions()] — Direction vectors -> vMF KDE -> SPHARM.
 #' * [spharm_from_meshes()] — STL meshes -> spherical interpolation -> SPHARM.
 #' * [spharm_reconstruct()] — Inverse transform: coefficients -> spherical

@@ -22,5 +22,27 @@ The modified \code{plotly} figure object.
 \description{
 Draws a semi-transparent quadrilateral mesh centred at \code{center} with the
 given \code{normal} direction. Used to visualise the best-fit plane of scar
-orientation data.
+orientation data before the rotation step.
+}
+\details{
+Two tangent vectors \eqn{\mathbf{u}} and \eqn{\mathbf{v}} spanning the
+plane are constructed via Gram-Schmidt orthogonalisation against the
+normalised \code{normal}.  The reference vector used for \eqn{\mathbf{u}} is
+\code{c(1, 0, 0)} unless \code{normal} is nearly parallel to the X-axis, in which
+case \code{c(0, 1, 0)} is used instead.  The four corners of the square are
+then \verb{center ± half_size * u ± half_size * v}.
+}
+\examples{
+\dontrun{
+library(plotly)
+fig <- plot_ly()
+fig <- add_tilted_plane_3d(fig, center = c(0, 0, 0),
+                           normal = c(0.5, 0.5, 1), half_size = 2)
+fig
+}
+
+}
+\seealso{
+\code{\link[=add_plane_3d]{add_plane_3d()}}, \code{\link[=add_arrow_3d]{add_arrow_3d()}}, \code{\link[=build_panel_scar]{build_panel_scar()}},
+\code{\link[=build_panels_morph]{build_panels_morph()}}
 }

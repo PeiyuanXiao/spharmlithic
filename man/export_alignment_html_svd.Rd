@@ -20,6 +20,20 @@ Builds four-panel SVD alignment visualisations for every specimen in
 \code{raw_data} and writes a standalone interactive HTML file to \code{out_path}.
 The page contains a drop-down menu to switch between specimens.
 }
+\details{
+The exported HTML is fully self-contained (Plotly loaded from CDN) and
+requires no R session to view.  All specimen panels are serialised to
+JSON at export time; switching specimens in the browser is instant.
+
+For the Lin 2024 morphology-based equivalent, see
+\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}.
+}
+\examples{
+\dontrun{
+export_alignment_html_svd(raw_data, "output/alignment_svd.html")
+}
+
+}
 \seealso{
-\code{\link[=build_panel_scar]{build_panel_scar()}}
+\code{\link[=build_panel_scar]{build_panel_scar()}}, \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
 }

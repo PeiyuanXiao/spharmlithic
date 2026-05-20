@@ -25,13 +25,30 @@ An optional index allows one scar to be rendered in a highlight style
 (thicker, pink) — used in the Lin 2024 pipeline to emphasise the longest
 scar.
 }
+\details{
+Each scar is rendered as two Plotly traces: a \code{scatter3d} line for the
+shaft and a \code{cone} trace for the arrowhead at the end-point.  The
+highlighted scar (if any) uses a wider line (\code{width = 6} vs \code{2}) and a
+larger cone (\code{sizeref = 0.08} vs \code{0.05}).
+}
 \examples{
 \dontrun{
 library(plotly)
 fig <- plot_ly()
-fig <- add_scars_3d(fig, sx = 0, sy = 0, sz = 0,
-                         ex = 1, ey = 0, ez = 0)
+fig <- add_scars_3d(fig, sx = c(0, 1), sy = c(0, 0), sz = c(0, 0),
+                         ex = c(1, 2), ey = c(0, 1), ez = c(0, 0))
 fig
+
+# Highlight the second scar (e.g. the longest)
+fig2 <- plot_ly()
+fig2 <- add_scars_3d(fig2, sx = c(0, 1), sy = c(0, 0), sz = c(0, 0),
+                           ex = c(1, 2), ey = c(0, 1), ez = c(0, 0),
+                           highlight_idx = 2)
+fig2
 }
 
+}
+\seealso{
+\code{\link[=add_arrow_3d]{add_arrow_3d()}}, \code{\link[=add_plane_3d]{add_plane_3d()}}, \code{\link[=build_panel_scar]{build_panel_scar()}},
+\code{\link[=build_panels_morph]{build_panels_morph()}}
 }

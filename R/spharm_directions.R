@@ -48,6 +48,11 @@
 #' Use [spharm_to_dataframe()] to flatten the list into a wide-format
 #' data frame suitable for CSV export.
 #'
+#' @references
+#' Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working
+#' with spherical harmonics. \emph{Geochemistry, Geophysics, Geosystems},
+#' \strong{19}(8), 2574--2592.
+#'
 #' @examples
 #' \dontrun{
 #' # Typical workflow

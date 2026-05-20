@@ -2,29 +2,68 @@
 % Please edit documentation in R/stats.R
 \name{compute_SPI}
 \alias{compute_SPI}
-\title{SPI (Clarkson method)}
+\title{Scar Pattern Index (Clarkson et al. 2006)}
 \usage{
-compute_SPI(dx, dy, dz)
+compute_SPI(dx, dy, dz, lengths = NULL)
 }
 \arguments{
-\item{dx}{Numeric vector. X-components of the direction vectors.}
+\item{dx, dy, dz}{Numeric vectors of equal length. The X, Y, Z components
+of the scar direction vectors. These are typically unit direction
+vectors returned by \code{\link[=align_scar_batch]{align_scar_batch()}} (columns \code{d_x}, \code{d_y}, \code{d_z}).}
 
-\item{dy}{Numeric vector. Y-components of the direction vectors.}
-
-\item{dz}{Numeric vector. Z-components of the direction vectors.}
+\item{lengths}{Optional numeric vector of scar lengths. If provided,
+each direction vector is scaled by its length before summation,
+reproducing the original length-weighted SPI of Clarkson et al. (2006).
+If \code{NULL} (the default), all scars contribute equally regardless of
+length, following the unit-vector variant of Bretzke & Conard (2012).}
 }
 \value{
-A single numeric value in \eqn{[0, 1]}.  Values close to 1
+A single numeric value in \eqn{[0, 1]}. Values close to 1
 indicate strong preferred orientation; values close to 0 indicate
-isotropy.
+isotropic / random patterning.
 }
 \description{
-Computes the SPI \eqn{R} for a set of 3-D scar direction
-vectors following the Clarkson convention: the magnitude of the resultant
-vector divided by the sum of all individual vector magnitudes.
+Computes the ratio of the resultant vector magnitude to the total scar
+length, on a scale from 0 (random orientation) to 1 (perfect alignment).
+}
+\details{
+Two variants of SPI are supported:
+\itemize{
+\item \strong{Length-weighted} (Clarkson et al. 2006): pass raw scar
+displacement vectors so that longer scars contribute proportionally
+more to the resultant, or equivalently pass unit vectors together
+with \code{lengths}. This reproduces the original definition.
+\item \strong{Unweighted} (Bretzke & Conard 2012): leave \code{lengths = NULL}.
+Every scar contributes equally regardless of length — useful when
+scar lengths are unreliable or when only direction matters.
+}
+
+To reproduce the length-weighted definition from aligned batch output:
+\preformatted{
+  lens <- sqrt((aligned$e_x - aligned$s_x)^2 +
+               (aligned$e_y - aligned$s_y)^2 +
+               (aligned$e_z - aligned$s_z)^2)
+  compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+}
 }
 \examples{
 # Perfectly aligned vectors along X
-compute_SPI(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))  # returns 1
+compute_SPI(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
 
+# Random-like distribution (close to 0)
+set.seed(1)
+compute_SPI(rnorm(50), rnorm(50), rnorm(50))
+
+}
+\references{
+Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
+patterning on cores using 3D recording techniques. \emph{Journal of
+Archaeological Science}, \strong{33}(1), 132--142.
+
+Bretzke, K., & Conard, N. J. (2012). Evaluating morphological variability
+in lithic assemblages using 3D models of stone artifacts. \emph{Journal of
+Archaeological Science}, \strong{39}(12), 3741--3749.
+}
+\seealso{
+\code{\link[=compute_spi_angle]{compute_spi_angle()}}, \code{\link[=compute_EI]{compute_EI()}}
 }

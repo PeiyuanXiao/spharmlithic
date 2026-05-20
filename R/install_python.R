@@ -134,13 +134,31 @@ install_spharmlithic_python <- function(
 #'   the active Python executable), and `available` (named logical
 #'   vector of required-package availability).
 #'
+#' @details
+#' The `envname` argument is resolved in the following order:
+#' \enumerate{
+#'   \item **Conda environment** — if `envname` matches a name returned
+#'     by `reticulate::conda_list()`, `reticulate::use_condaenv()` is
+#'     called.
+#'   \item **Virtualenv** — if `reticulate::virtualenv_exists(envname)`
+#'     is `TRUE`, `reticulate::use_virtualenv()` is called.
+#'   \item **Python executable path** — if `file.exists(envname)` is
+#'     `TRUE`, `reticulate::use_python()` is called with the path
+#'     directly.
+#' }
+#' If none of the above match, the function stops with an informative
+#' error. In all cases `required = TRUE` is passed to the underlying
+#' reticulate call, so any conflict with an already-initialised Python
+#' session will raise an error rather than silently use a different
+#' interpreter.
+#'
 #' @examples
 #' \dontrun{
 #' # Reuse the conda env created by your analysis project
-#' use_spharmlithic_python("spharm")
+#' use_spharmlithic_python("r-spharmlithic")
 #'
 #' # Reuse and verify mesh extension is available
-#' use_spharmlithic_python("spharm", check_mesh = TRUE)
+#' use_spharmlithic_python("r-spharmlithic", check_mesh = TRUE)
 #' }
 #'
 #' @seealso [install_spharmlithic_python()]

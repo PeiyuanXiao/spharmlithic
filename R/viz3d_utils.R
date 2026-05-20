@@ -1,6 +1,6 @@
 # ==============================================================================
 # viz3d_utils.R
-# Plotly 三维可视化公共函数
+# Plotly 3-D visualisation helpers
 # ==============================================================================
 
 #' Add scar line segments and arrow cones to a Plotly 3-D figure
@@ -18,15 +18,30 @@
 #'
 #' @return The modified `plotly` figure object.
 #'
+#' @details
+#' Each scar is rendered as two Plotly traces: a `scatter3d` line for the
+#' shaft and a `cone` trace for the arrowhead at the end-point.  The
+#' highlighted scar (if any) uses a wider line (`width = 6` vs `2`) and a
+#' larger cone (`sizeref = 0.08` vs `0.05`).
+#'
 #' @examples
 #' \dontrun{
 #' library(plotly)
 #' fig <- plot_ly()
-#' fig <- add_scars_3d(fig, sx = 0, sy = 0, sz = 0,
-#'                          ex = 1, ey = 0, ez = 0)
+#' fig <- add_scars_3d(fig, sx = c(0, 1), sy = c(0, 0), sz = c(0, 0),
+#'                          ex = c(1, 2), ey = c(0, 1), ez = c(0, 0))
 #' fig
+#'
+#' # Highlight the second scar (e.g. the longest)
+#' fig2 <- plot_ly()
+#' fig2 <- add_scars_3d(fig2, sx = c(0, 1), sy = c(0, 0), sz = c(0, 0),
+#'                            ex = c(1, 2), ey = c(0, 1), ez = c(0, 0),
+#'                            highlight_idx = 2)
+#' fig2
 #' }
 #'
+#' @seealso [add_arrow_3d()], [add_plane_3d()], [build_panel_scar()],
+#'   [build_panels_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
@@ -36,11 +51,11 @@ add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
     clr   <- if (is_hl) "pink"  else "steelblue"
     lwd   <- if (is_hl) 6      else 2
     csz   <- if (is_hl) 0.08   else 0.05
-
+    
     dx <- ex[i] - sx[i]
     dy <- ey[i] - sy[i]
     dz <- ez[i] - sz[i]
-
+    
     fig <- fig %>% plotly::add_trace(
       type = "scatter3d", mode = "lines",
       x = c(sx[i], ex[i]), y = c(sy[i], ey[i]), z = c(sz[i], ez[i]),
@@ -81,17 +96,19 @@ add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
 #' \dontrun{
 #' library(plotly)
 #' fig <- plot_ly()
-#' fig <- add_arrow_3d(fig, origin = c(0,0,0), direction = c(0,0,1),
+#' fig <- add_arrow_3d(fig, origin = c(0, 0, 0), direction = c(0, 0, 1),
 #'                     scale = 1, color = "red")
 #' fig
 #' }
 #'
+#' @seealso [add_scars_3d()], [add_plane_3d()], [build_panel_scar()],
+#'   [build_panels_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
   d   <- direction / sqrt(sum(direction^2)) * scale
   tip <- origin + d
-
+  
   fig <- fig %>% plotly::add_trace(
     type = "scatter3d", mode = "lines",
     x = c(origin[1], tip[1]),
@@ -118,7 +135,7 @@ add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
 #'
 #' Draws a semi-transparent quadrilateral mesh centred at `center` with the
 #' given `normal` direction. Used to visualise the best-fit plane of scar
-#' orientation data.
+#' orientation data before the rotation step.
 #'
 #' @param fig A `plotly` figure object.
 #' @param center Numeric vector of length 3. Plane centre coordinates.
@@ -128,6 +145,25 @@ add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
 #'
 #' @return The modified `plotly` figure object.
 #'
+#' @details
+#' Two tangent vectors \eqn{\mathbf{u}} and \eqn{\mathbf{v}} spanning the
+#' plane are constructed via Gram-Schmidt orthogonalisation against the
+#' normalised `normal`.  The reference vector used for \eqn{\mathbf{u}} is
+#' `c(1, 0, 0)` unless `normal` is nearly parallel to the X-axis, in which
+#' case `c(0, 1, 0)` is used instead.  The four corners of the square are
+#' then `center ± half_size * u ± half_size * v`.
+#'
+#' @examples
+#' \dontrun{
+#' library(plotly)
+#' fig <- plot_ly()
+#' fig <- add_tilted_plane_3d(fig, center = c(0, 0, 0),
+#'                            normal = c(0.5, 0.5, 1), half_size = 2)
+#' fig
+#' }
+#'
+#' @seealso [add_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
+#'   [build_panels_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_tilted_plane_3d <- function(fig, center, normal, half_size) {
@@ -162,6 +198,8 @@ add_tilted_plane_3d <- function(fig, center, normal, half_size) {
 #' Add a horizontal (XY-parallel) plane mesh to a Plotly 3-D figure
 #'
 #' Draws a semi-transparent flat plane at height `z0`, centred at (`cx`, `cy`).
+#' Used to visualise the XY reference plane after the rotation step has aligned
+#' the scar pattern normal to the Z-axis.
 #'
 #' @param fig A `plotly` figure object.
 #' @param cx,cy Numeric scalars. Centre X and Y coordinates.
@@ -170,6 +208,16 @@ add_tilted_plane_3d <- function(fig, center, normal, half_size) {
 #'
 #' @return The modified `plotly` figure object.
 #'
+#' @examples
+#' \dontrun{
+#' library(plotly)
+#' fig <- plot_ly()
+#' fig <- add_plane_3d(fig, cx = 0, cy = 0, z0 = 0, half_size = 2)
+#' fig
+#' }
+#'
+#' @seealso [add_tilted_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
+#'   [build_panels_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_plane_3d <- function(fig, cx, cy, z0, half_size) {
@@ -197,6 +245,15 @@ add_plane_3d <- function(fig, cx, cy, z0, half_size) {
 #'
 #' @return A named list for use in `plotly::layout(scene = make_scene())`.
 #'
+#' @examples
+#' \dontrun{
+#' library(plotly)
+#' fig <- plot_ly() %>%
+#'   plotly::layout(scene = make_scene())
+#' fig
+#' }
+#'
+#' @seealso [panel_layout()]
 #' @export
 make_scene <- function() {
   list(
@@ -219,6 +276,15 @@ make_scene <- function() {
 #'
 #' @return A named list for use in `plotly::layout()`.
 #'
+#' @examples
+#' \dontrun{
+#' library(plotly)
+#' fig <- plot_ly() %>%
+#'   plotly::layout(panel_layout("<b>Step 0</b>: Raw data"))
+#' fig
+#' }
+#'
+#' @seealso [make_scene()], [build_panel_scar()], [build_panels_morph()]
 #' @export
 panel_layout <- function(title_text) {
   list(
@@ -241,6 +307,23 @@ panel_layout <- function(title_text) {
 #'
 #' @return A character string of JSON.
 #'
+#' @details
+#' Standalone HTML export (see [export_alignment_html_svd()] and
+#' [export_alignment_html_lin2024()]) serialises all specimen panels to
+#' JSON at build time so that the resulting file requires no R session or
+#' server to render.  This function handles the per-panel serialisation,
+#' producing a compact `{"data": ..., "layout": ...}` string that is
+#' assigned to a JavaScript variable and later consumed by `Plotly.react()`.
+#'
+#' @examples
+#' \dontrun{
+#' library(plotly)
+#' fig  <- plot_ly() %>% add_scars_3d(0, 0, 0, 1, 0, 0)
+#' json <- get_panel_json(fig)
+#' cat(substr(json, 1, 120))
+#' }
+#'
+#' @seealso [export_alignment_html_svd()], [export_alignment_html_lin2024()]
 #' @importFrom plotly plotly_build
 #' @importFrom jsonlite toJSON
 #' @export

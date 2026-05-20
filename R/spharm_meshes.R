@@ -45,6 +45,11 @@
 #'   Failed specimens are reported via warnings and omitted from the
 #'   result.
 #'
+#' @references
+#' Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working
+#' with spherical harmonics. \emph{Geochemistry, Geophysics, Geosystems},
+#' \strong{19}(8), 2574--2592.
+#'
 #' @examples
 #' \dontrun{
 #' # Requires mesh extension

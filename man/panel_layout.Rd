@@ -17,3 +17,15 @@ A named list for use in \code{plotly::layout()}.
 Returns a \code{layout} list for a single Plotly panel, including a centred
 title, tight margins, and a light background colour.
 }
+\examples{
+\dontrun{
+library(plotly)
+fig <- plot_ly() \%>\%
+  plotly::layout(panel_layout("<b>Step 0</b>: Raw data"))
+fig
+}
+
+}
+\seealso{
+\code{\link[=make_scene]{make_scene()}}, \code{\link[=build_panel_scar]{build_panel_scar()}}, \code{\link[=build_panels_morph]{build_panels_morph()}}
+}

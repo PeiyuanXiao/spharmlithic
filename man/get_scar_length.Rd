@@ -18,3 +18,18 @@ Returns the length of each scar.  If a \code{Length} column already exists it
 is used directly; otherwise lengths are computed from the start- and
 end-point coordinates.
 }
+\details{
+The \code{Length} column (if present) takes precedence over coordinate-derived
+lengths.  This allows pre-computed lengths from external software to be
+used directly without recalculation.
+}
+\examples{
+\dontrun{
+lens <- get_scar_length(df_one)
+longest <- df_one[which.max(lens), ]
+}
+
+}
+\seealso{
+\code{\link[=align_morph]{align_morph()}}
+}

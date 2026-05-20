@@ -21,9 +21,16 @@ The input data frame with nine additional columns
 A convenience wrapper around \code{\link[=align_morph]{align_morph()}} that accepts a complete
 multi-specimen data frame and handles the grouping internally.
 }
+\details{
+Specimens are processed independently: the morphological plane normal
+and the longest-scar anchor are determined separately for each group
+defined by \code{id_col}.  Row order within each group is preserved; the
+output is ungrouped.
+}
 \examples{
 \dontrun{
-aligned <- align_lin2024_batch(my_scar)
+aligned <- align_morph_batch(raw_data)
+head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 }
 
 }

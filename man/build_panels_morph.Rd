@@ -22,6 +22,19 @@ Reconstructs the two Lin 2024 alignment steps for specimen \code{demo_id} and
 returns three Plotly figures (Step 0 – Step 2) for HTML embedding.  The
 longest scar is highlighted in pink in all panels.
 }
+\details{
+This function is primarily called by \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}} to
+assemble the full multi-specimen HTML report.  It can also be called
+directly to inspect a single specimen's alignment interactively.
+}
+\examples{
+\dontrun{
+panels <- build_panels_morph("S001", raw_data)
+panels$p0  # raw data
+panels$p2  # fully aligned
+}
+
+}
 \seealso{
-\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
+\code{\link[=align_morph]{align_morph()}}, \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
 }

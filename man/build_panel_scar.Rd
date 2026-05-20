@@ -21,6 +21,19 @@ Reconstructs the three alignment steps for specimen \code{demo_id} and returns
 four Plotly figures (Step 0 – Step 3) suitable for embedding in an
 interactive HTML page.
 }
+\details{
+This function is primarily called by \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}} to
+assemble the full multi-specimen HTML report.  It can also be called
+directly to inspect a single specimen's alignment interactively.
+}
+\examples{
+\dontrun{
+panels <- build_panel_scar("S001", raw_data)
+panels$p0  # raw data
+panels$p3  # fully aligned
+}
+
+}
 \seealso{
-\code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
+\code{\link[=align_scar]{align_scar()}}, \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
 }

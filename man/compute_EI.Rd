@@ -7,37 +7,61 @@
 compute_EI(ux, uy, uz)
 }
 \arguments{
-\item{ux}{Numeric vector. X-components of unit direction vectors.}
-
-\item{uy}{Numeric vector. Y-components of unit direction vectors.}
-
-\item{uz}{Numeric vector. Z-components of unit direction vectors.}
+\item{ux, uy, uz}{Numeric vectors of equal length. The X, Y, Z components
+of \strong{unit} direction vectors. Non-unit vectors are accepted without
+error but will produce meaningless results; normalisation is the
+caller's responsibility.}
 }
 \value{
-A named list with the following elements:
+A one-row data frame with columns:
 \describe{
-\item{E}{Elongation index \eqn{[0, 1]}: 1 = perfectly linear, 0 = planar/isotropic.}
-\item{I}{Isotropy index \eqn{[0, 1]}: 1 = perfectly isotropic, 0 = linear/planar.}
-\item{lambda1}{Largest eigenvalue.}
-\item{lambda2}{Middle eigenvalue.}
-\item{lambda3}{Smallest eigenvalue.}
+\item{E}{Elongation index in \eqn{[0, 1]}: 1 = perfectly linear,
+0 = planar / isotropic.}
+\item{I}{Isotropy index in \eqn{[0, 1]}: 1 = perfectly isotropic,
+0 = linear / planar.}
+\item{lambda1, lambda2, lambda3}{The three eigenvalues, sorted in
+decreasing order.}
 }
 }
 \description{
-Constructs the 3×3 orientation (fabric) tensor from unit direction vectors,
-computes its eigenvalues \eqn{\lambda_1 \ge \lambda_2 \ge \lambda_3}, and
-returns the shape descriptors defined as:
+Constructs the 3×3 orientation (fabric) tensor from unit direction
+vectors, computes its eigenvalues
+\eqn{\lambda_1 \ge \lambda_2 \ge \lambda_3}, and returns the shape
+descriptors:
 \deqn{E = 1 - \lambda_2 / \lambda_1, \quad I = \lambda_3 / \lambda_1.}
 }
 \details{
 Negative eigenvalues caused by numerical error are clamped to zero.
-Both \code{E} and \code{I} are set to \code{NA} when
-\eqn{\lambda_1 \approx 0} (degenerate tensor).
+Both \code{E} and \code{I} are returned as \code{NA} when \eqn{\lambda_1 \approx 0}
+(degenerate tensor, threshold \eqn{10^{-10}}).
+
+The orientation tensor and the E/I descriptors follow Lin et al. (2024),
+whose implementation adapts the fabric analysis of McPherron (2018).
+
+The one-row data frame return type is designed to play well with
+\code{\link[dplyr:group_map]{dplyr::group_modify()}}, allowing direct per-specimen computation.
 }
 \examples{
-ux <- c(1, 1, 0.9)
-uy <- c(0, 0, 0.1)
-uz <- c(0, 0, 0.0)
-compute_EI(ux, uy, uz)
+# Strongly elongated — vectors mostly aligned along X
+compute_EI(c(1, 1, 0.9), c(0, 0, 0.1), c(0, 0, 0))
 
+# Isotropic — vectors evenly distributed along all three axes
+ux <- c(1, -1,  0,  0,  0,  0)
+uy <- c(0,  0,  1, -1,  0,  0)
+uz <- c(0,  0,  0,  0,  1, -1)
+compute_EI(ux, uy, uz)   # I close to 1
+
+}
+\references{
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
+T. (2024). A new method for quantifying flake scar organisation on cores
+using orientation statistics. \emph{Journal of Archaeological Science},
+\strong{167}, 105998.
+
+McPherron, S. P. (2018). Additional statistical and graphical methods for
+analyzing site formation processes using artifact orientations.
+\emph{PLOS ONE}, \strong{13}(1), e0190195.
+}
+\seealso{
+\code{\link[=compute_SPI]{compute_SPI()}}, \code{\link[=align_morph_batch]{align_morph_batch()}}
 }
