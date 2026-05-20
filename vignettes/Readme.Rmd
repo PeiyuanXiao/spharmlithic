@@ -6,7 +6,7 @@ editor_options:
 
 # spharmlithic
 
-> Spherical Harmonic Analysis of Lithic Flaking Scar Patterns
+> Spherical Harmonic Analysis of Lithic Analysis
 
 ## Overview
 
