@@ -13,15 +13,15 @@
 #'   \item Spherical harmonic expansion via `pyshtools` (4pi normalization).
 #' }
 #'
-#' This function calls the bundled Python backend via `reticulate`. Make sure
-#' you have run [install_lithicscarpattern_python()] (or
-#' [use_lithicscarpattern_python()]) at least once.
+#' This function calls the bundled Python backend via `reticulate`. Make
+#' sure you have run [install_spharmlithic_python()] (or
+#' [use_spharmlithic_python()]) at least once.
 #'
 #' @param data A data frame containing direction vectors. Must contain an
 #'   ID column (default `"ID"`) and three direction-component columns
 #'   (default `"d_x"`, `"d_y"`, `"d_z"`, matching the output of
-#'   [align_scar()] and [align_morph()]). Rows where a direction vector is
-#'   zero or NA are silently dropped.
+#'   [align_scar()] and [align_morph()]). Rows where a direction vector
+#'   is zero or NA are silently dropped.
 #' @param lmax Integer. Maximum spherical harmonic degree. Default 20.
 #' @param bandwidth Numeric. vMF KDE bandwidth (smaller -> sharper peaks).
 #'   Default 0.35. This is an empirical value; users are encouraged to
@@ -35,8 +35,8 @@
 #'   [align_scar()] output.
 #' @param verbose Logical. Print per-specimen progress. Default `TRUE`.
 #'
-#' @return A list with one element per specimen, named by ID. Each element
-#'   is itself a list with:
+#' @return A list with one element per specimen, named by ID. Each
+#'   element is itself a list with:
 #' \describe{
 #'   \item{coefficients}{Numeric array of shape `(2, lmax+1, lmax+1)` -
 #'     spherical harmonic coefficients in pyshtools 4pi normalization.
@@ -63,7 +63,7 @@
 #' }
 #'
 #' @seealso [spharm_from_meshes()], [spharm_to_dataframe()],
-#'   [install_lithicscarpattern_python()]
+#'   [install_spharmlithic_python()]
 #'
 #' @importFrom reticulate r_to_py
 #' @export
@@ -79,7 +79,7 @@ spharm_from_directions <- function(
     dy_col     = "d_y",
     dz_col     = "d_z",
     verbose    = TRUE) {
-
+  
   # ---- Validate input ---------------------------------------------------
   required <- c(id_col, dx_col, dy_col, dz_col)
   missing  <- setdiff(required, names(data))
@@ -87,12 +87,12 @@ spharm_from_directions <- function(
     stop("`data` is missing required columns: ",
          paste(missing, collapse = ", "), call. = FALSE)
   }
-
+  
   # Drop rows with zero / NA direction vectors
   d <- data[, c(id_col, dx_col, dy_col, dz_col)]
   names(d) <- c("ID", "ux", "uy", "uz")
   ok <- stats::complete.cases(d) &
-        (d$ux^2 + d$uy^2 + d$uz^2) > 1e-20
+    (d$ux^2 + d$uy^2 + d$uz^2) > 1e-20
   if (any(!ok)) {
     if (verbose) message("Dropping ", sum(!ok),
                          " row(s) with zero / NA direction vectors.")
@@ -102,7 +102,7 @@ spharm_from_directions <- function(
     stop("No valid direction vectors after cleaning.", call. = FALSE)
   }
   d$ID <- as.character(d$ID)
-
+  
   # ---- Call Python backend ----------------------------------------------
   py_result <- sh_py$api$spharm_from_directions(
     df         = reticulate::r_to_py(d),
@@ -113,7 +113,7 @@ spharm_from_directions <- function(
     dh_size    = as.integer(dh_size),
     verbose    = as.logical(verbose)
   )
-
+  
   # ---- Convert to native R structures -----------------------------------
   result <- lapply(py_result, function(x) {
     list(

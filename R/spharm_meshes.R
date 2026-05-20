@@ -8,8 +8,8 @@
 #'
 #' Pipeline (Track A), per STL file:
 #' \enumerate{
-#'   \item Read mesh via `open3d`. Files exceeding 3M faces are pre-decimated
-#'     by streaming face sub-sampling to avoid memory pressure.
+#'   \item Read mesh via `open3d`. Files exceeding 3M faces are
+#'     pre-decimated by streaming face sub-sampling to avoid memory pressure.
 #'   \item Quadric-error decimation to `target_faces`.
 #'   \item Laplacian smoothing (`smooth_iterations` passes).
 #'   \item Volume-centroid normalization to a unit sphere.
@@ -21,16 +21,16 @@
 #' }
 #'
 #' Requires the **mesh** Python extension. Run
-#' `install_lithicscarpattern_python(mesh = TRUE)` once before first use.
+#' `install_spharmlithic_python(mesh = TRUE)` once before first use.
 #'
 #' @param stl_dir Character. Path to a directory containing `.stl` files.
 #'   Each STL is treated as one specimen; the file basename (without
 #'   extension) becomes its ID.
 #' @param lmax Integer. Maximum spherical harmonic degree. Default 20.
 #' @param target_faces Integer. Decimation target. Default 20000.
-#' @param grid_size Integer. Latitude resolution of the interpolation grid;
-#'   the longitude direction uses `2 * grid_size` points (Driscoll-Healy
-#'   sampling 2). Default 256.
+#' @param grid_size Integer. Latitude resolution of the interpolation
+#'   grid; the longitude direction uses `2 * grid_size` points
+#'   (Driscoll-Healy sampling 2). Default 256.
 #' @param smooth_iterations Integer. Laplacian smoothing iterations after
 #'   decimation. Default 3. Set to 0 to skip smoothing.
 #' @param pre_decimate_threshold Integer. Face count above which streaming
@@ -39,15 +39,16 @@
 #'   Default 500000.
 #' @param verbose Logical. Print per-file progress. Default `TRUE`.
 #'
-#' @return A list with one element per successfully-processed STL, named by
-#'   file basename. Each element is a list with `coefficients` and
+#' @return A list with one element per successfully-processed STL, named
+#'   by file basename. Each element is a list with `coefficients` and
 #'   `power_spectrum` (same structure as [spharm_from_directions()]).
-#'   Failed specimens are reported via warnings and omitted from the result.
+#'   Failed specimens are reported via warnings and omitted from the
+#'   result.
 #'
 #' @examples
 #' \dontrun{
 #' # Requires mesh extension
-#' install_lithicscarpattern_python(mesh = TRUE)
+#' install_spharmlithic_python(mesh = TRUE)
 #'
 #' result <- spharm_from_meshes(
 #'   stl_dir      = "data/3D_models",
@@ -60,7 +61,7 @@
 #' }
 #'
 #' @seealso [spharm_from_directions()], [spharm_to_dataframe()],
-#'   [install_lithicscarpattern_python()]
+#'   [install_spharmlithic_python()]
 #'
 #' @export
 spharm_from_meshes <- function(
@@ -72,19 +73,19 @@ spharm_from_meshes <- function(
     pre_decimate_threshold  = 3000000,
     pre_decimate_target     = 500000,
     verbose                 = TRUE) {
-
+  
   if (!dir.exists(stl_dir)) {
     stop("Directory does not exist: ", stl_dir, call. = FALSE)
   }
-
+  
   # Pre-flight: warn early if mesh extension isn't installed.
   if (!reticulate::py_module_available("trimesh") ||
       !reticulate::py_module_available("open3d")) {
     stop("STL pipeline requires `trimesh` and `open3d`. Install with:\n",
-         "  install_lithicscarpattern_python(mesh = TRUE)",
+         "  install_spharmlithic_python(mesh = TRUE)",
          call. = FALSE)
   }
-
+  
   py_result <- sh_py$api$spharm_from_meshes(
     stl_dir                 = normalizePath(stl_dir, mustWork = TRUE),
     lmax                    = as.integer(lmax),
@@ -95,7 +96,7 @@ spharm_from_meshes <- function(
     pre_decimate_target     = as.integer(pre_decimate_target),
     verbose                 = as.logical(verbose)
   )
-
+  
   # Convert. Failed specimens come back as Python None and are skipped.
   result <- list()
   for (id in names(py_result)) {

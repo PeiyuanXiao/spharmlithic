@@ -1,4 +1,4 @@
-name: r-lithicscarpattern
+name: r-spharmlithic
 channels:
   - conda-forge
 dependencies:

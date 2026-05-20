@@ -1,4 +1,4 @@
 library(testthat)
-library(lithicscarpattern)
+library(spharmlithic)
 
-test_check("lithicscarpattern")
+test_check("spharmlithic")

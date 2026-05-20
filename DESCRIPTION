@@ -1,15 +1,17 @@
-Package: lithicscarpattern
-Title: Lithic Flaking Scar Orientation Alignment and Spherical Harmonic Analysis
-Version: 0.2.0
+Package: spharmlithic
+Title: Spherical Harmonic Analysis of Lithic Analysis
+Version: 0.3.0
 Authors@R:
     person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"))
-Description: A complete toolkit for the geometric alignment, spherical
-    harmonic decomposition, and statistical analysis of three-dimensional
+Description: A complete toolkit for the geometric alignment, directional
+    statistics, and spherical harmonic analysis of three-dimensional
     lithic flaking scar orientation data. Provides two alignment pipelines
-    (SVD and Lin 2024), classical orientation statistics (SPI, E, I), and
-    spherical harmonic analysis via a Python backend (von Mises-Fisher
-    kernel density estimation followed by Driscoll-Healy spherical harmonic
-    expansion using pyshtools).
+    (SVD and Lin 2024), classical orientation statistics (SPI with
+    Clarkson length weighting, elongation/isotropy from the orientation
+    tensor), and a Python-backed spherical harmonic pipeline (von
+    Mises-Fisher kernel density estimation followed by Driscoll-Healy
+    spherical harmonic expansion via pyshtools), supporting both
+    direction-vector and mesh-based inputs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
