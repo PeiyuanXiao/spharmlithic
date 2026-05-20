@@ -9,25 +9,25 @@
 #'
 #' ### Alignment pipelines
 #' * [align_scar()] / [align_scar_batch()] — Three-step SVD pipeline
-#'   (rotate → translate → in-plane rotate).
+#'   (rotate -> translate -> in-plane rotate).
 #' * [align_morph()] / [align_morph_batch()] — Two-step Lin 2024 pipeline
-#'   (morphological normal rotation → longest-scar translation).
-#'
-#' ### Plane deviation analysis
-#' * [compute_plane_angle()] — Angle between morphological and SVD planes.
-#' * [compute_scar_plane()] — Mean perpendicular distance of scar endpoints
-#'   from morphological plane.
+#'   (morphological normal rotation -> longest-scar translation).
 #'
 #' ### Classical orientation statistics
-#' * [compute_SPI()] — Scar Pattern Index (Clarkson method).
+#' * [compute_SPI()] — Scar Pattern Index (Clarkson 2013); supports both
+#'   unit-vector and length-weighted variants.
+#' * [compute_spi_angle()] — SPI converted to expected pairwise angle
+#'   (Clarkson 2013).
 #' * [compute_EI()] — Elongation (E) and Isotropy (I) from the
 #'   orientation tensor.
 #'
 #' ### Spherical harmonic analysis (Python-backed)
 #' * [install_lithicscarpattern_python()] — One-time Python backend setup.
 #' * [use_lithicscarpattern_python()] — Point at an existing Python env.
-#' * [spharm_from_directions()] — Directions → vMF KDE → SPHARM.
-#' * [spharm_from_meshes()] — STL meshes → spherical interpolation → SPHARM.
+#' * [spharm_from_directions()] — Direction vectors -> vMF KDE -> SPHARM.
+#' * [spharm_from_meshes()] — STL meshes -> spherical interpolation -> SPHARM.
+#' * [spharm_reconstruct()] — Inverse transform: coefficients -> spherical
+#'   density grid (for visualisation).
 #' * [spharm_to_dataframe()] — Flatten results for CSV export.
 #'
 #' ### 3-D visualisation (Plotly helpers)

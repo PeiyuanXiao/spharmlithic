@@ -2,7 +2,7 @@ Package: lithicscarpattern
 Title: Lithic Flaking Scar Orientation Alignment and Spherical Harmonic Analysis
 Version: 0.2.0
 Authors@R:
-    person("Your", "Name", , "you@example.com", role = c("aut", "cre"))
+    person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"))
 Description: A complete toolkit for the geometric alignment, spherical
     harmonic decomposition, and statistical analysis of three-dimensional
     lithic flaking scar orientation data. Provides two alignment pipelines

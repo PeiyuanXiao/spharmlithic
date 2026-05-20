@@ -1,10 +1,11 @@
 """
 kde_to_spharm.py
 ================
-Interpolate KDE values onto a Driscoll-Healy grid and run spherical
-harmonic expansion. Outputs raw coefficients and per-degree power.
+Interpolate KDE values onto a Driscoll-Healy grid, run spherical harmonic
+expansion (forward), and reconstruct from coefficients (inverse).
 
-Trimmed: no spectral entropy, no SHE, no variance analysis.
+Outputs raw coefficients and per-degree power. No spectral entropy / SHE /
+variance analysis - those are left to the R side.
 """
 
 import numpy as np
@@ -71,7 +72,7 @@ def kde_vector_to_dh_grid(kde_vec: np.ndarray,
 
 
 # =============================================================================
-# DH grid -> SH coefficients + power spectrum
+# DH grid -> SH coefficients + power spectrum (forward transform)
 # =============================================================================
 
 def compute_spharm_features(grid_2d: np.ndarray,
@@ -92,3 +93,52 @@ def compute_spharm_features(grid_2d: np.ndarray,
         "coefficients":   np.asarray(clm.coeffs),
         "power_spectrum": np.asarray(clm.spectrum())[:lmax + 1],
     }
+
+
+# =============================================================================
+# SH coefficients -> DH grid (inverse transform)
+# =============================================================================
+
+def reconstruct_from_coeffs(coeffs: np.ndarray,
+                            grid_size: int = 64) -> np.ndarray:
+    """
+    Inverse spherical harmonic transform.
+
+    Given a coefficient array of shape (2, lmax+1, lmax+1), reconstruct
+    the corresponding scalar field on a Driscoll-Healy grid. Negative
+    values introduced by finite-degree truncation are clipped to zero.
+
+    Parameters
+    ----------
+    coeffs    : ndarray, shape (2, lmax+1, lmax+1)  4pi-normalized SH coeffs.
+                Real-valued. (R side strips imaginary parts before calling.)
+    grid_size : int. Latitude resolution of the output grid; longitude
+                resolution is 2 * grid_size.
+
+    Returns
+    -------
+    grid_2d : ndarray, shape (grid_size, 2*grid_size).
+              Non-negative reconstructed density.
+
+    Notes
+    -----
+    The output grid size is determined by `grid_size`, NOT by the lmax
+    of the input coefficients. pyshtools internally upsamples the SH
+    expansion onto the requested grid.
+    """
+    coeffs = np.asarray(coeffs, dtype=np.float64)
+    if coeffs.ndim != 3 or coeffs.shape[0] != 2:
+        raise ValueError(
+            f"coeffs must have shape (2, lmax+1, lmax+1); got {coeffs.shape}"
+        )
+
+    clm = pysh.SHCoeffs.from_array(coeffs, normalization='4pi', csphase=1)
+
+    # extend='False' so output shape is exactly (grid_size, 2*grid_size).
+    sh_grid = clm.expand(grid='DH', lmax=grid_size - 1, extend=False)
+    grid_2d = np.asarray(sh_grid.to_array(), dtype=np.float64)
+
+    # Clip negative values from truncation noise.
+    grid_2d = np.clip(grid_2d, 0, None)
+
+    return grid_2d

@@ -2,15 +2,18 @@
 # (this is a starter NAMESPACE; regenerate with devtools::document() once
 #  all roxygen tags are in place)
 
-# Existing alignment & stats functions
+# Existing alignment functions
 export(align_morph)
 export(align_morph_batch)
 export(align_scar)
 export(align_scar_batch)
+
+# Classical orientation statistics
 export(compute_EI)
 export(compute_SPI)
-export(compute_plane_angle)
-export(compute_scar_plane)
+export(compute_spi_angle)
+
+# Geometry utilities
 export(get_rot_matrix)
 export(get_scar_length)
 
@@ -27,11 +30,12 @@ export(get_panel_json)
 export(make_scene)
 export(panel_layout)
 
-# New: SPHARM (Python-backed)
+# SPHARM (Python-backed)
 export(install_lithicscarpattern_python)
 export(use_lithicscarpattern_python)
 export(spharm_from_directions)
 export(spharm_from_meshes)
+export(spharm_reconstruct)
 export(spharm_to_dataframe)
 
 # Pipe re-export
