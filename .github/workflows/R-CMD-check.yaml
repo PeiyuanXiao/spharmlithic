@@ -35,7 +35,8 @@ jobs:
       - name: Create spharmlithic Python environment
         shell: Rscript {0}
         run: |
-          devtools::load_all(".")
+          install.packages(".", repos = NULL, type = "source")
+          library(spharmlithic)
           install_spharmlithic_python(mesh = TRUE)
 
       # ── R CMD check ──────────────────────────────────────
