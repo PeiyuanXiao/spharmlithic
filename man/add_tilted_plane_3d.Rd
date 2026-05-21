@@ -44,5 +44,5 @@ fig
 }
 \seealso{
 \code{\link[=add_plane_3d]{add_plane_3d()}}, \code{\link[=add_arrow_3d]{add_arrow_3d()}}, \code{\link[=build_panel_scar]{build_panel_scar()}},
-\code{\link[=build_panels_morph]{build_panels_morph()}}
+\code{\link[=build_panel_morph]{build_panel_morph()}}
 }

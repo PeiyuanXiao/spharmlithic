@@ -30,6 +30,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![R ≥
 4.5](https://img.shields.io/badge/R-%E2%89%A5%204.5-276DC3?logo=r)](https://cran.r-project.org/)
+[![R-CMD-check](https://github.com/PeiyuanXiao/spharmlithic/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PeiyuanXiao/spharmlithic/actions/workflows/R-CMD-check.yaml)
 
 **spharmlithic** is an R package for the quantitative analysis of 3D
 stone artefacts. It supports two complementary lines of inquiry:
@@ -114,7 +115,7 @@ ei  <- compute_EI(aligned$d_x, aligned$d_y, aligned$d_z)
 sh <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)
 
 # 5. Export an interactive HTML report
-export_alignment_html_svd(aligned, file = "alignment_report.html")
+export_alignment_html_svd(aligned, out_path = "alignment_report.html")
 
 # ── Track A: morphological analysis ─────────────────────────
 
@@ -161,7 +162,7 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 |:---|:---|
 | `add_scars_3d()` / `add_arrow_3d()` | Add scar vectors or arrows to a Plotly scene |
 | `add_plane_3d()` / `add_tilted_plane_3d()` | Add reference planes to a 3D plot |
-| `build_panel_scar()` / `build_panels_morph()` | Assemble multi-panel Plotly figures |
+| `build_panel_scar()` / `build_panel_morph()` | Assemble multi-panel Plotly figures |
 | `export_alignment_html_svd()` | Export SVD alignment as a self-contained HTML file |
 | `export_alignment_html_lin2024()` | Export Lin 2024 alignment as a self-contained HTML |
 

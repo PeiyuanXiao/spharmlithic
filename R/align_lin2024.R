@@ -153,7 +153,7 @@ align_morph <- function(df_group) {
 #'
 #' @examples
 #' \dontrun{
-#' panels <- build_panels_morph("S001", raw_data)
+#' panels <- build_panel_morph("S001", raw_data)
 #' panels$p0  # raw data
 #' panels$p2  # fully aligned
 #' }
@@ -163,7 +163,7 @@ align_morph <- function(df_group) {
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
 #' @export
-build_panels_morph <- function(demo_id, raw_data) {
+build_panel_morph <- function(demo_id, raw_data) {
   df <- dplyr::filter(raw_data, .data$ID == demo_id)
   
   s0         <- as.matrix(df[, c("Start_X", "Start_Y", "Start_Z")])
@@ -223,7 +223,7 @@ build_panels_morph <- function(demo_id, raw_data) {
 #' `raw_data` and writes a standalone interactive HTML file to `out_path`.
 #'
 #' @param raw_data A data frame with the required columns (see
-#'   [build_panels_morph()]).
+#'   [build_panel_morph()]).
 #' @param out_path Character. File path for the output HTML.
 #'
 #' @return Invisibly, the `out_path` string.
@@ -240,14 +240,14 @@ build_panels_morph <- function(demo_id, raw_data) {
 #' export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
 #' }
 #'
-#' @seealso [build_panels_morph()], [export_alignment_html_svd()]
+#' @seealso [build_panel_morph()], [export_alignment_html_svd()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON
 #' @export
 export_alignment_html_lin2024 <- function(raw_data, out_path) {
   all_ids     <- unique(raw_data$ID)
-  panels_list <- lapply(as.character(all_ids), build_panels_morph,
+  panels_list <- lapply(as.character(all_ids), build_panel_morph,
                         raw_data = raw_data)
   names(panels_list) <- as.character(all_ids)
   

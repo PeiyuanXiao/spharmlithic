@@ -58,7 +58,7 @@ density grid (for visualisation).
 \subsection{Visualisation builders}{
 \itemize{
 \item \code{\link[=build_panel_scar]{build_panel_scar()}} — SVD four-panel figure for one specimen.
-\item \code{\link[=build_panels_morph]{build_panels_morph()}} — Lin 2024 three-panel figure for one specimen.
+\item \code{\link[=build_panel_morph]{build_panel_morph()}} — Lin 2024 three-panel figure for one specimen.
 }
 }
 

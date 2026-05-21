@@ -5,3 +5,4 @@
 ^\.positai$
 ^\.claude$
 ^README\.qmd$
+^\.github$

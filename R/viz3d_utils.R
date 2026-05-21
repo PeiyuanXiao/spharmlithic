@@ -41,7 +41,7 @@
 #' }
 #'
 #' @seealso [add_arrow_3d()], [add_plane_3d()], [build_panel_scar()],
-#'   [build_panels_morph()]
+#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
@@ -102,7 +102,7 @@ add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
 #' }
 #'
 #' @seealso [add_scars_3d()], [add_plane_3d()], [build_panel_scar()],
-#'   [build_panels_morph()]
+#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
@@ -163,7 +163,7 @@ add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
 #' }
 #'
 #' @seealso [add_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
-#'   [build_panels_morph()]
+#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_tilted_plane_3d <- function(fig, center, normal, half_size) {
@@ -217,7 +217,7 @@ add_tilted_plane_3d <- function(fig, center, normal, half_size) {
 #' }
 #'
 #' @seealso [add_tilted_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
-#'   [build_panels_morph()]
+#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
 #' @export
 add_plane_3d <- function(fig, cx, cy, z0, half_size) {
@@ -284,7 +284,7 @@ make_scene <- function() {
 #' fig
 #' }
 #'
-#' @seealso [make_scene()], [build_panel_scar()], [build_panels_morph()]
+#' @seealso [make_scene()], [build_panel_scar()], [build_panel_morph()]
 #' @export
 panel_layout <- function(title_text) {
   list(

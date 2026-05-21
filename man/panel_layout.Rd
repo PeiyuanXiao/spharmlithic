@@ -27,5 +27,5 @@ fig
 
 }
 \seealso{
-\code{\link[=make_scene]{make_scene()}}, \code{\link[=build_panel_scar]{build_panel_scar()}}, \code{\link[=build_panels_morph]{build_panels_morph()}}
+\code{\link[=make_scene]{make_scene()}}, \code{\link[=build_panel_scar]{build_panel_scar()}}, \code{\link[=build_panel_morph]{build_panel_morph()}}
 }

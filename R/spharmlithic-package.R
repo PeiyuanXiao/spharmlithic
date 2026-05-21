@@ -39,7 +39,7 @@
 #'
 #' ### Visualisation builders
 #' * [build_panel_scar()] — SVD four-panel figure for one specimen.
-#' * [build_panels_morph()] — Lin 2024 three-panel figure for one specimen.
+#' * [build_panel_morph()] — Lin 2024 three-panel figure for one specimen.
 #'
 #' ### Geometry utilities
 #' * [get_rot_matrix()] — Rodrigues rotation matrix between two unit vectors.

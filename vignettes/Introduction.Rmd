@@ -140,7 +140,7 @@ panels
 To export an interactive HTML report:
 
 ```{r export-html}
-export_alignment_html_svd(aligned_svd, file = "alignment_report.html")
+export_alignment_html_svd(aligned_svd, out_path = "alignment_report.html")
 ```
 
 ### 5. Spherical harmonic analysis (Track B)
