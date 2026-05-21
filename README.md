@@ -96,23 +96,33 @@ library(readxl)
 # Activate the Python back-end (skip if you only need alignment / statistics)
 use_spharmlithic_python("r-spharmlithic")
 
-# 1. Read scar orientation data
-raw_data <- read_excel("Scar_orientation_data.xlsx")
+# ── Track B: scar pattern analysis ──────────────────────────
 
-# 2. Align all specimens using the SVD pipeline
+# 1. Load the bundled example scar data
+scar_path <- system.file("extdata", "example_scars.xlsx",
+                          package = "spharmlithic")
+raw_data  <- read_excel(scar_path)
+
+# 2. Align all specimens (SVD pipeline)
 aligned <- align_scar_batch(raw_data)
 
-# 3. Compute the Scar Pattern Index (SPI)
+# 3. Descriptive statistics
 spi <- compute_SPI(aligned$dx, aligned$dy, aligned$dz)
+ei  <- compute_EI(aligned)
 
-# 4. Compute the Elongation ratio and Isotropy ratio
-ei <- compute_EI(aligned)
-
-# 5. Spherical harmonic analysis on aligned directions (Track B)
+# 4. Spherical harmonic analysis on aligned directions
 sh <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)
 
-# 6. Export an interactive HTML report of the alignment
+# 5. Export an interactive HTML report
 export_alignment_html_svd(aligned, file = "alignment_report.html")
+
+# ── Track A: morphological analysis ─────────────────────────
+
+# 6. Point to the bundled example meshes
+stl_dir <- system.file("extdata", "meshes", package = "spharmlithic")
+
+# 7. Spherical harmonic analysis on 3D shape
+sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 ```
 
 ------------------------------------------------------------------------

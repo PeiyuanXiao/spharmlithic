@@ -1,5 +1,5 @@
 Package: spharmlithic
-Title: Spherical Harmonic Analysis of Lithic Analysis
+Title: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns
 Version: 0.3.0
 Authors@R:
     person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"))
@@ -35,3 +35,4 @@ Suggests:
     rmarkdown
 Config/testthat/edition: 3
 SystemRequirements: Python (>= 3.9)
+VignetteBuilder: knitr
