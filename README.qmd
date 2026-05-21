@@ -146,9 +146,9 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 
 | Function | Description |
 |:---------------------|:-------------------------------------------------|
-| `compute_SPI()` | Scar Pattern Index — overall directionality of removals |
-| `compute_spi_angle()` | Angular variant of SPI |
-| `compute_EI()` | Elongation Index — ratio of scar length axes |
+| `compute_SPI()` | Scar Pattern Index |
+| `compute_spi_angle()` | Scar Pattern Angle |
+| `compute_EI()` | Elongation and Isotropy ratio |
 | `get_scar_length()` | Individual scar lengths from coordinate data |
 | `get_rot_matrix()` | Extract the rotation matrix used during alignment |
 
@@ -156,9 +156,9 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 
 | Function | Description |
 |:-------------------|:--------------------------------------------------|
-| `spharm_from_directions()` | Compute coefficients from scar orientation vectors (core scar patterns) |
-| `spharm_from_meshes()` | Compute coefficients from 3D mesh surfaces (core morphology; requires mesh extras) |
-| `spharm_reconstruct()` | Reconstruct a density surface from coefficients |
+| `spharm_from_directions()` | Compute SH coefficients from scar orientation vectors (core scar patterns) |
+| `spharm_from_meshes()` | Compute SH coefficients from 3D mesh surfaces (core morphology; requires mesh extras) |
+| `spharm_reconstruct()` | Reconstruct a density surface from SH coefficients |
 | `spharm_to_dataframe()` | Convert results to a wide-format data frame |
 
 #### Visualisation & Export
