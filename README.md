@@ -15,7 +15,8 @@
 
 <p align="center">
 
-<b>Spherical Harmonic Analysis of Lithic Flaking Scar Patterns</b>
+<b>Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar
+Patterns</b>
 
 </p>
 
@@ -30,17 +31,19 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 [![R ≥
 4.5](https://img.shields.io/badge/R-%E2%89%A5%204.5-276DC3?logo=r)](https://cran.r-project.org/)
 
-**spharmlithic** is an R package for aligning, summarising, and
-comparing flake scar orientation data recorded on 3D stone artefact
-models. It brings together two coordinate-alignment pipelines, a suite
-of descriptive statistics, interactive 3D visualisation via Plotly, and
-an optional Python back-end for spherical harmonic decomposition of scar
-density on the unit sphere — all in a single, script-based workflow that
-goes from raw orientation measurements to publication-ready outputs.
+**spharmlithic** is an R package for the quantitative analysis of 3D
+stone artefacts. It supports two complementary lines of inquiry:
+**artefact morphology** (overall 3D shape from mesh surfaces) and
+**flaking scar patterns** (orientation and organisation of flaking
+removals). The package brings together two coordinate-alignment
+pipelines, a suite of descriptive statistics, interactive 3D
+visualisation via Plotly, and an optional Python back-end for spherical
+harmonic decomposition — all in a single, script-based workflow that
+goes from raw data to publication-ready outputs.
 
 The package is designed for **lithic analysts** who work with 3D-scanned
-cores or other flaked pieces and want reproducible results without
-requiring prior experience with package development or Python.
+cores, shaped tools or other artifacts and want reproducible results
+without requiring prior experience with package development or Python.
 
 ------------------------------------------------------------------------
 
@@ -65,7 +68,7 @@ library(spharmlithic)
 # First-time setup — creates a dedicated conda environment "r-spharmlithic"
 install_spharmlithic_python()
 
-# If you also need mesh-based analysis (Track A), install the mesh extras:
+# If you also need mesh-based morphological analysis (Track A), install the mesh extras:
 install_spharmlithic_python(mesh = TRUE)
 ```
 
@@ -137,8 +140,8 @@ export_alignment_html_svd(aligned, file = "alignment_report.html")
 
 | Function | Description |
 |:---|:---|
-| `spharm_from_directions()` | Estimate coefficients from orientation vectors (Track B) |
-| `spharm_from_meshes()` | Estimate coefficients from 3D mesh files (Track A; requires mesh extras) |
+| `spharm_from_directions()` | Compute coefficients from scar orientation vectors (core scar patterns) |
+| `spharm_from_meshes()` | Compute coefficients from 3D mesh surfaces (core morphology; requires mesh extras) |
 | `spharm_reconstruct()` | Reconstruct a density surface from coefficients |
 | `spharm_to_dataframe()` | Convert results to a wide-format data frame |
 
@@ -170,21 +173,26 @@ common coordinate frame:
 
 ### 🌐 Spherical Harmonic Analysis
 
-Spherical harmonic (SPHARM) decomposition represents how scar removal
-directions are distributed across the surface of a sphere, enabling
-quantitative, frequency-based comparison of flaking strategies.
+Spherical harmonic (SPHARM) decomposition expands a function defined on
+the sphere into a series of orthogonal basis functions, analogous to a
+Fourier transform on a circle. In lithic analysis this provides a
+compact, quantitative representation that supports frequency-based
+comparison across specimens or assemblages.
 
-**spharmlithic** supports two input tracks:
+**spharmlithic** applies this framework to two complementary aspects of
+stone artefact variability:
 
-- **Track A — from 3D meshes.** `spharm_from_meshes()` reads STL files,
-  extracts surface normals from flake-scar facets, and projects them
-  onto the unit sphere before computing spherical harmonic coefficients.
-  Requires the mesh extras (`install_spharmlithic_python(mesh = TRUE)`).
+- **Track A — 3D morphology.** `spharm_from_meshes()` reads 3D mesh
+  files (.stl/.ply), extracts surface normals, and maps them onto the
+  unit sphere to characterise overall shape via spherical harmonic
+  coefficients. This track requires the mesh extras
+  (`install_spharmlithic_python(mesh = TRUE)`).
 
-- **Track B — from direction vectors.** `spharm_from_directions()` takes
-  pre-computed scar orientation vectors, applies von Mises-Fisher kernel
+- **Track B — Scar patterns.** `spharm_from_directions()` takes
+  pre-computed scar orientation vectors, applies von Mises–Fisher kernel
   density estimation on the sphere, and decomposes the resulting density
-  into spherical harmonic coefficients.
+  into spherical harmonic coefficients. This captures how flaking
+  removals are organised on core reduction.
 
 In both cases, `spharm_reconstruct()` regenerates a smooth density grid
 from the coefficients, and `spharm_to_dataframe()` flattens everything
@@ -215,6 +223,11 @@ Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
 spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
 2574–2592.
 
+Ye, Z., Pei, S. W., Ma. D. D., Li, H., Marwick, B. (2026). Spherical
+harmonic analysis of faceted spheroids identifies shaping strategies and
+standardisation at Qianshangying (North China). *Journal of
+Archaeological Science*, 190, 106551.
+
 ------------------------------------------------------------------------
 
 ### 📝 Citation
@@ -222,7 +235,8 @@ spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
 If you use **spharmlithic** in your research, please cite it as:
 
 > Xiao P. Y. (2025). spharmlithic: Spherical Harmonic Analysis of Lithic
-> Analysis. R package. https://github.com/PeiyuanXiao/spharmlithic
+> Morphology and Flaking Scar Patterns. R package.
+> https://github.com/PeiyuanXiao/spharmlithic
 
 ------------------------------------------------------------------------
 
