@@ -208,26 +208,26 @@ build_panel_scar <- function(demo_id, raw_data) {
     add_scars_3d(s0[,1], s0[,2], s0[,3], e0[,1], e0[,2], e0[,3]) %>%
     add_arrow_3d(center_raw, normal_svd, arr_scale) %>%
     add_tilted_plane_3d(center_raw, normal_svd, half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 0</b>: Raw data — SVD normal shown"))
+    plotly::layout(panel_layout("<b>Step 0</b>: Raw data \u2014 SVD normal shown"))
   
   p1 <- plotly::plot_ly() %>%
     add_scars_3d(s1[,1], s1[,2], s1[,3], e1[,1], e1[,2], e1[,3]) %>%
     add_arrow_3d(center_r1, c(0, 0, 1), arr_scale) %>%
     add_plane_3d(center_r1[1], center_r1[2], center_r1[3], half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 1</b>: Rotate — SVD normal aligned to Z-axis"))
+    plotly::layout(panel_layout("<b>Step 1</b>: Rotate \u2014 SVD normal aligned to Z-axis"))
   
   p2 <- plotly::plot_ly() %>%
     add_scars_3d(s2[,1], s2[,2], s2[,3], e2[,1], e2[,2], e2[,3]) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 2</b>: Translate — center moved to origin"))
+    plotly::layout(panel_layout("<b>Step 2</b>: Translate \u2014 center moved to origin"))
   
   p3 <- plotly::plot_ly() %>%
     add_scars_3d(s3[,1], s3[,2], s3[,3], e3[,1], e3[,2], e3[,3]) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_arrow_3d(c(0, 0, 0), c(1, 0, 0), arr_scale, color = "orange") %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 3</b>: Rotate XY — PCA main axis aligned to X-axis"))
+    plotly::layout(panel_layout("<b>Step 3</b>: Rotate XY \u2014 PCA main axis aligned to X-axis"))
   
   list(p0 = p0, p1 = p1, p2 = p2, p3 = p3)
 }

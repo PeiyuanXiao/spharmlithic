@@ -29,6 +29,7 @@ Imports:
     tibble,
     utils
 Suggests:
+    rstudioapi,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown

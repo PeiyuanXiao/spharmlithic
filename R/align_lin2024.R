@@ -194,7 +194,7 @@ build_panels_morph <- function(demo_id, raw_data) {
                  highlight_idx = longest_idx) %>%
     add_arrow_3d(center_raw, normal_raw, arr_scale) %>%
     add_tilted_plane_3d(center_raw, normal_raw, half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 0</b>: Raw data — arbitrary orientation"))
+    plotly::layout(panel_layout("<b>Step 0</b>: Raw data \u2014 arbitrary orientation"))
   
   p1 <- plotly::plot_ly() %>%
     add_scars_3d(s1[,1], s1[,2], s1[,3],
@@ -202,7 +202,7 @@ build_panels_morph <- function(demo_id, raw_data) {
                  highlight_idx = longest_idx) %>%
     add_arrow_3d(center_r1, c(0, 0, 1), arr_scale) %>%
     add_plane_3d(center_r1[1], center_r1[2], center_r1[3], half_sz) %>%
-    plotly::layout(panel_layout("<b>Step 1</b>: Rotate — normal aligned to Z-axis"))
+    plotly::layout(panel_layout("<b>Step 1</b>: Rotate \u2014 normal aligned to Z-axis"))
   
   p2 <- plotly::plot_ly() %>%
     add_scars_3d(s2[,1], s2[,2], s2[,3],
@@ -211,7 +211,7 @@ build_panels_morph <- function(demo_id, raw_data) {
     add_arrow_3d(c(0, 0, z_longest), c(0, 0, 1), arr_scale) %>%
     add_plane_3d(0, 0, z_longest, half_sz) %>%
     plotly::layout(panel_layout(
-      "<b>Step 2 (Lin 2024)</b>: Translate — longest scar start to (0,0)"))
+      "<b>Step 2 (Lin 2024)</b>: Translate \u2014 longest scar start to (0,0)"))
   
   list(p0 = p0, p1 = p1, p2 = p2)
 }

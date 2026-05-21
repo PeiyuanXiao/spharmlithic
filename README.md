@@ -1,0 +1,232 @@
+# spharmlithic
+
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
+
+<p align="center">
+
+<br /> <samp>R PACKAGE</samp> <br />
+
+<h1 align="center">
+
+<b>spharmlithic</b>
+
+</h1>
+
+<p align="center">
+
+<b>Spherical Harmonic Analysis of Lithic Flaking Scar Patterns</b>
+
+</p>
+
+<hr />
+
+</p>
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![R ≥
+4.5](https://img.shields.io/badge/R-%E2%89%A5%204.5-276DC3?logo=r)](https://cran.r-project.org/)
+
+**spharmlithic** is an R package for aligning, summarising, and
+comparing flake scar orientation data recorded on 3D stone artefact
+models. It brings together two coordinate-alignment pipelines, a suite
+of descriptive statistics, interactive 3D visualisation via Plotly, and
+an optional Python back-end for spherical harmonic decomposition of scar
+density on the unit sphere — all in a single, script-based workflow that
+goes from raw orientation measurements to publication-ready outputs.
+
+The package is designed for **lithic analysts** who work with 3D-scanned
+cores or other flaked pieces and want reproducible results without
+requiring prior experience with package development or Python.
+
+------------------------------------------------------------------------
+
+### 📦 Installation
+
+#### Step 1 — Install the R package
+
+``` r
+# install.packages("remotes")
+remotes::install_github("PeiyuanXiao/spharmlithic")
+```
+
+#### Step 2 — Install the Python back-end
+
+Spherical harmonic analysis is handled by a bundled Python module that
+runs behind the scenes via **reticulate**. If you only need alignment
+and descriptive statistics you can skip this step entirely.
+
+``` r
+library(spharmlithic)
+
+# First-time setup — creates a dedicated conda environment "r-spharmlithic"
+install_spharmlithic_python()
+
+# If you also need mesh-based analysis (Track A), install the mesh extras:
+install_spharmlithic_python(mesh = TRUE)
+```
+
+On subsequent R sessions, activate the environment with:
+
+``` r
+use_spharmlithic_python("r-spharmlithic")
+```
+
+> **Note:** A working
+> [conda](https://docs.conda.io/en/latest/miniconda.html) installation
+> is required. If conda is not on your system PATH, point R to it before
+> calling the install function — for example by adding
+> `Sys.setenv(RETICULATE_CONDA = "path/to/conda")` to your
+> `~/.Rprofile`.
+
+------------------------------------------------------------------------
+
+### 🚀 Quick Start
+
+``` r
+library(spharmlithic)
+library(readxl)
+
+# Activate the Python back-end (skip if you only need alignment / statistics)
+use_spharmlithic_python("r-spharmlithic")
+
+# 1. Read scar orientation data
+raw_data <- read_excel("Scar_orientation_data.xlsx")
+
+# 2. Align all specimens using the SVD pipeline
+aligned <- align_scar_batch(raw_data)
+
+# 3. Compute the Scar Pattern Index (SPI)
+spi <- compute_SPI(aligned$dx, aligned$dy, aligned$dz)
+
+# 4. Compute the Elongation ratio and Isotropy ratio
+ei <- compute_EI(aligned)
+
+# 5. Spherical harmonic analysis on aligned directions (Track B)
+sh <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)
+
+# 6. Export an interactive HTML report of the alignment
+export_alignment_html_svd(aligned, file = "alignment_report.html")
+```
+
+------------------------------------------------------------------------
+
+### 🔧 Main Functions
+
+#### Alignment
+
+| Function | Description |
+|:---|:---|
+| `align_scar()` / `align_scar_batch()` | SVD three-step alignment of scar orientation vectors |
+| `align_morph()` / `align_morph_batch()` | Two-step alignment following Lin et al. (2024) |
+
+#### Descriptive Statistics
+
+| Function | Description |
+|:---|:---|
+| `compute_SPI()` | Scar Pattern Index — overall directionality of removals |
+| `compute_spi_angle()` | Angular variant of SPI |
+| `compute_EI()` | Elongation Index — ratio of scar length axes |
+| `get_scar_length()` | Individual scar lengths from coordinate data |
+| `get_rot_matrix()` | Extract the rotation matrix used during alignment |
+
+#### Spherical Harmonic Analysis (Python back-end)
+
+| Function | Description |
+|:---|:---|
+| `spharm_from_directions()` | Estimate coefficients from orientation vectors (Track B) |
+| `spharm_from_meshes()` | Estimate coefficients from 3D mesh files (Track A; requires mesh extras) |
+| `spharm_reconstruct()` | Reconstruct a density surface from coefficients |
+| `spharm_to_dataframe()` | Convert results to a wide-format data frame |
+
+#### Visualisation & Export
+
+| Function | Description |
+|:---|:---|
+| `add_scars_3d()` / `add_arrow_3d()` | Add scar vectors or arrows to a Plotly scene |
+| `add_plane_3d()` / `add_tilted_plane_3d()` | Add reference planes to a 3D plot |
+| `build_panel_scar()` / `build_panels_morph()` | Assemble multi-panel Plotly figures |
+| `export_alignment_html_svd()` | Export SVD alignment as a self-contained HTML file |
+| `export_alignment_html_lin2024()` | Export Lin 2024 alignment as a self-contained HTML |
+
+------------------------------------------------------------------------
+
+### ↔️ Two Alignment Pipelines
+
+**spharmlithic** offers two ways to bring scar orientation data into a
+common coordinate frame:
+
+|  | SVD alignment | Lin 2024 alignment |
+|:---|:---|:---|
+| **Functions** | `align_scar()` / `align_scar_batch()` | `align_morph()` / `align_morph_batch()` |
+| **Approach** | Singular value decomposition of the full direction-vector cloud | Two-step rotation along a morphological long-axis (Lin et al. 2024) |
+| **Best suited for** | General-purpose analysis; no predefined axis required | Cases where a technological axis (e.g. platform–base) can be identified |
+| **Output** | Identical format — all downstream functions work with either | ← same |
+
+------------------------------------------------------------------------
+
+### 🌐 Spherical Harmonic Analysis
+
+Spherical harmonic (SPHARM) decomposition represents how scar removal
+directions are distributed across the surface of a sphere, enabling
+quantitative, frequency-based comparison of flaking strategies.
+
+**spharmlithic** supports two input tracks:
+
+- **Track A — from 3D meshes.** `spharm_from_meshes()` reads STL files,
+  extracts surface normals from flake-scar facets, and projects them
+  onto the unit sphere before computing spherical harmonic coefficients.
+  Requires the mesh extras (`install_spharmlithic_python(mesh = TRUE)`).
+
+- **Track B — from direction vectors.** `spharm_from_directions()` takes
+  pre-computed scar orientation vectors, applies von Mises-Fisher kernel
+  density estimation on the sphere, and decomposes the resulting density
+  into spherical harmonic coefficients.
+
+In both cases, `spharm_reconstruct()` regenerates a smooth density grid
+from the coefficients, and `spharm_to_dataframe()` flattens everything
+into a tidy data frame for further analysis in R.
+
+------------------------------------------------------------------------
+
+### 📖 References
+
+Bretzke, K., & Conard, N. J. (2012). Evaluating morphological
+variability in lithic assemblages using 3D models of stone artifacts.
+*Journal of Archaeological Science*, 39(12), 3741–3749.
+
+Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
+patterning on cores using 3D recording techniques. *Journal of
+Archaeological Science*, 33(1), 132–142.
+
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
+T. (2024). A new method for quantifying flake scar organisation on cores
+using orientation statistics. *Journal of Archaeological Science*, 167,
+105998.
+
+McPherron, S. P. (2018). Additional statistical and graphical methods
+for analyzing site formation processes using artifact orientations.
+*PLoS ONE*, 13(1), e0190195.
+
+Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
+spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
+2574–2592.
+
+------------------------------------------------------------------------
+
+### 📝 Citation
+
+If you use **spharmlithic** in your research, please cite it as:
+
+> Xiao P. Y. (2025). spharmlithic: Spherical Harmonic Analysis of Lithic
+> Analysis. R package. https://github.com/PeiyuanXiao/spharmlithic
+
+------------------------------------------------------------------------
+
+### ⚖️ License
+
+This project is licensed under the **MIT License** — see the
+[LICENSE](LICENSE) file for details.
