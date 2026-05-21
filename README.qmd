@@ -112,8 +112,8 @@ raw_data  <- read_excel(scar_path)
 aligned <- align_scar_batch(raw_data)
 
 # 3. Descriptive statistics
-spi <- compute_SPI(aligned$dx, aligned$dy, aligned$dz)
-ei  <- compute_EI(aligned)
+spi <- compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
+ei  <- compute_EI(aligned$d_x, aligned$d_y, aligned$d_z)
 
 # 4. Spherical harmonic analysis on aligned directions
 sh <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)

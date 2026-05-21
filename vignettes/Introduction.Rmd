@@ -20,9 +20,9 @@ knitr::opts_chunk$set(
 **spharmlithic** supports two complementary lines of quantitative
 analysis on 3D stone artefacts:
 
-- **Track A — 3D morphology.** Spherical harmonic decomposition of
+- **Track A -- 3D morphology.** Spherical harmonic decomposition of
   3D mesh surfaces (.stl/.ply), capturing overall artefact shape.
-- **Track B — Scar patterns.** Alignment, descriptive statistics,
+- **Track B -- Scar patterns.** Alignment, descriptive statistics,
   and spherical harmonic decomposition of scar orientation vectors,
   capturing how flaking removals are organised on core reduction.
 
@@ -31,7 +31,7 @@ bundled with the package.
 
 ## Setup
 
-```{r load-package}
+```{r load-package, eval = TRUE, message = FALSE}
 library(spharmlithic)
 library(readxl)
 ```
@@ -50,7 +50,7 @@ use_spharmlithic_python("r-spharmlithic")
 
 ------------------------------------------------------------------------
 
-## Track B — Scar pattern analysis
+## Track B -- Scar pattern analysis
 
 ### 1. Load the example data
 
@@ -58,7 +58,7 @@ The package ships with a small Excel file containing scar orientation
 data for two experimental specimens (a Levallois core and a Discoid
 core):
 
-```{r load-scar-data}
+```{r load-scar-data, eval = TRUE}
 scar_path <- system.file("extdata", "example_scars.xlsx",
                           package = "spharmlithic")
 raw_data  <- read_excel(scar_path)
@@ -77,7 +77,7 @@ The SVD method defines three principal axes from the full set of scar
 direction vectors via singular value decomposition. It is
 general-purpose and does not require a predefined morphological axis.
 
-```{r align-svd}
+```{r align-svd, eval = TRUE}
 aligned_svd <- align_scar_batch(raw_data)
 head(aligned_svd)
 ```
@@ -89,7 +89,7 @@ morphological long-axis and then rotates around that axis to align the
 dominant flaking direction. It is best suited when a meaningful
 technological axis (e.g. the platform-base axis) can be identified.
 
-```{r align-lin}
+```{r align-lin, eval = TRUE}
 aligned_lin <- align_morph_batch(raw_data)
 head(aligned_lin)
 ```
@@ -105,15 +105,15 @@ use the SVD-aligned data for the rest of this vignette.
 The SPI quantifies the overall directionality of flaking removals.
 Higher values indicate a more unidirectional pattern.
 
-```{r spi}
-spi <- compute_SPI(aligned_svd$dx, aligned_svd$dy, aligned_svd$dz)
+```{r spi, eval = TRUE}
+spi <- compute_SPI(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
 spi
 ```
 
 An angular variant is also available:
 
-```{r spi-angle}
-spi_angle <- compute_spi_angle(aligned_svd)
+```{r spi-angle, eval = TRUE}
+spi_angle <- compute_spi_angle(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
 spi_angle
 ```
 
@@ -122,8 +122,8 @@ spi_angle
 The EI captures the elongation ratio and isotropy ratio of the scar
 pattern:
 
-```{r ei}
-ei <- compute_EI(aligned_svd)
+```{r ei, eval = TRUE}
+ei <- compute_EI(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
 ei
 ```
 
@@ -133,7 +133,7 @@ Interactive 3D plots can be generated with the built-in Plotly helpers:
 
 ```{r vis-3d}
 # Build a multi-panel figure for the SVD alignment
-panels <- build_panel_scar(aligned_svd)
+panels <- build_panel_scar(demo_id = "ClarksonEXP01", raw_data = raw_data)
 panels
 ```
 
@@ -171,7 +171,7 @@ head(df)
 
 ------------------------------------------------------------------------
 
-## Track A — Morphological analysis
+## Track A -- Morphological analysis
 
 Track A takes 3D mesh files (.stl/.ply) as input and characterises
 overall artefact shape via spherical harmonics. This requires the mesh
@@ -179,7 +179,7 @@ extras (`install_spharmlithic_python(mesh = TRUE)`).
 
 ### 1. Locate the example meshes
 
-```{r mesh-dir}
+```{r mesh-dir, eval = TRUE}
 stl_dir <- system.file("extdata", "meshes", package = "spharmlithic")
 list.files(stl_dir, pattern = "\\.(stl|ply)$")
 ```
@@ -207,7 +207,7 @@ head(df_morph)
 
 ## Comparing the two tracks
 
-| | Track A — 3D morphology | Track B — Scar patterns |
+| | Track A -- 3D morphology | Track B -- Scar patterns |
 |:---|:---|:---|
 | **Input** | 3D mesh files (.stl/.ply) | Scar orientation vectors (Excel / data frame) |
 | **What it captures** | Overall artefact shape | Organisation of flaking removals |
@@ -228,7 +228,7 @@ pipeline.
 
 Prepare an Excel or CSV file with the same column structure as the
 example data. At minimum you need columns identifying the specimen, the
-scar, and the three direction-vector components (dx, dy, dz). See
+scar, and the three direction-vector components (d_x, d_y, d_z). See
 `?align_scar_batch` for the expected format.
 
 ### 3D meshes (Track A)
