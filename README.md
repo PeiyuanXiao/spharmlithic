@@ -158,7 +158,7 @@ export_spharm_html(
 | Function | Description |
 |:---|:---|
 | `compute_SPI()` | Scar Pattern Index (unweighted by default; pass `lengths` for Clarkson’s original version) |
-| `compute_spi_angle()` | Scar Pattern Angle (angular conversion: $\theta = \arccos(\mathrm{SPI})$) |
+| `compute_spi_angle()` | Scar Pattern Angle (angular conversion: `θ = arccos(SPI)`) |
 | `compute_EI()` | Elongation and Isotropy ratio from the orientation tensor |
 | `get_scar_length()` | Individual scar lengths from coordinate data |
 | `get_rot_matrix()` | Rotation matrix between two 3D vectors (Rodrigues formula) |
@@ -323,12 +323,12 @@ spaces and special characters in filenames.
 
 **Mesh preparation:** Although the package includes automatic
 pre-decimation for high-resolution models (\>3M faces), it is
-recommended to simplify your meshes to a manageable face count (e.g. 50
-000–200 000 faces) in advance using dedicated 3D processing software
-(e.g. MeshLab, CloudCompare). This significantly reduces computation
-time without affecting the spherical harmonic results at typical
-analysis degrees (lmax ≤ 20–50). In addition, input meshes must be
-**watertight** (closed, manifold, genus-0), repair any holes,
+recommended to simplify your meshes to a manageable face count
+(e.g. 50,000–200,000 faces) in advance using dedicated 3D processing
+software (e.g. MeshLab, CloudCompare). This significantly reduces
+computation time without affecting the spherical harmonic results at
+typical analysis degrees (lmax ≤ 20–50). In addition, input meshes must
+be **watertight** (closed, manifold, genus-0), repair any holes,
 non-manifold edges, or self-intersections before analysis.
 
 ``` r
@@ -352,18 +352,13 @@ Both alignment pipelines (`align_scar_batch()` and
 
 ### 📖 References
 
-Bretzke, K., & Conard, N. J. (2012). Evaluating morphological
-variability in lithic assemblages using 3D models of stone artifacts.
-*Journal of Archaeological Science*, 39(12), 3741–3749.
-
 Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
 patterning on cores using 3D recording techniques. *Journal of
 Archaeological Science*, 33(1), 132–142.
 
-Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. *Journal of Archaeological Science*, 167,
-105998.
+Bretzke, K., & Conard, N. J. (2012). Evaluating morphological
+variability in lithic assemblages using 3D models of stone artifacts.
+*Journal of Archaeological Science*, 39(12), 3741–3749.
 
 McPherron, S. P. (2018). Additional statistical and graphical methods
 for analyzing site formation processes using artifact orientations.
@@ -372,6 +367,11 @@ for analyzing site formation processes using artifact orientations.
 Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
 spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
 2574–2592.
+
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
+T. (2024). A new method for quantifying flake scar organisation on cores
+using orientation statistics. *Journal of Archaeological Science*, 167,
+105998.
 
 Ye, Z., Pei, S. W., Ma. D. D., Li, H., Marwick, B. (2026). Spherical
 harmonic analysis of faceted spheroids identifies shaping strategies and
