@@ -112,9 +112,9 @@ spi <- compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
 ei  <- compute_EI(aligned$d_x, aligned$d_y, aligned$d_z)
 
 # 4. Spherical harmonic analysis on aligned directions
-sh <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)
+sh_scar <- spharm_from_directions(aligned, lmax = 20, bandwidth = 0.35)
 
-# 5. Export an interactive HTML report
+# 5. Export an interactive HTML report for alignment
 export_alignment_html_svd(aligned, out_path = "alignment_report.html")
 
 # ── Track A: morphological analysis ─────────────────────────
@@ -124,6 +124,16 @@ stl_dir <- system.file("extdata", "meshes", package = "spharmlithic")
 
 # 7. Spherical harmonic analysis on 3D shape
 sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
+
+# ── Interactive SPHARM viewer ───────────────────────────────
+
+# 8. Export an interactive 3D viewer for spherical harmonic reconstructions
+#    (supports morph only, scar only, or both)
+export_spharm_html(
+  morph    = sh_morph,
+  scar     = sh_scar,
+  out_path = "spharm_viewer.html"
+)
 ```
 
 ------------------------------------------------------------------------
@@ -153,8 +163,9 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 |:---|:---|
 | `spharm_from_directions()` | Compute SH coefficients from scar orientation vectors (core scar patterns) |
 | `spharm_from_meshes()` | Compute SH coefficients from 3D mesh surfaces (core morphology; requires mesh extras) |
-| `spharm_reconstruct()` | Reconstruct a density surface from SH coefficients |
-| `spharm_to_dataframe()` | Convert results to a wide-format data frame |
+| `spharm_to_dataframe()` | Convert results to a wide-format data frame for downstream analysis |
+| `spharm_reconstruct()` | Reconstruct a density grid from SH coefficients (low-level utility) |
+| `export_spharm_html()` | Export an interactive 3D viewer for SH reconstructions |
 
 #### Visualisation & Export
 
@@ -205,9 +216,33 @@ stone artefact variability:
   into spherical harmonic coefficients. This captures how flaking
   removals are organised on core reduction.
 
-In both cases, `spharm_reconstruct()` regenerates a smooth density grid
-from the coefficients, and `spharm_to_dataframe()` flattens everything
-into a tidy data frame for further analysis in R.
+Both functions return spherical harmonic coefficient arrays that can be
+flattened into a wide-format data frame with `spharm_to_dataframe()` for
+downstream multivariate analysis (PCA, clustering, distance matrices)
+directly in R.
+
+#### Interactive 3D viewer
+
+`export_spharm_html()` generates a self-contained HTML file that
+reconstructs the spherical harmonic surfaces in real time using
+Three.js. The viewer supports:
+
+- Dual viewports (morphology and scar direction side-by-side, with
+  synchronised rotation)
+- Degree-by-degree slider and animation (l = 1 → lmax)
+- Six material presets and a radial deviation colormap
+- Type-mean reconstruction (averaging coefficients within a Typology
+  group)
+- PNG screenshot and OBJ mesh export
+
+#### Low-level reconstruction
+
+For users who need the reconstructed density values as numerical data
+(e.g. for computing point-wise differences between specimens, extracting
+density peaks, or building custom visualisations),
+`spharm_reconstruct()` performs the inverse spherical harmonic transform
+and returns the density matrix, grid coordinates, and unit-sphere
+Cartesian points.
 
 ------------------------------------------------------------------------
 

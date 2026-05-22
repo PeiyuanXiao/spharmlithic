@@ -155,18 +155,12 @@ sh_scar <- spharm_from_directions(aligned_svd, lmax = 20, bandwidth = 0.35)
 sh_scar
 ```
 
-The density surface can be reconstructed on a regular grid:
-
-```{r reconstruct-trackb}
-recon <- spharm_reconstruct(sh_scar)
-recon
-```
-
-To convert the results into a flat data frame for further analysis in R:
+To convert the results into a flat data frame for downstream
+multivariate analysis (PCA, clustering, distance matrices) in R:
 
 ```{r df-trackb}
-df <- spharm_to_dataframe(sh_scar)
-head(df)
+df_scar <- spharm_to_dataframe(sh_scar)
+head(df_scar)
 ```
 
 ------------------------------------------------------------------------
@@ -195,12 +189,102 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 sh_morph
 ```
 
-The same downstream functions apply:
+To convert to a flat data frame:
 
-```{r downstream-tracka}
-recon_morph <- spharm_reconstruct(sh_morph)
-df_morph    <- spharm_to_dataframe(sh_morph)
+```{r df-tracka}
+df_morph <- spharm_to_dataframe(sh_morph)
 head(df_morph)
+```
+
+------------------------------------------------------------------------
+
+## Interactive SPHARM viewer
+
+`export_spharm_html()` generates a self-contained HTML file with an
+interactive Three.js-based 3D viewer for exploring spherical harmonic
+reconstructions. The viewer synthesises the harmonic expansion in real
+time on the client side — only the coefficients are embedded, so file
+sizes stay small.
+
+You can pass results from either track, or both:
+
+```{r viewer-scar-only}
+# Scar direction only
+export_spharm_html(
+  scar     = sh_scar,
+  out_path = "viewer_scar.html"
+)
+```
+
+```{r viewer-both}
+# Both tracks side-by-side
+export_spharm_html(
+  morph    = sh_morph,
+  scar     = sh_scar,
+  out_path = "spharm_viewer.html"
+)
+```
+
+An optional `meta` argument accepts a data frame with specimen
+metadata. If a `Typology` column is present, the viewer groups the
+specimen dropdown by type and enables a Type Mean toggle that
+averages coefficients within each group:
+
+```{r viewer-meta}
+meta <- data.frame(
+  ID       = c("ClarksonEXP01_Levallois", "ClarksonEXP02_Discoid"),
+  Typology = c("Levallois", "Discoid")
+)
+export_spharm_html(
+  scar     = sh_scar,
+  meta     = meta,
+  out_path = "spharm_viewer.html",
+  title    = "Example specimens"
+)
+```
+
+The viewer supports:
+
+- **Dual viewports** (morphology and scar direction, synchronised
+  rotation)
+- **Degree slider and animation** (l = 1 → lmax, for visualising how
+  successive harmonic degrees build up the reconstruction)
+- **Six material presets** (Ceramic, Clay, Glass, Brushed Metal, X-Ray,
+  Flat) and a radial deviation colormap
+- **Type Mean** (average coefficients across specimens sharing the same
+  Typology)
+- **PNG screenshot** and **OBJ mesh export** at the current degree
+
+------------------------------------------------------------------------
+
+## Low-level reconstruction with `spharm_reconstruct()`
+
+For users who need the reconstructed density as numerical data rather
+than an interactive visualisation, `spharm_reconstruct()` performs the
+inverse spherical harmonic transform and returns the results as R
+matrices. This is useful for computing point-wise differences between
+specimens, extracting density peaks or concentration statistics, or
+building custom 2D projections and Plotly visualisations:
+
+```{r reconstruct}
+recon <- spharm_reconstruct(sh_scar[["ClarksonEXP01_Levallois"]]$coefficients,
+                            grid_size = 64)
+
+# recon$density  — numeric matrix (grid_size x 2*grid_size)
+# recon$lon      — longitude vector (radians)
+# recon$lat      — latitude vector (radians)
+# recon$xyz      — unit-sphere Cartesian coordinates for Plotly
+
+# Quick plotly visualisation
+library(plotly)
+nlat <- length(recon$lat); nlon <- length(recon$lon)
+x_mat <- matrix(recon$xyz[, "x"], nlat, nlon)
+y_mat <- matrix(recon$xyz[, "y"], nlat, nlon)
+z_mat <- matrix(recon$xyz[, "z"], nlat, nlon)
+plot_ly(x = x_mat, y = y_mat, z = z_mat,
+        surfacecolor = recon$density,
+        type = "surface", colorscale = "Hot",
+        showscale = TRUE)
 ```
 
 ------------------------------------------------------------------------
@@ -216,9 +300,10 @@ head(df_morph)
 | **Typical use** | Shape-based typology, reduction intensity | Flaking strategy comparison |
 
 Both tracks produce spherical harmonic coefficient objects that can be
-reconstructed (`spharm_reconstruct()`) and converted to data frames
-(`spharm_to_dataframe()`), so they integrate into the same analytical
-pipeline.
+exported to an interactive 3D viewer (`export_spharm_html()`),
+converted to data frames (`spharm_to_dataframe()`), or reconstructed
+as numerical grids (`spharm_reconstruct()`), so they integrate into
+the same analytical pipeline.
 
 ------------------------------------------------------------------------
 
