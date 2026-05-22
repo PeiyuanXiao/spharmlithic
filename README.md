@@ -1,4 +1,3 @@
-# spharmlithic
 
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
@@ -267,7 +266,30 @@ detail, and is therefore not recommended.
 
 ### 📊 Input Data Format
 
-#### Track B — Scar orientation data (.xlsx / .csv)
+#### Track A: 3D mesh files
+
+Place `.stl` or `.ply` mesh files in a single directory. Each file is
+treated as one specimen; the filename (without extension) becomes the
+specimen ID. No particular naming convention is required, but avoid
+spaces and special characters in filenames.
+
+**Mesh preparation:** Although the package includes automatic
+pre-decimation for high-resolution models (\>3M faces), it is
+recommended to simplify your meshes to a manageable face count
+(e.g. 50,000–200,000 faces) in advance using dedicated 3D processing
+software (e.g. MeshLab, CloudCompare). This significantly reduces
+computation time without affecting the spherical harmonic results at
+typical analysis degrees (lmax ≤ 20–50). In addition, input meshes must
+be **watertight** (closed, manifold, genus-0), repair any holes,
+non-manifold edges, or self-intersections before analysis.
+
+``` r
+stl_dir <- "path/to/my/meshes"
+list.files(stl_dir, pattern = "\\.(stl|ply)$")
+# [1] "Specimen_A.stl"  "Specimen_B.stl"
+```
+
+#### Track B: Scar orientation data (.xlsx / .csv)
 
 The scar analysis pipeline expects a data frame with **one row per
 scar**, where all scars from all specimens are stacked together. The
@@ -312,29 +334,6 @@ this format and can be used as a template:
 scar_path <- system.file("extdata", "example_scars.xlsx", package = "spharmlithic")
 example   <- readxl::read_excel(scar_path)
 names(example)
-```
-
-#### Track A — 3D mesh files
-
-Place `.stl` or `.ply` mesh files in a single directory. Each file is
-treated as one specimen; the filename (without extension) becomes the
-specimen ID. No particular naming convention is required, but avoid
-spaces and special characters in filenames.
-
-**Mesh preparation:** Although the package includes automatic
-pre-decimation for high-resolution models (\>3M faces), it is
-recommended to simplify your meshes to a manageable face count
-(e.g. 50,000–200,000 faces) in advance using dedicated 3D processing
-software (e.g. MeshLab, CloudCompare). This significantly reduces
-computation time without affecting the spherical harmonic results at
-typical analysis degrees (lmax ≤ 20–50). In addition, input meshes must
-be **watertight** (closed, manifold, genus-0), repair any holes,
-non-manifold edges, or self-intersections before analysis.
-
-``` r
-stl_dir <- "path/to/my/meshes"
-list.files(stl_dir, pattern = "\\.(stl|ply)$")
-# [1] "Specimen_A.stl"  "Specimen_B.stl"
 ```
 
 #### Output columns after alignment
