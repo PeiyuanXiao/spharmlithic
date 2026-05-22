@@ -27,6 +27,10 @@ Computes the ratio of the resultant vector magnitude to the total scar
 length, on a scale from 0 (random orientation) to 1 (perfect alignment).
 }
 \details{
+\strong{Default behaviour:} unweighted (Bretzke & Conard 2012) — all scars
+contribute equally regardless of length. Pass \code{lengths} to get the
+length-weighted SPI (Clarkson et al. 2006).
+
 Two variants of SPI are supported:
 \itemize{
 \item \strong{Length-weighted} (Clarkson et al. 2006): pass raw scar
@@ -54,6 +58,15 @@ compute_SPI(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
 set.seed(1)
 compute_SPI(rnorm(50), rnorm(50), rnorm(50))
 
+\dontrun{
+# Unweighted (default) — every scar counts equally
+compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
+
+# Length-weighted — longer scars contribute more
+lens <- get_scar_length(aligned)
+compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+}
+
 }
 \references{
 Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
@@ -65,5 +78,5 @@ in lithic assemblages using 3D models of stone artifacts. \emph{Journal of
 Archaeological Science}, \strong{39}(12), 3741--3749.
 }
 \seealso{
-\code{\link[=compute_spi_angle]{compute_spi_angle()}}, \code{\link[=compute_EI]{compute_EI()}}
+\code{\link[=compute_spi_angle]{compute_spi_angle()}}, \code{\link[=compute_EI]{compute_EI()}}, \code{\link[=get_scar_length]{get_scar_length()}}
 }

@@ -48,6 +48,6 @@ write.csv(df_full, "spharm_results.csv", row.names = FALSE)
 
 }
 \seealso{
-\code{\link[=spharm_from_directions]{spharm_from_directions()}}, \code{\link[=spharm_from_meshes]{spharm_from_meshes()}},
+\code{\link[=spharm_from_directions]{spharm_from_directions()}}, \code{\link[=spharm_from_meshes]{spharm_from_meshes()}}, \code{\link[=export_spharm_html]{export_spharm_html()}},
 \code{\link[=spharm_reconstruct]{spharm_reconstruct()}}
 }

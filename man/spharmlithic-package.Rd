@@ -35,9 +35,18 @@ orientation tensor (Lin et al. 2024).
 \item \code{\link[=use_spharmlithic_python]{use_spharmlithic_python()}} — Point at an existing Python env.
 \item \code{\link[=spharm_from_directions]{spharm_from_directions()}} — Direction vectors -> vMF KDE -> SPHARM.
 \item \code{\link[=spharm_from_meshes]{spharm_from_meshes()}} — STL meshes -> spherical interpolation -> SPHARM.
-\item \code{\link[=spharm_reconstruct]{spharm_reconstruct()}} — Inverse transform: coefficients -> spherical
-density grid (for visualisation).
-\item \code{\link[=spharm_to_dataframe]{spharm_to_dataframe()}} — Flatten results for CSV export.
+\item \code{\link[=spharm_to_dataframe]{spharm_to_dataframe()}} — Flatten SH results for CSV export and
+downstream multivariate analysis (PCA, clustering).
+\item \code{\link[=spharm_reconstruct]{spharm_reconstruct()}} — Low-level inverse transform: coefficients ->
+density grid (for custom analysis or plotting).
+}
+}
+
+\subsection{Interactive SPHARM viewer}{
+\itemize{
+\item \code{\link[=export_spharm_html]{export_spharm_html()}} — Export an interactive Three.js-based 3D
+viewer for spherical harmonic reconstructions (morphology, scar
+direction, or both side-by-side).
 }
 }
 
@@ -73,6 +82,11 @@ density grid (for visualisation).
 }
 \author{
 \strong{Maintainer}: Peiyuan Xiao \email{pyxiao@uw.edu}
+
+Authors:
+\itemize{
+  \item Ben Marwick \email{bmarwick@uw.edu}
+}
 
 }
 \keyword{internal}

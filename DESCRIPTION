@@ -1,8 +1,11 @@
 Package: spharmlithic
 Title: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns
-Version: 0.3.0
+Version: 0.1.0
 Authors@R:
-    person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"))
+    c(
+      person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre")),
+      person("Ben", "Marwick", , "bmarwick@uw.edu", role = c("aut"))
+      )
 Description: A complete toolkit for the geometric alignment, directional
     statistics, and spherical harmonic analysis of three-dimensional
     lithic flaking scar orientation data. Provides two alignment pipelines

@@ -92,6 +92,6 @@ with spherical harmonics. \emph{Geochemistry, Geophysics, Geosystems},
 \strong{19}(8), 2574--2592.
 }
 \seealso{
-\code{\link[=spharm_from_meshes]{spharm_from_meshes()}}, \code{\link[=spharm_to_dataframe]{spharm_to_dataframe()}},
+\code{\link[=spharm_from_meshes]{spharm_from_meshes()}}, \code{\link[=spharm_to_dataframe]{spharm_to_dataframe()}}, \code{\link[=export_spharm_html]{export_spharm_html()}},
 \code{\link[=install_spharmlithic_python]{install_spharmlithic_python()}}
 }

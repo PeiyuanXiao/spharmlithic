@@ -43,7 +43,7 @@
 #' write.csv(df_full, "spharm_results.csv", row.names = FALSE)
 #' }
 #'
-#' @seealso [spharm_from_directions()], [spharm_from_meshes()],
+#' @seealso [spharm_from_directions()], [spharm_from_meshes()], [export_spharm_html()],
 #'   [spharm_reconstruct()]
 #'
 #' @importFrom tibble tibble as_tibble
@@ -93,6 +93,13 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
 
 
 #' Inverse spherical harmonic transform: coefficients to spherical density
+#'
+#' **Low-level utility.** For interactive 3D exploration of
+#' reconstructed surfaces, [export_spharm_html()] is usually more
+#' convenient. Use this function when you need the reconstructed density
+#' as numerical data — for example, computing point-wise differences
+#' between specimens, extracting density peaks, or building custom
+#' visualisations with `plotly` or `ggplot2`.
 #'
 #' Given a single specimen's spherical-harmonic coefficient array (as
 #' returned in `spharm_from_*()$<id>$coefficients`), reconstructs the
@@ -151,7 +158,7 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
 #' all_recs <- lapply(result, function(s) spharm_reconstruct(s$coefficients))
 #' }
 #'
-#' @seealso [spharm_from_directions()], [spharm_from_meshes()]
+#' @seealso [spharm_from_directions()], [spharm_from_meshes()], [export_spharm_html()]
 #'
 #' @export
 spharm_reconstruct <- function(coefficients, grid_size = 64) {

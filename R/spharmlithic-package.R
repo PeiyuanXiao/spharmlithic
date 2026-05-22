@@ -25,9 +25,15 @@
 #' * [use_spharmlithic_python()] — Point at an existing Python env.
 #' * [spharm_from_directions()] — Direction vectors -> vMF KDE -> SPHARM.
 #' * [spharm_from_meshes()] — STL meshes -> spherical interpolation -> SPHARM.
-#' * [spharm_reconstruct()] — Inverse transform: coefficients -> spherical
-#'   density grid (for visualisation).
-#' * [spharm_to_dataframe()] — Flatten results for CSV export.
+#' * [spharm_to_dataframe()] — Flatten SH results for CSV export and
+#'   downstream multivariate analysis (PCA, clustering).
+#' * [spharm_reconstruct()] — Low-level inverse transform: coefficients ->
+#'   density grid (for custom analysis or plotting).
+#'
+#' ### Interactive SPHARM viewer
+#' * [export_spharm_html()] — Export an interactive Three.js-based 3D
+#'   viewer for spherical harmonic reconstructions (morphology, scar
+#'   direction, or both side-by-side).
 #'
 #' ### 3-D visualisation (Plotly helpers)
 #' * [add_scars_3d()], [add_arrow_3d()], [add_tilted_plane_3d()],

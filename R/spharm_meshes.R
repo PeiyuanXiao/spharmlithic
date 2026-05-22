@@ -65,7 +65,7 @@
 #' write.csv(df, "spharm_meshes.csv", row.names = FALSE)
 #' }
 #'
-#' @seealso [spharm_from_directions()], [spharm_to_dataframe()],
+#' @seealso [spharm_from_directions()], [spharm_to_dataframe()], [export_spharm_html()],
 #'   [install_spharmlithic_python()]
 #'
 #' @export

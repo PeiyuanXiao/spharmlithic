@@ -11,6 +11,10 @@
 #' Computes the ratio of the resultant vector magnitude to the total scar
 #' length, on a scale from 0 (random orientation) to 1 (perfect alignment).
 #'
+#' **Default behaviour:** unweighted (Bretzke & Conard 2012) — all scars
+#' contribute equally regardless of length. Pass `lengths` to get the
+#' length-weighted SPI (Clarkson et al. 2006).
+#'
 #' @param dx,dy,dz Numeric vectors of equal length. The X, Y, Z components
 #'   of the scar direction vectors. These are typically unit direction
 #'   vectors returned by [align_scar_batch()] (columns `d_x`, `d_y`, `d_z`).
@@ -61,7 +65,16 @@
 #' set.seed(1)
 #' compute_SPI(rnorm(50), rnorm(50), rnorm(50))
 #'
-#' @seealso [compute_spi_angle()], [compute_EI()]
+#' \dontrun{
+#' # Unweighted (default) — every scar counts equally
+#' compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
+#'
+#' # Length-weighted — longer scars contribute more
+#' lens <- get_scar_length(aligned)
+#' compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+#' }
+#'
+#' @seealso [compute_spi_angle()], [compute_EI()], [get_scar_length()]
 #' @export
 compute_SPI <- function(dx, dy, dz, lengths = NULL) {
   if (!is.null(lengths)) {

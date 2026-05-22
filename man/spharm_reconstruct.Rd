@@ -33,6 +33,14 @@ order matching \code{as.vector(density)}. Convenient input for
 }
 }
 \description{
+\strong{Low-level utility.} For interactive 3D exploration of
+reconstructed surfaces, \code{\link[=export_spharm_html]{export_spharm_html()}} is usually more
+convenient. Use this function when you need the reconstructed density
+as numerical data — for example, computing point-wise differences
+between specimens, extracting density peaks, or building custom
+visualisations with \code{plotly} or \code{ggplot2}.
+}
+\details{
 Given a single specimen's spherical-harmonic coefficient array (as
 returned in \verb{spharm_from_*()$<id>$coefficients}), reconstructs the
 corresponding density on a Driscoll-Healy grid on the unit sphere.
@@ -69,5 +77,5 @@ with spherical harmonics. \emph{Geochemistry, Geophysics, Geosystems},
 \strong{19}(8), 2574--2592.
 }
 \seealso{
-\code{\link[=spharm_from_directions]{spharm_from_directions()}}, \code{\link[=spharm_from_meshes]{spharm_from_meshes()}}
+\code{\link[=spharm_from_directions]{spharm_from_directions()}}, \code{\link[=spharm_from_meshes]{spharm_from_meshes()}}, \code{\link[=export_spharm_html]{export_spharm_html()}}
 }
