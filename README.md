@@ -188,7 +188,6 @@ common coordinate frame:
 |:---|:---|:---|
 | **Functions** | `align_scar()` / `align_scar_batch()` | `align_morph()` / `align_morph_batch()` |
 | **Approach** | Singular value decomposition of the full direction-vector cloud | Two-step rotation along a morphological long-axis (Lin et al. 2024) |
-| **Best suited for** | General-purpose analysis; no predefined axis required | Cases where a technological axis (e.g. platform–base) can be identified |
 | **Output** | Identical format — all downstream functions work with either | ← same |
 
 ------------------------------------------------------------------------
