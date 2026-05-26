@@ -11,9 +11,9 @@ spherical harmonic decomposition for artifact shape and flaking scar vector
 \subsection{Main components}{
 \subsection{Alignment pipelines}{
 \itemize{
-\item \code{\link[=align_scar]{align_scar()}} / \code{\link[=align_scar_batch]{align_scar_batch()}} — Three-step SVD pipeline
+\item \code{\link[=align_scar_batch]{align_scar_batch()}} — Three-step SVD pipeline
 (rotate -> translate -> in-plane rotate).
-\item \code{\link[=align_morph]{align_morph()}} / \code{\link[=align_morph_batch]{align_morph_batch()}} — Two-step Lin 2024 pipeline
+\item \code{\link[=align_morph_batch]{align_morph_batch()}} — Two-step Lin 2024 pipeline
 (morphological normal rotation -> longest-scar translation).
 }
 }
@@ -42,32 +42,13 @@ density grid (for custom analysis or plotting).
 }
 }
 
-\subsection{Interactive SPHARM viewer}{
+\subsection{Interactive viewers and HTML export}{
 \itemize{
 \item \code{\link[=export_spharm_html]{export_spharm_html()}} — Export an interactive Three.js-based 3D
 viewer for spherical harmonic reconstructions (morphology, scar
 direction, or both side-by-side).
-}
-}
-
-\subsection{3-D visualisation (Plotly helpers)}{
-\itemize{
-\item \code{\link[=add_scars_3d]{add_scars_3d()}}, \code{\link[=add_arrow_3d]{add_arrow_3d()}}, \code{\link[=add_tilted_plane_3d]{add_tilted_plane_3d()}},
-\code{\link[=add_plane_3d]{add_plane_3d()}}, \code{\link[=make_scene]{make_scene()}}, \code{\link[=panel_layout]{panel_layout()}}, \code{\link[=get_panel_json]{get_panel_json()}}
-}
-}
-
-\subsection{Interactive HTML export}{
-\itemize{
 \item \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}} — Four-panel SVD alignment page.
 \item \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}} — Three-panel Lin 2024 alignment page.
-}
-}
-
-\subsection{Visualisation builders}{
-\itemize{
-\item \code{\link[=build_panel_scar]{build_panel_scar()}} — SVD four-panel figure for one specimen.
-\item \code{\link[=build_panel_morph]{build_panel_morph()}} — Lin 2024 three-panel figure for one specimen.
 }
 }
 

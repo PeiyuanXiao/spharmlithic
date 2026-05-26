@@ -25,7 +25,7 @@
 #' longest <- df_one[which.max(lens), ]
 #' }
 #'
-#' @seealso [align_morph()]
+#' @seealso [align_morph_batch()]
 #' @export
 get_scar_length <- function(df) {
   if ("Length" %in% names(df)) return(df$Length)
@@ -66,7 +66,7 @@ get_scar_length <- function(df) {
 #' distributed scars.
 #'
 #' For the data-driven alternative that estimates the plane normal from the
-#' scars themselves, see [align_scar()].
+#' scars themselves, see `align_scar()`.
 #'
 #' @references
 #' Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
@@ -84,10 +84,10 @@ get_scar_length <- function(df) {
 #' aligned_all <- align_morph_batch(raw_data)
 #' }
 #'
-#' @seealso [align_scar()], [get_scar_length()], [align_morph_batch()]
+#' @seealso `align_scar()`, [get_scar_length()], [align_morph_batch()]
 #'
 #' @importFrom dplyr mutate
-#' @export
+#' @noRd
 align_morph <- function(df_group) {
   
   # --- Compute unit direction vectors ---
@@ -158,11 +158,11 @@ align_morph <- function(df_group) {
 #' panels$p2  # fully aligned
 #' }
 #'
-#' @seealso [align_morph()], [export_alignment_html_lin2024()]
+#' @seealso `align_morph()`, [export_alignment_html_lin2024()]
 #'
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
-#' @export
+#' @noRd
 build_panel_morph <- function(demo_id, raw_data) {
   df <- dplyr::filter(raw_data, .data$ID == demo_id)
   
@@ -222,8 +222,8 @@ build_panel_morph <- function(demo_id, raw_data) {
 #' Builds three-panel Lin 2024 alignment visualisations for every specimen in
 #' `raw_data` and writes a standalone interactive HTML file to `out_path`.
 #'
-#' @param raw_data A data frame with the required columns (see
-#'   [build_panel_morph()]).
+#' @param raw_data A data frame with columns `ID`, `Start_X/Y/Z`,
+#'   `End_X/Y/Z`, `Norm_X/Y/Z`, `Pos_X/Y/Z`, and optionally `Length`.
 #' @param out_path Character. File path for the output HTML.
 #'
 #' @return Invisibly, the `out_path` string.
@@ -240,7 +240,7 @@ build_panel_morph <- function(demo_id, raw_data) {
 #' export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
 #' }
 #'
-#' @seealso [build_panel_morph()], [export_alignment_html_svd()]
+#' @seealso [export_alignment_html_svd()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON

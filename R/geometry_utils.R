@@ -23,7 +23,7 @@
 #' }
 #'
 #' This function is a low-level geometric utility; in typical usage it is
-#' called internally by [align_scar()] and [align_morph()] rather than
+#' called internally by `align_scar()` and `align_morph()` rather than
 #' directly.
 #'
 #' @examples
@@ -39,8 +39,7 @@
 #' R_flip <- get_rot_matrix(c(0, 0, 1), c(0, 0, -1))
 #' round(R_flip %*% c(0, 0, 1), 10)   # should equal c(0, 0, -1)
 #'
-#' @seealso [align_scar()], [align_morph()], [align_scar_batch()],
-#'   [align_morph_batch()]
+#' @seealso [align_scar_batch()], [align_morph_batch()]
 #' @export
 get_rot_matrix <- function(a, b) {
   a <- a / sqrt(sum(a^2))

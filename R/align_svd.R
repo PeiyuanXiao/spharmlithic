@@ -34,7 +34,7 @@
 #' (length > `1e-10`) are needed for the SVD step.
 #'
 #' For the morphology-based alternative that uses a pre-measured plane normal,
-#' see [align_morph()].
+#' see `align_morph()`.
 #'
 #' @examples
 #' \dontrun{
@@ -46,10 +46,10 @@
 #' aligned_all <- align_scar_batch(raw_data)
 #' }
 #'
-#' @seealso [get_rot_matrix()], [align_morph()], [align_scar_batch()]
+#' @seealso [get_rot_matrix()], `align_morph()`, [align_scar_batch()]
 #'
 #' @importFrom dplyr mutate
-#' @export
+#' @noRd
 align_scar <- function(df_group) {
   
   # --- Step 1: Rotate — align SVD normal to the Z-axis ---
@@ -146,11 +146,11 @@ align_scar <- function(df_group) {
 #' panels$p3  # fully aligned
 #' }
 #'
-#' @seealso [align_scar()], [export_alignment_html_svd()]
+#' @seealso `align_scar()`, [export_alignment_html_svd()]
 #'
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
-#' @export
+#' @noRd
 build_panel_scar <- function(demo_id, raw_data) {
   df <- dplyr::filter(raw_data, .data$ID == demo_id)
   
@@ -258,7 +258,7 @@ build_panel_scar <- function(demo_id, raw_data) {
 #' export_alignment_html_svd(raw_data, "output/alignment_svd.html")
 #' }
 #'
-#' @seealso [build_panel_scar()], [export_alignment_html_lin2024()]
+#' @seealso [export_alignment_html_lin2024()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON

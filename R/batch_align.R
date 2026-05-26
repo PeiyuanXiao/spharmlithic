@@ -5,7 +5,7 @@
 
 #' Batch SVD alignment for all specimens
 #'
-#' A convenience wrapper around [align_scar()] that accepts a complete
+#' A convenience wrapper around `align_scar()` that accepts a complete
 #' multi-specimen data frame and handles the grouping internally.
 #' Equivalent to calling `group_by(ID) %>% group_modify(~ align_scar(.x))`.
 #'
@@ -31,7 +31,7 @@
 #' head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 #' }
 #'
-#' @seealso [align_scar()], [align_morph_batch()]
+#' @seealso [align_morph_batch()]
 #'
 #' @importFrom dplyr group_by group_modify ungroup
 #' @export
@@ -45,7 +45,7 @@ align_scar_batch <- function(data, id_col = "ID") {
 
 #' Batch Lin 2024 alignment for all specimens
 #'
-#' A convenience wrapper around [align_morph()] that accepts a complete
+#' A convenience wrapper around `align_morph()` that accepts a complete
 #' multi-specimen data frame and handles the grouping internally.
 #'
 #' @param data A data frame containing **all** specimens. Must contain columns
@@ -68,7 +68,7 @@ align_scar_batch <- function(data, id_col = "ID") {
 #' head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 #' }
 #'
-#' @seealso [align_morph()], [align_scar_batch()]
+#' @seealso [align_scar_batch()]
 #'
 #' @importFrom dplyr group_by group_modify ungroup
 #' @export

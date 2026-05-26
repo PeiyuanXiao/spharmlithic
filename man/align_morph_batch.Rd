@@ -18,7 +18,7 @@ The input data frame with nine additional columns
 (\code{s_x/y/z}, \code{e_x/y/z}, \code{d_x/y/z}).
 }
 \description{
-A convenience wrapper around \code{\link[=align_morph]{align_morph()}} that accepts a complete
+A convenience wrapper around \code{align_morph()} that accepts a complete
 multi-specimen data frame and handles the grouping internally.
 }
 \details{
@@ -35,5 +35,5 @@ head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 
 }
 \seealso{
-\code{\link[=align_morph]{align_morph()}}, \code{\link[=align_scar_batch]{align_scar_batch()}}
+\code{\link[=align_scar_batch]{align_scar_batch()}}
 }

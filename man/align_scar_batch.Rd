@@ -21,7 +21,7 @@ The input data frame with nine additional columns:
 }
 }
 \description{
-A convenience wrapper around \code{\link[=align_scar]{align_scar()}} that accepts a complete
+A convenience wrapper around \code{align_scar()} that accepts a complete
 multi-specimen data frame and handles the grouping internally.
 Equivalent to calling \code{group_by(ID) \%>\% group_modify(~ align_scar(.x))}.
 }
@@ -38,5 +38,5 @@ head(aligned[, c("ID", "d_x", "d_y", "d_z")])
 
 }
 \seealso{
-\code{\link[=align_scar]{align_scar()}}, \code{\link[=align_morph_batch]{align_morph_batch()}}
+\code{\link[=align_morph_batch]{align_morph_batch()}}
 }

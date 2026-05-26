@@ -40,10 +40,8 @@
 #' fig2
 #' }
 #'
-#' @seealso [add_arrow_3d()], [add_plane_3d()], [build_panel_scar()],
-#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
-#' @export
+#' @noRd
 add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
                          highlight_idx = NULL) {
   for (i in seq_along(sx)) {
@@ -101,10 +99,8 @@ add_scars_3d <- function(fig, sx, sy, sz, ex, ey, ez,
 #' fig
 #' }
 #'
-#' @seealso [add_scars_3d()], [add_plane_3d()], [build_panel_scar()],
-#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
-#' @export
+#' @noRd
 add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
   d   <- direction / sqrt(sum(direction^2)) * scale
   tip <- origin + d
@@ -162,10 +158,8 @@ add_arrow_3d <- function(fig, origin, direction, scale, color = "red") {
 #' fig
 #' }
 #'
-#' @seealso [add_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
-#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
-#' @export
+#' @noRd
 add_tilted_plane_3d <- function(fig, center, normal, half_size) {
   n   <- normal / sqrt(sum(normal^2))
   ref <- if (abs(n[1]) < 0.9) c(1, 0, 0) else c(0, 1, 0)
@@ -216,10 +210,8 @@ add_tilted_plane_3d <- function(fig, center, normal, half_size) {
 #' fig
 #' }
 #'
-#' @seealso [add_tilted_plane_3d()], [add_arrow_3d()], [build_panel_scar()],
-#'   [build_panel_morph()]
 #' @importFrom plotly add_trace
-#' @export
+#' @noRd
 add_plane_3d <- function(fig, cx, cy, z0, half_size) {
   h  <- half_size
   xs <- c(cx - h, cx + h, cx + h, cx - h)
@@ -253,8 +245,8 @@ add_plane_3d <- function(fig, cx, cy, z0, half_size) {
 #' fig
 #' }
 #'
-#' @seealso [panel_layout()]
-#' @export
+#' @seealso `panel_layout()`
+#' @noRd
 make_scene <- function() {
   list(
     camera     = list(eye = list(x = 1.6, y = 1.6, z = 1.1)),
@@ -284,8 +276,8 @@ make_scene <- function() {
 #' fig
 #' }
 #'
-#' @seealso [make_scene()], [build_panel_scar()], [build_panel_morph()]
-#' @export
+#' @seealso `make_scene()`, `build_panel_scar()`, `build_panel_morph()`
+#' @noRd
 panel_layout <- function(title_text) {
   list(
     title         = list(text = title_text, font = list(size = 13),
@@ -326,7 +318,7 @@ panel_layout <- function(title_text) {
 #' @seealso [export_alignment_html_svd()], [export_alignment_html_lin2024()]
 #' @importFrom plotly plotly_build
 #' @importFrom jsonlite toJSON
-#' @export
+#' @noRd
 get_panel_json <- function(p) {
   built       <- plotly::plotly_build(p)
   data_json   <- jsonlite::toJSON(built$x$data,   auto_unbox = TRUE,

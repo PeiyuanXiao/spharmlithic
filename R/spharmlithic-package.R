@@ -7,9 +7,9 @@
 #' ## Main components
 #'
 #' ### Alignment pipelines
-#' * [align_scar()] / [align_scar_batch()] — Three-step SVD pipeline
+#' * [align_scar_batch()] — Three-step SVD pipeline
 #'   (rotate -> translate -> in-plane rotate).
-#' * [align_morph()] / [align_morph_batch()] — Two-step Lin 2024 pipeline
+#' * [align_morph_batch()] — Two-step Lin 2024 pipeline
 #'   (morphological normal rotation -> longest-scar translation).
 #'
 #' ### Classical orientation statistics
@@ -30,22 +30,12 @@
 #' * [spharm_reconstruct()] — Low-level inverse transform: coefficients ->
 #'   density grid (for custom analysis or plotting).
 #'
-#' ### Interactive SPHARM viewer
+#' ### Interactive viewers and HTML export
 #' * [export_spharm_html()] — Export an interactive Three.js-based 3D
 #'   viewer for spherical harmonic reconstructions (morphology, scar
 #'   direction, or both side-by-side).
-#'
-#' ### 3-D visualisation (Plotly helpers)
-#' * [add_scars_3d()], [add_arrow_3d()], [add_tilted_plane_3d()],
-#'   [add_plane_3d()], [make_scene()], [panel_layout()], [get_panel_json()]
-#'
-#' ### Interactive HTML export
 #' * [export_alignment_html_svd()] — Four-panel SVD alignment page.
 #' * [export_alignment_html_lin2024()] — Three-panel Lin 2024 alignment page.
-#'
-#' ### Visualisation builders
-#' * [build_panel_scar()] — SVD four-panel figure for one specimen.
-#' * [build_panel_morph()] — Lin 2024 three-panel figure for one specimen.
 #'
 #' ### Geometry utilities
 #' * [get_rot_matrix()] — Rodrigues rotation matrix between two unit vectors.

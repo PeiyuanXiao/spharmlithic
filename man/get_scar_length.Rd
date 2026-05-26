@@ -31,5 +31,5 @@ longest <- df_one[which.max(lens), ]
 
 }
 \seealso{
-\code{\link[=align_morph]{align_morph()}}
+\code{\link[=align_morph_batch]{align_morph_batch()}}
 }

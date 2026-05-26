@@ -35,5 +35,5 @@ export_alignment_html_svd(raw_data, "output/alignment_svd.html")
 
 }
 \seealso{
-\code{\link[=build_panel_scar]{build_panel_scar()}}, \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
+\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
 }

@@ -20,7 +20,7 @@
 #' @param data A data frame containing direction vectors. Must contain an
 #'   ID column (default `"ID"`) and three direction-component columns
 #'   (default `"d_x"`, `"d_y"`, `"d_z"`, matching the output of
-#'   [align_scar()] and [align_morph()]). Rows where a direction vector
+#'   `align_scar()` and `align_morph()`). Rows where a direction vector
 #'   is zero or NA are silently dropped.
 #' @param lmax Integer. Maximum spherical harmonic degree. Default 20.
 #' @param bandwidth Numeric. vMF KDE bandwidth (smaller -> sharper peaks).
@@ -32,7 +32,7 @@
 #' @param dh_size Integer. Driscoll-Healy grid latitude size; longitude is
 #'   `2 * dh_size`. Default 64.
 #' @param id_col,dx_col,dy_col,dz_col Column names. Defaults match
-#'   [align_scar()] output.
+#'   [align_scar_batch()] output.
 #' @param verbose Logical. Print per-specimen progress. Default `TRUE`.
 #'
 #' @return A list with one element per specimen, named by ID. Each

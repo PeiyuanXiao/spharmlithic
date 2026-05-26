@@ -22,7 +22,7 @@ spharm_from_directions(
 \item{data}{A data frame containing direction vectors. Must contain an
 ID column (default \code{"ID"}) and three direction-component columns
 (default \code{"d_x"}, \code{"d_y"}, \code{"d_z"}, matching the output of
-\code{\link[=align_scar]{align_scar()}} and \code{\link[=align_morph]{align_morph()}}). Rows where a direction vector
+\code{align_scar()} and \code{align_morph()}). Rows where a direction vector
 is zero or NA are silently dropped.}
 
 \item{lmax}{Integer. Maximum spherical harmonic degree. Default 20.}
@@ -39,7 +39,7 @@ evaluation grid for vMF KDE. Defaults 72 and 36 (5-degree spacing).}
 \code{2 * dh_size}. Default 64.}
 
 \item{id_col, dx_col, dy_col, dz_col}{Column names. Defaults match
-\code{\link[=align_scar]{align_scar()}} output.}
+\code{\link[=align_scar_batch]{align_scar_batch()}} output.}
 
 \item{verbose}{Logical. Print per-specimen progress. Default \code{TRUE}.}
 }

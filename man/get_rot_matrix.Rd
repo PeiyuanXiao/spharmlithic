@@ -30,7 +30,7 @@ matrix is returned.
 }
 
 This function is a low-level geometric utility; in typical usage it is
-called internally by \code{\link[=align_scar]{align_scar()}} and \code{\link[=align_morph]{align_morph()}} rather than
+called internally by \code{align_scar()} and \code{align_morph()} rather than
 directly.
 }
 \examples{
@@ -48,6 +48,5 @@ round(R_flip \%*\% c(0, 0, 1), 10)   # should equal c(0, 0, -1)
 
 }
 \seealso{
-\code{\link[=align_scar]{align_scar()}}, \code{\link[=align_morph]{align_morph()}}, \code{\link[=align_scar_batch]{align_scar_batch()}},
-\code{\link[=align_morph_batch]{align_morph_batch()}}
+\code{\link[=align_scar_batch]{align_scar_batch()}}, \code{\link[=align_morph_batch]{align_morph_batch()}}
 }

@@ -7,8 +7,8 @@
 export_alignment_html_lin2024(raw_data, out_path)
 }
 \arguments{
-\item{raw_data}{A data frame with the required columns (see
-\code{\link[=build_panel_morph]{build_panel_morph()}}).}
+\item{raw_data}{A data frame with columns \code{ID}, \code{Start_X/Y/Z},
+\code{End_X/Y/Z}, \code{Norm_X/Y/Z}, \code{Pos_X/Y/Z}, and optionally \code{Length}.}
 
 \item{out_path}{Character. File path for the output HTML.}
 }
@@ -33,5 +33,5 @@ export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
 
 }
 \seealso{
-\code{\link[=build_panel_morph]{build_panel_morph()}}, \code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
+\code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
 }
