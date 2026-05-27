@@ -47,7 +47,7 @@ Failed specimens are reported via warnings and omitted from the
 result.
 }
 \description{
-Pipeline (Track A), per STL file:
+Pipeline (morphological analysis), per STL file:
 \enumerate{
 \item Read mesh via \code{open3d}. Files exceeding 3M faces are
 pre-decimated by streaming face sub-sampling to avoid memory pressure.

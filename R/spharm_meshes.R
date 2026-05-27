@@ -1,12 +1,12 @@
 # ==============================================================================
 # spharm_meshes.R
-# Track A: STL files -> open3d simplify -> trimesh smooth -> normalize ->
+# Morphological analysis: STL files -> open3d simplify -> trimesh smooth -> normalize ->
 #          PCA align -> spherical interpolation -> SPHARM
 # ==============================================================================
 
 #' Spherical harmonic analysis from STL meshes
 #'
-#' Pipeline (Track A), per STL file:
+#' Pipeline (morphological analysis), per STL file:
 #' \enumerate{
 #'   \item Read mesh via `open3d`. Files exceeding 3M faces are
 #'     pre-decimated by streaming face sub-sampling to avoid memory pressure.

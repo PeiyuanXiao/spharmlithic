@@ -1,11 +1,11 @@
 # ==============================================================================
 # spharm_directions.R
-# Track B: scar direction vectors -> vMF KDE -> Driscoll-Healy grid -> SPHARM
+# Scar pattern analysis: scar direction vectors -> vMF KDE -> Driscoll-Healy grid -> SPHARM
 # ==============================================================================
 
 #' Spherical harmonic analysis from scar direction vectors
 #'
-#' Pipeline (Track B):
+#' Pipeline (scar pattern analysis):
 #' \enumerate{
 #'   \item Extract unit direction vectors `(d_x, d_y, d_z)` from each scar.
 #'   \item Per-specimen von Mises-Fisher kernel density estimate on the sphere.
@@ -20,7 +20,7 @@
 #' @param data A data frame containing direction vectors. Must contain an
 #'   ID column (default `"ID"`) and three direction-component columns
 #'   (default `"d_x"`, `"d_y"`, `"d_z"`, matching the output of
-#'   `align_scar()` and `align_morph()`). Rows where a direction vector
+#'   `align_scar_batch()` and `align_morph_batch()`). Rows where a direction vector
 #'   is zero or NA are silently dropped.
 #' @param lmax Integer. Maximum spherical harmonic degree. Default 20.
 #' @param bandwidth Numeric. vMF KDE bandwidth (smaller -> sharper peaks).

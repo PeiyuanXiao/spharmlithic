@@ -73,7 +73,7 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
     coeff_mat <- do.call(rbind, lapply(x, function(s) {
       cf <- s$coefficients
       if (is.complex(cf)) {
-        # Track A (STL) returns complex coefficients with theoretically
+        # Morphology pipeline (STL) returns complex coefficients with theoretically
         # zero imaginary parts (real-valued spherical functions).
         # Explicitly take Re() to avoid spurious "discarding imaginary
         # parts" warnings from as.numeric().
@@ -168,7 +168,7 @@ spharm_reconstruct <- function(coefficients, grid_size = 64) {
          call. = FALSE)
   }
   
-  # If complex, take real part (Track A returns complex with ~0 imag).
+  # If complex, take real part (morphology pipeline returns complex with ~0 imag).
   if (is.complex(coefficients)) {
     coefficients <- Re(coefficients)
   }

@@ -86,7 +86,7 @@ Typology.}
 
 \examples{
 \dontrun{
-# Track B only
+# Scar pattern only
 aligned <- align_scar_batch(my_scar_data)
 scar_result <- spharm_from_directions(aligned, lmax = 20)
 export_spharm_html(scar = scar_result, out_path = "viewer.html")

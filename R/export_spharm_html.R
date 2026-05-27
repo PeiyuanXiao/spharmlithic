@@ -64,7 +64,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Track B only
+#' # Scar pattern only
 #' aligned <- align_scar_batch(my_scar_data)
 #' scar_result <- spharm_from_directions(aligned, lmax = 20)
 #' export_spharm_html(scar = scar_result, out_path = "viewer.html")
@@ -253,7 +253,7 @@ export_spharm_html <- function(
 .cilm_to_json <- function(coefficients, lmax_out, digits) {
   if (is.null(coefficients)) return(NULL)
   
-  # Handle complex coefficients (Track A)
+  # Handle complex coefficients (morphology pipeline)
   if (is.complex(coefficients)) {
     coefficients <- Re(coefficients)
   }

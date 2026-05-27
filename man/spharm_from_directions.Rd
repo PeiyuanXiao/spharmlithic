@@ -22,7 +22,7 @@ spharm_from_directions(
 \item{data}{A data frame containing direction vectors. Must contain an
 ID column (default \code{"ID"}) and three direction-component columns
 (default \code{"d_x"}, \code{"d_y"}, \code{"d_z"}, matching the output of
-\code{align_scar()} and \code{align_morph()}). Rows where a direction vector
+\code{align_scar_batch()} and \code{align_morph_batch()}). Rows where a direction vector
 is zero or NA are silently dropped.}
 
 \item{lmax}{Integer. Maximum spherical harmonic degree. Default 20.}
@@ -58,7 +58,7 @@ Use \code{\link[=spharm_to_dataframe]{spharm_to_dataframe()}} to flatten the lis
 data frame suitable for CSV export.
 }
 \description{
-Pipeline (Track B):
+Pipeline (scar pattern analysis):
 \enumerate{
 \item Extract unit direction vectors \verb{(d_x, d_y, d_z)} from each scar.
 \item Per-specimen von Mises-Fisher kernel density estimate on the sphere.

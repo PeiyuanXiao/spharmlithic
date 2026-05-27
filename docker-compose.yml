@@ -1,0 +1,13 @@
+services:
+  spharmlithic:
+    image: peiyuanxiao/spharmlithic
+    container_name: spharmlithic
+    ports:
+      - "8787:8787"
+    environment:
+      - PASSWORD=${RSTUDIO_PASSWORD:-spharm}
+      - DISABLE_AUTH=${DISABLE_AUTH:-false}
+    volumes:
+      - ./data:/home/rstudio/data
+    stop_grace_period: 1s
+    restart: "no"
