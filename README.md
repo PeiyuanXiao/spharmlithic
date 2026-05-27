@@ -56,8 +56,8 @@ use_spharmlithic_python("r-spharmlithic")
 #### Option B — Docker (recommended for macOS)
 
 A pre-built Docker image includes R, RStudio Server, and the full Python
-environment. This is the recommended approach on **macOS**, where
-`open3d` can cause R session crashes.
+environment. This is the recommended because `open3d` can cause R
+session crashes.
 
 ``` bash
 docker pull peiyuanxiao/spharmlithic
@@ -112,21 +112,20 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 
 #### Descriptive Statistics
 
-| Function              | Description                                         |
-|:----------------------|:----------------------------------------------------|
-| `compute_SPI()`       | Scar Pattern Index (optionally length-weighted)     |
-| `compute_spi_angle()` | Angular conversion of SPI (`θ = arccos(SPI)`)       |
-| `compute_EI()`        | Elongation and Isotropy from the orientation tensor |
-| `get_scar_length()`   | Individual scar lengths from coordinate data        |
+| Function | Description |
+|:---|:---|
+| `compute_SPI()` | Scar Pattern Index (length-weighted: Clarkson et al., 2006; non-weighted: Bretzke & Conard, 2012) |
+| `compute_spi_angle()` | Angular conversion of SPI (`θ = arccos(SPI)`) |
+| `compute_EI()` | Elongation and Isotropy ratio from Lin et al. (2024) |
+| `get_scar_length()` | Individual scar lengths from coordinate data |
 
 #### Spherical Harmonic Analysis
 
-| Function | Description |
-|:---|:---|
+| Function                   | Description                                   |
+|:---------------------------|:----------------------------------------------|
 | `spharm_from_directions()` | SH coefficients from scar orientation vectors |
-| `spharm_from_meshes()` | SH coefficients from 3D mesh surfaces |
-| `spharm_to_dataframe()` | Convert results to a wide-format data frame |
-| `spharm_reconstruct()` | Reconstruct a density grid from SH coefficients |
+| `spharm_from_meshes()`     | SH coefficients from 3D mesh surfaces         |
+| `spharm_to_dataframe()`    | Convert results to a wide-format data frame   |
 
 #### Export & Visualisation
 
@@ -134,7 +133,7 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 |:---|:---|
 | `export_spharm_html()` | Interactive Three.js viewer for SH reconstructions |
 | `export_alignment_html_svd()` | SVD alignment as self-contained HTML |
-| `export_alignment_html_lin2024()` | Lin 2024 alignment as self-contained HTML |
+| `export_alignment_html_lin2024()` | Lin et al (2024) alignment as self-contained HTML |
 
 #### Python Environment
 
