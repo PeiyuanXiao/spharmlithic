@@ -167,6 +167,8 @@ spharm_reconstruct <- function(coefficients, grid_size = 64) {
     stop("`coefficients` must be a 3-D array of shape (2, lmax+1, lmax+1).",
          call. = FALSE)
   }
+
+  .ensure_backend()
   
   # If complex, take real part (morphology pipeline returns complex with ~0 imag).
   if (is.complex(coefficients)) {

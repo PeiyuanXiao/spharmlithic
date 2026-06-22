@@ -16,6 +16,8 @@ Description: A complete toolkit for the geometric alignment, directional
     spherical harmonic expansion via pyshtools), supporting both
     direction-vector and mesh-based inputs.
 License: MIT + file LICENSE
+URL: https://github.com/PeiyuanXiao/spharmlithic
+BugReports: https://github.com/PeiyuanXiao/spharmlithic/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -36,7 +38,11 @@ Suggests:
     rstudioapi,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggplot2,
+    tidyr,
+    vegan,
+    compositions
 Config/testthat/edition: 3
 SystemRequirements: Python (>= 3.9)
 VignetteBuilder: knitr

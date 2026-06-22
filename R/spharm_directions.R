@@ -85,6 +85,8 @@ spharm_from_directions <- function(
     dz_col     = "d_z",
     verbose    = TRUE) {
   
+  .ensure_backend()
+
   # ---- Validate input ---------------------------------------------------
   required <- c(id_col, dx_col, dy_col, dz_col)
   missing  <- setdiff(required, names(data))

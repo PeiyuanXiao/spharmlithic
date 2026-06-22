@@ -82,7 +82,9 @@ spharm_from_meshes <- function(
   if (!dir.exists(stl_dir)) {
     stop("Directory does not exist: ", stl_dir, call. = FALSE)
   }
-  
+
+  .ensure_backend()
+
   # Pre-flight: warn early if mesh extension isn't installed.
   if (!reticulate::py_module_available("trimesh") ||
       !reticulate::py_module_available("open3d")) {

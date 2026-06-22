@@ -33,6 +33,22 @@ sh_py <- NULL
   invisible()
 }
 
+# Guard called by every Python-backed function. Turns the cryptic
+# "attempt to apply non-function" (raised when sh_py is NULL because the
+# backend was never set up) into an actionable message.
+#' @noRd
+.ensure_backend <- function() {
+  if (is.null(sh_py)) {
+    stop(
+      "spharmlithic: Python backend not initialised.\n",
+      "  Run install_spharmlithic_python() to set it up, or\n",
+      "  use_spharmlithic_python('r-spharmlithic') to point at an existing env.",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
 .onAttach <- function(libname, pkgname) {
   if (is.null(sh_py)) {
     packageStartupMessage(

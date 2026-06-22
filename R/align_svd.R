@@ -31,7 +31,10 @@
 #' normal is required.  The best-fit plane is estimated directly from the
 #' scar direction vectors using SVD, making it suitable when morphological
 #' normals (`Norm_X/Y/Z`) are unavailable.  At least three valid scars
-#' (length > `1e-10`) are needed for the SVD step.
+#' (length > `1e-10`) are needed for the SVD step; for specimens with fewer
+#' valid scars the function falls back to the pre-measured morphological
+#' normal (`Norm_X/Y/Z`) with a warning, or errors if those columns are
+#' absent.
 #'
 #' For the morphology-based alternative that uses a pre-measured plane normal,
 #' see `align_morph()`.
@@ -68,8 +71,20 @@ align_scar <- function(df_group) {
                     dy[valid] / len[valid],
                     dz[valid] / len[valid])
     normal <- svd(U)$v[, 3]
+  } else if (all(c("Norm_X", "Norm_Y", "Norm_Z") %in% names(df_group))) {
+    # Too few scars to estimate the plane by SVD; fall back to the
+    # pre-measured morphological normal (as build_panel_scar() does).
+    warning("Fewer than 3 valid scars (", sum(valid), "); falling back to the ",
+            "morphological normal (Norm_X/Y/Z) for the rotation step.",
+            call. = FALSE)
+    normal <- as.numeric(df_group[1, c("Norm_X", "Norm_Y", "Norm_Z")])
+  } else {
+    stop("align_scar() needs at least 3 valid scars (length > 1e-10) to ",
+         "estimate the SVD plane normal, or Norm_X/Y/Z columns as a fallback. ",
+         "This specimen has only ", sum(valid), " valid scar(s).",
+         call. = FALSE)
   }
-  
+
   normal <- normal / sqrt(sum(normal^2))
   if (normal[3] < 0) normal <- -normal
   

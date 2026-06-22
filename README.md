@@ -142,8 +142,11 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 | `install_spharmlithic_python()` | Create the conda environment     |
 | `use_spharmlithic_python()`     | Activate an existing environment |
 
-For detailed usage, see
-`vignette("Introduction", package = "spharmlithic")`.
+For detailed usage, see the two vignettes:
+`vignette("Introduction", package = "spharmlithic")` (from artefacts to
+spherical harmonic coefficients) and
+`vignette("Statistics", package = "spharmlithic")` (PCA, PERMANOVA, and tests
+of standardisation on the results).
 
 ------------------------------------------------------------------------
 
