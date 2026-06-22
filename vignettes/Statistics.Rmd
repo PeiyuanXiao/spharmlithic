@@ -65,6 +65,16 @@ strategy_levels <- c("Unidirectional", "Bidirectional",
 scar$Typology  <- factor(scar$Typology,  levels = strategy_levels)
 morph$Typology <- factor(morph$Typology, levels = strategy_levels)
 
+# Shared colour palette, so every figure in this vignette matches the look of
+# the source-study figures (Xiao, Li & Marwick, in preparation).
+typology_colors <- c(
+  "Unidirectional" = "#BA8530",
+  "Bidirectional"  = "#788C4A",
+  "Levallois"      = "#4A6E8A",
+  "Discoid"        = "#802520",
+  "Multiplatform"  = "#8A7A68"
+)
+
 knitr::kable(
   as.data.frame(table(Strategy = scar$Typology)),
   col.names = c("Reduction strategy", "n"),
@@ -85,10 +95,15 @@ range(rowSums(scar[, grep("^power_l", names(scar))]))
 It is convenient to separate the numeric feature matrix from the grouping variable:
 
 ```{r feature-matrices}
-power_cols  <- grep("^power_l", names(scar), value = TRUE)
+# Degree selection (matching the source study, Xiao, Li & Marwick in prep.):
+# the informative shape/scar structure concentrates in the low spherical-harmonic
+# degrees, so we keep degrees 1-6 for scar direction and 1-8 for morphology and
+# drop the higher, near-noise degrees before the compositional analysis.
+scar_cols   <- paste0("power_l", 1:6)
+morph_cols  <- paste0("power_l", 1:8)
 
-scar_feat   <- scar[,  power_cols]
-morph_feat  <- morph[, power_cols]
+scar_feat   <- scar[,  scar_cols]
+morph_feat  <- morph[, morph_cols]
 groups      <- scar$Typology      # identical IDs/order in both tables
 ```
 
@@ -114,22 +129,32 @@ replace_zeros <- function(X, delta = NULL) {
   X
 }
 
-# ILR coordinates: 20 parts -> 19 real-valued coordinates per specimen.
-scar_ilr  <- as.data.frame(compositions::ilr(replace_zeros(as.matrix(scar_feat))))
-morph_ilr <- as.data.frame(compositions::ilr(replace_zeros(as.matrix(morph_feat))))
+# Wrap the transform in a helper that first drops any zero-variance degree (a
+# column identical across all specimens carries no information and would break
+# the log-ratio), then replaces zeros and applies ILR. This mirrors the
+# make_ilr() helper in the source study.
+make_ilr <- function(power_df) {
+  X    <- as.matrix(power_df)
+  keep <- apply(X, 2, function(v) sd(v, na.rm = TRUE) > 0)
+  as.data.frame(compositions::ilr(replace_zeros(X[, keep, drop = FALSE])))
+}
 
-dim(scar_ilr)   # 58 specimens x 19 ILR coordinates
+# ILR coordinates: D parts -> (D - 1) real-valued coordinates per specimen.
+scar_ilr  <- make_ilr(scar_feat)    # 6 degrees -> 5 ILR coordinates
+morph_ilr <- make_ilr(morph_feat)   # 8 degrees -> 7 ILR coordinates
+
+dim(scar_ilr)   # 58 specimens x 5 ILR coordinates
 ```
 
 All of the analyses below operate on these ILR coordinates. Note that this is specific to the *power spectrum* (a composition); the **raw coefficients** returned by `spharm_to_dataframe(include_coeffs = TRUE)` are ordinary real-valued numbers and would be analysed directly (e.g. with Euclidean distances), not log-ratio transformed.
 
 ## 1. Exploring variation with PCA
 
-A quick way to see whether the strategies separate at all is to project each domain's (standardised) ILR coordinates onto their first two principal components.
+A quick way to see whether the strategies separate at all is to project each domain's ILR coordinates onto their first two principal components. We run PCA on the **unscaled** coordinates (no `scale. = TRUE`): ILR already lays the composition out in a Euclidean space whose distances are the Aitchison distances the PERMANOVA below relies on, so standardising each coordinate would reweight the parts and distort that geometry.
 
 ```{r pca}
-pca_scar  <- prcomp(scar_ilr,  scale. = TRUE)
-pca_morph <- prcomp(morph_ilr, scale. = TRUE)
+pca_scar  <- prcomp(scar_ilr)
+pca_morph <- prcomp(morph_ilr)
 
 # Variance explained by the first few components, both domains
 var_tab <- data.frame(
@@ -141,7 +166,7 @@ knitr::kable(var_tab, row.names = FALSE,
   caption = "Variance explained by the leading principal components, by domain")
 ```
 
-```{r pca-plot, fig.cap = "Cores in the space of the first two principal components of the ILR coordinates, by domain, coloured by reduction strategy. Axis scales are free; variance explained is in the table above."}
+```{r pca-plot, fig.cap = "Cores in the space of the first two principal components of the ILR coordinates, by domain, coloured by reduction strategy, with convex hulls outlining each group. Axis scales are free; variance explained is in the table above."}
 library(ggplot2)
 
 pca_df <- rbind(
@@ -149,30 +174,45 @@ pca_df <- rbind(
              PC1 = pca_scar$x[, 1],  PC2 = pca_scar$x[, 2],  Strategy = groups),
   data.frame(Domain = "Morphology",
              PC1 = pca_morph$x[, 1], PC2 = pca_morph$x[, 2], Strategy = groups))
-pca_df$Domain <- factor(pca_df$Domain, levels = c("Scar direction", "Morphology"))
+pca_df$Domain   <- factor(pca_df$Domain, levels = c("Scar direction", "Morphology"))
+pca_df$Strategy <- factor(pca_df$Strategy, levels = strategy_levels)
+
+# Convex hulls per strategy, matching the project's LDA / ternary scatterplots
+hull_df <- do.call(rbind, lapply(
+  split(pca_df, list(pca_df$Domain, pca_df$Strategy), drop = TRUE),
+  function(d) d[chull(d$PC1, d$PC2), ]))
 
 ggplot(pca_df, aes(PC1, PC2, colour = Strategy)) +
-  geom_point(size = 2, alpha = 0.85) +
-  stat_ellipse(level = 0.68, linewidth = 0.4) +
+  geom_hline(yintercept = 0, colour = "grey50", linewidth = 0.35, linetype = "dashed") +
+  geom_vline(xintercept = 0, colour = "grey50", linewidth = 0.35, linetype = "dashed") +
+  geom_polygon(data = hull_df, aes(fill = Strategy, group = Strategy),
+               alpha = 0.25, colour = NA) +
+  geom_point(size = 2, alpha = 0.85, shape = 16) +
+  scale_colour_manual(values = typology_colors) +
+  scale_fill_manual(values  = typology_colors) +
   facet_wrap(~ Domain, scales = "free") +
   labs(x = "PC1", y = "PC2") +
-  theme_bw()
+  theme_bw() +
+  theme(panel.grid = element_blank())
 ```
 
-The ellipses (68% concentration) give a first impression of both *location* (do the groups sit in different places?) and *spread* (are some groups tighter than others?) — the two things we test formally below.
+The convex hulls give a first impression of both *location* (do the groups sit in different places?) and *spread* (are some groups tighter than others?) — the two things we test formally below.
 
 It is also informative to look at the **mean power spectrum** of each strategy (on the original closed scale): the degree at which energy concentrates reflects the angular scale of the dominant structure.
 
 ```{r spectrum-plot, fig.cap = "Mean power spectrum by reduction strategy and domain (ribbon = +/- 1 SE). Values are closed proportions."}
 library(tidyr)
 
+# The two domains now keep different numbers of degrees, so pivot each to long
+# form (a shared schema) before combining.
 spec_long <- rbind(
-  data.frame(Domain = "Scar direction", Strategy = groups, scar_feat,  check.names = FALSE),
-  data.frame(Domain = "Morphology",     Strategy = groups, morph_feat, check.names = FALSE)) |>
-  tidyr::pivot_longer(cols = all_of(power_cols),
-                      names_to = "degree", values_to = "power")
-spec_long$degree <- as.integer(sub("power_l", "", spec_long$degree))
-spec_long$Domain <- factor(spec_long$Domain, levels = c("Scar direction", "Morphology"))
+  data.frame(Domain = "Scar direction", Strategy = groups, scar_feat,  check.names = FALSE) |>
+    tidyr::pivot_longer(cols = all_of(scar_cols),  names_to = "degree", values_to = "power"),
+  data.frame(Domain = "Morphology",     Strategy = groups, morph_feat, check.names = FALSE) |>
+    tidyr::pivot_longer(cols = all_of(morph_cols), names_to = "degree", values_to = "power"))
+spec_long$degree   <- as.integer(sub("power_l", "", spec_long$degree))
+spec_long$Domain   <- factor(spec_long$Domain, levels = c("Scar direction", "Morphology"))
+spec_long$Strategy <- factor(spec_long$Strategy, levels = strategy_levels)
 
 spec_summ <- aggregate(power ~ Domain + Strategy + degree, spec_long,
                        FUN = function(x) c(m = mean(x),
@@ -183,9 +223,12 @@ ggplot(spec_summ, aes(degree, power.m, colour = Strategy, fill = Strategy)) +
   geom_ribbon(aes(ymin = power.m - power.se, ymax = power.m + power.se),
               alpha = 0.15, colour = NA) +
   geom_line(linewidth = 0.6) +
+  scale_colour_manual(values = typology_colors) +
+  scale_fill_manual(values  = typology_colors) +
   facet_wrap(~ Domain, scales = "free_y") +
   labs(x = "Spherical harmonic degree", y = "Mean power (proportion)") +
-  theme_bw()
+  theme_bw() +
+  theme(panel.grid = element_blank())
 ```
 
 ## 2. Do reduction strategies differ? (PERMANOVA)
@@ -264,8 +307,10 @@ Read `p_adj` rather than the raw `p` to decide which pairs differ: with five str
 `vegan::betadisper()` is the multivariate analogue of Levene's test: it measures each specimen's Aitchison distance to its group centroid and tests whether those distances differ among groups (Anderson 2006). **Smaller average distance = tighter cluster = more standardised.** (This is the PERMDISP test reported in the source study.)
 
 ```{r betadisper}
-bd_scar  <- betadisper(dist(scar_ilr),  groups)
-bd_morph <- betadisper(dist(morph_ilr), groups)
+# type = "centroid" gives the original PERMDISP of Anderson (2006): distances are
+# measured to the group centroid (betadisper's default is the spatial median).
+bd_scar  <- betadisper(dist(scar_ilr),  groups, type = "centroid")
+bd_morph <- betadisper(dist(morph_ilr), groups, type = "centroid")
 
 set.seed(1); pt_scar  <- permutest(bd_scar,  permutations = 999)
 set.seed(1); pt_morph <- permutest(bd_morph, permutations = 999)
@@ -286,18 +331,26 @@ knitr::kable(disp_summary, digits = 3,
 disp_df <- rbind(
   data.frame(Domain = "Scar direction", Strategy = groups, distance = bd_scar$distances),
   data.frame(Domain = "Morphology",     Strategy = groups, distance = bd_morph$distances))
-disp_df$Domain <- factor(disp_df$Domain, levels = c("Scar direction", "Morphology"))
+disp_df$Domain   <- factor(disp_df$Domain, levels = c("Scar direction", "Morphology"))
+disp_df$Strategy <- factor(disp_df$Strategy, levels = strategy_levels)
 
-ggplot(disp_df, aes(Strategy, distance)) +
-  geom_boxplot(outlier.shape = NA) +
-  geom_jitter(width = 0.15, alpha = 0.5) +
+ggplot(disp_df, aes(Strategy, distance, colour = Strategy, fill = Strategy)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.25, linewidth = 0.35) +
+  geom_jitter(width = 0.15, size = 1.6, alpha = 0.7, shape = 16) +
+  stat_summary(fun = mean, geom = "point", shape = 16, size = 2.4, colour = "white") +
+  scale_colour_manual(values = typology_colors) +
+  scale_fill_manual(values  = typology_colors) +
   facet_wrap(~ Domain, scales = "free_y") +
-  labs(y = "Distance to group centroid") +
+  labs(x = NULL, y = "Distance to group centroid") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 20, hjust = 1))
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "none")
 ```
 
 A significant `permutest` p-value (table above) means the strategies are *not* equally variable in that domain; the boxplots show which are tighter (more standardised) and which are more dispersed. For a direct ranking within a domain, average each group's distance to its centroid — e.g. `tapply(bd_scar$distances, groups, mean)` for scar direction.
+
+**Read the two tests together.** PERMANOVA and PERMDISP are not independent: a PERMANOVA is sensitive to differences in *dispersion* as well as in *location*, so when `betadisper` is *also* significant, a significant PERMANOVA can no longer be read as unambiguous evidence of a *location* (mean-shape) difference — the groups may differ in spread, in centroid, or both. In that situation interpret the group "difference" cautiously and lean on the ordination and the dispersion boxplots to tell the two apart (Anderson & Walsh 2013).
 
 > **Why not a coefficient-of-variation test here?** Because the power spectrum is closed (every specimen sums to 1), it carries no absolute-size information — the total is constant — and the ILR coordinates are interval-scaled (they can be negative). The coefficient of variation is only meaningful for a ratio-scale, non-negative variable with a true zero, so it applies to neither. To compare the *variability of size* across strategies you would bring in an external measurement (e.g. a linear core dimension or mass) and test it with, for example, the `cvequality` package.
 
@@ -318,6 +371,8 @@ Aitchison, J. (1986). *The Statistical Analysis of Compositional Data*. London: 
 Anderson, M. J. (2001). A new method for non-parametric multivariate analysis of variance. *Austral Ecology*, 26(1), 32–46.
 
 Anderson, M. J. (2006). Distance-based tests for homogeneity of multivariate dispersions. *Biometrics*, 62(1), 245–253.
+
+Anderson, M. J., & Walsh, D. C. I. (2013). PERMANOVA, ANOSIM, and the Mantel test in the face of heterogeneous dispersions: What null hypothesis are you testing? *Ecological Monographs*, 83(4), 557–574.
 
 Egozcue, J. J., Pawlowsky-Glahn, V., Mateu-Figueras, G., & Barceló-Vidal, C. (2003). Isometric logratio transformations for compositional data analysis. *Mathematical Geology*, 35(3), 279–300.
 
