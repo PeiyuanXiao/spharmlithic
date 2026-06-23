@@ -98,14 +98,14 @@ The scar analysis pipeline expects a data frame with **one row per scar**, where
 **Additional columns required by `align_morph_batch()` (Lin 2024 pipeline):**
 
 | Column | Description |
-|:---|:---|
+|:-----------------------------------|:-----------------------------------|
 | `Norm_X`, `Norm_Y`, `Norm_Z` | Morphological best-fitted plane normal vector |
 | `Pos_X`, `Pos_Y`, `Pos_Z` | Centroid of the morphological best-fitted plane |
 
 **Optional columns:**
 
 | Column | Description |
-|:---|:---|
+|:-----------------------------------|:-----------------------------------|
 | `Scar_ID` | Individual scar identifier within a specimen |
 | `Length` | Pre-computed scar length (if absent, computed from start/end coordinates) |
 | `Typology` | Specimen type label (e.g. "Levallois", "Discoid"); used for grouping in the interactive SPHARM viewer |
@@ -146,7 +146,7 @@ list.files(stl_dir, pattern = "\\.stl$", ignore.case = TRUE)
 Both alignment pipelines (`align_scar_batch()` and `align_morph_batch()`) add nine columns to the input data frame:
 
 | Column | Description |
-|:---|:---|
+|:-----------------------------------|:-----------------------------------|
 | `s_x`, `s_y`, `s_z` | Aligned scar start-point coordinates |
 | `e_x`, `e_y`, `e_z` | Aligned scar end-point coordinates |
 | `d_x`, `d_y`, `d_z` | Aligned unit direction vectors — the primary input for `compute_SPI()`, `compute_EI()`, and `spharm_from_directions()` |
@@ -383,20 +383,6 @@ plot_ly(x = x_mat, y = y_mat, z = z_mat,
         type = "surface", colorscale = "Hot",
         showscale = TRUE)
 ```
-
-------------------------------------------------------------------------
-
-## 8. Comparing the Two Analyses
-
-|   | Morphological analysis | Scar pattern analysis |
-|:---|:---|:---|
-| **Input** | 3D mesh files (.stl) | Scar orientation vectors (Excel / data frame) |
-| **What it captures** | Overall artefact shape | Organisation of flaking removals |
-| **Key function** | `spharm_from_meshes()` | `spharm_from_directions()` |
-| **Python extras** | Requires `mesh = TRUE` | Base Python install |
-| **Typical use** | Shape-based typology, reduction intensity | Flaking strategy comparison |
-
-Both produce spherical harmonic coefficient objects that can be exported to an interactive viewer (`export_spharm_html()`), converted to data frames (`spharm_to_dataframe()`), or reconstructed as numerical grids (`spharm_reconstruct()`).
 
 ------------------------------------------------------------------------
 

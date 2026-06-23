@@ -37,19 +37,19 @@ The companion vignette `vignette("Introduction", package = "spharmlithic")` show
 
 We work through three questions that recur in lithic analysis:
 
-1.  **Exploration** — how is shape/scar variation structured across specimens? (Principal Component Analysis.)
-2.  **Group difference** — do specimens made by different reduction strategies differ in their SH descriptors? (PERMANOVA.)
-3.  **Standardisation** — is one strategy more *standardised* (less variable) than another? (Multivariate dispersion.)
+1.  **Exploration**: how is shape/scar pattern variation structured across specimens? (Principal Component Analysis, PCA)
+2.  **Group difference**: do specimens made by different reduction strategies differ in their SPHARM descriptors? (PERMANOVA)
+3.  **Standardisation**: is one strategy more standardised (less variable) than another? (Multivariate dispersion, PERMIDSP)
 
-Three features of SH power spectra shape the choice of method:
+Three features of SPHARM power spectra shape the choice of method:
 
-- **The power spectrum is rotation-invariant.** Each `power_lN` value summarises the energy at spherical-harmonic degree `N`, independent of how the specimen was oriented. This makes the power spectrum a robust feature set for cross-specimen comparison — we use it throughout. (The raw coefficients carry more detail but depend on alignment.)
-- **The power spectrum is compositional.** Each specimen's spectrum is *closed* to a constant sum (here, 1): the values are relative proportions of energy across degrees, not absolute magnitudes. Compositional data live on the simplex, not in ordinary Euclidean space, so applying Euclidean-based methods (PCA, distances) to the raw proportions induces spurious negative correlations (the *closure problem*). The fix is a log-ratio transform — we use the **isometric log-ratio (ILR)** transform (Egozcue et al. 2003), which maps the composition into ordinary Euclidean coordinates where standard methods are valid. Distances computed on ILR coordinates are *Aitchison distances*.
+- **The power spectrum is rotation-invariant.** Each `power_lN` value summarises the energy at spherical harmonic degree `N`, independent of how the specimen was oriented. This makes the power spectrum a robust feature set for cross-specimen comparison, we use it throughout.
+- **The power spectrum is compositional data.** Each specimen's spectrum is closed to a constant sum (here, 1): the values are relative proportions of energy across degrees, not absolute magnitudes. Compositional data live on the simplex, not in Euclidean space, so applying Euclidean-based methods (PCA, distances) to the raw proportions induces spurious negative correlations (the closure problem). The fix is a log-ratio transform. We use the **isometric log-ratio (ILR)** transform (Egozcue et al. 2003), which maps the composition into ordinary Euclidean coordinates where standard methods are valid. Distances computed on ILR coordinates are **Aitchison distances.**
 - **`p` is often comparable to or larger than `n`.** Even the power spectrum has 20+ columns. Classical MANOVA breaks down when variables approach the number of specimens, so we lean on distance- and permutation-based methods (PERMANOVA, `betadisper`) and dimension reduction (PCA).
 
 ## The example data
 
-The package bundles a worked example: spherical harmonic power spectra for **58 experimental cores** knapped with five known reduction strategies, from the authors' experimental reference collection (Xiao, Li, & Marwick, in preparation). Two parallel tables describe the same specimens in two domains — **scar direction** (how flaking removals are organised) and **morphology** (overall shape). Each was produced exactly as in the Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`); we ship the flattened tables so this vignette needs no Python backend.
+The package bundles a worked example: spherical harmonic power spectra for **58 experimental cores** knapped with five known reduction strategies, from the Professor Chris Clarkson, also used in Xiao et al (in preparation). Two parallel tables describe the same specimens in two domains: **scar direction** (how flaking removals are organised) and **morphology** (overall shape). Each was produced exactly as in the Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`); we ship the flattened tables so this vignette needs no Python backend.
 
 ```{r load-data}
 scar  <- read.csv(
@@ -58,15 +58,10 @@ scar  <- read.csv(
 morph <- read.csv(
   system.file("extdata", "exp_cores_morph.csv", package = "spharmlithic"),
   check.names = FALSE)
-
-# Put the strategies in a sensible order for plots and tables
 strategy_levels <- c("Unidirectional", "Bidirectional",
                      "Levallois", "Discoid", "Multiplatform")
 scar$Typology  <- factor(scar$Typology,  levels = strategy_levels)
 morph$Typology <- factor(morph$Typology, levels = strategy_levels)
-
-# Shared colour palette, so every figure in this vignette matches the look of
-# the source-study figures (Xiao, Li & Marwick, in preparation).
 typology_colors <- c(
   "Unidirectional" = "#BA8530",
   "Bidirectional"  = "#788C4A",
@@ -74,14 +69,13 @@ typology_colors <- c(
   "Discoid"        = "#802520",
   "Multiplatform"  = "#8A7A68"
 )
-
 knitr::kable(
   as.data.frame(table(Strategy = scar$Typology)),
   col.names = c("Reduction strategy", "n"),
   caption   = "Experimental cores per reduction strategy")
 ```
 
-Each table has an `ID`, a `Typology` (the reduction strategy), and the power spectrum from degree 1 to 20 (`power_l1` … `power_l20`; degree 0, the constant term, is dropped because it carries no shape information). Each row sums to 1:
+Each table has an `ID`, a `Typology`, and the power spectrum from degree 1 to 20 (`power_l1` … `power_l20`; degree 0, the constant term, is dropped because it carries no shape information). Each row sums to 1:
 
 ```{r preview}
 knitr::kable(
@@ -95,21 +89,16 @@ range(rowSums(scar[, grep("^power_l", names(scar))]))
 It is convenient to separate the numeric feature matrix from the grouping variable:
 
 ```{r feature-matrices}
-# Degree selection (matching the source study, Xiao, Li & Marwick in prep.):
-# the informative shape/scar structure concentrates in the low spherical-harmonic
-# degrees, so we keep degrees 1-6 for scar direction and 1-8 for morphology and
-# drop the higher, near-noise degrees before the compositional analysis.
 scar_cols   <- paste0("power_l", 1:6)
 morph_cols  <- paste0("power_l", 1:8)
-
 scar_feat   <- scar[,  scar_cols]
 morph_feat  <- morph[, morph_cols]
-groups      <- scar$Typology      # identical IDs/order in both tables
+groups      <- scar$Typology     
 ```
 
-## Treating the power spectrum as compositional data
+## CoDA of the power spectrum
 
-Before any Euclidean-based analysis we move the spectra off the simplex with the ILR transform. ILR (like any log-ratio) requires strictly positive values, but the scar spectra contain exact zeros (degrees with no energy). We handle them with a **multiplicative zero replacement** that preserves the unit sum, following Xiao, Li & Marwick (in preparation):
+Before any Euclidean-based analysis we move the spectra off the simplex with the ILR transform. ILR (like any log-ratio) requires strictly positive values, but the scar spectra contain exact zeros (degrees with no energy). We handle them with a multiplicative zero replacement that preserves the unit sum, following Xiao et al (in preparation):
 
 ```{r ilr}
 # Replace zeros with a small fraction of the smallest non-zero value in the
@@ -143,10 +132,72 @@ make_ilr <- function(power_df) {
 scar_ilr  <- make_ilr(scar_feat)    # 6 degrees -> 5 ILR coordinates
 morph_ilr <- make_ilr(morph_feat)   # 8 degrees -> 7 ILR coordinates
 
-dim(scar_ilr)   # 58 specimens x 5 ILR coordinates
+dim(scar_ilr)
 ```
 
-All of the analyses below operate on these ILR coordinates. Note that this is specific to the *power spectrum* (a composition); the **raw coefficients** returned by `spharm_to_dataframe(include_coeffs = TRUE)` are ordinary real-valued numbers and would be analysed directly (e.g. with Euclidean distances), not log-ratio transformed.
+All of the analyses below operate on these ILR coordinates. Note that this is specific to the power spectrum (a composition); the **raw coefficients** returned by `spharm_to_dataframe(include_coeffs = TRUE)` are ordinary real-valued numbers and would be analysed directly, not log-ratio transformed.
+
+## Example of power degree selection
+
+The feature matrices defined above keep only the first 6 degrees for scar direction and the first 8 for morphology, rather than all 20. This section shows the diagnostic behind that choice; it operates on the full 20-degree spectra, before the truncation used everywhere else.
+
+Although coefficients were computed to degree 20 for faithful reconstruction, retaining all 20 degrees for statistical comparison would add dimensionality and, for scar patterns, noise. We therefore screen degrees prior to all statistical analyses using two diagnostics: the across-specimen coefficient of variation (CV), indexing the reliability of each degree's between-specimen signal, and cumulative power, indexing the share of total variance each degree carries.
+
+```{r degree-selection, fig.width = 7, fig.height = 3.4, fig.cap = "Per-degree diagnostics for the two power spectra (experimental cores, n = 58): across-specimen coefficient of variation (left) and cumulative power (right), each overlaying the two domains. Red dashed lines mark the retained truncations (degree 6 for scar direction, degree 8 for morphology); grey dashed lines mark CV = 100% and the 95% / 99% cumulative-power levels."}
+library(ggplot2)
+
+# Per-degree CV and cumulative power on the full 20-degree spectra (before the
+# 1:6 / 1:8 truncation used elsewhere). One row per degree per domain.
+degree_diagnostics <- function(power_df, descriptor) {
+  mat <- as.matrix(power_df[, paste0("power_l", 1:20)])
+  mu  <- colMeans(mat)
+  data.frame(
+    descriptor = descriptor,
+    degree     = 1:20,
+    cv_pct     = apply(mat, 2, sd) / mu * 100,  # across-specimen reliability
+    cumul_pct  = cumsum(mu) / sum(mu) * 100)    # share of total variance
+}
+
+deg_df <- rbind(
+  degree_diagnostics(scar,  "SP-SPHARM (scar direction)"),
+  degree_diagnostics(morph, "M-SPHARM (morphology)"))
+deg_df$descriptor <- factor(deg_df$descriptor,
+  levels = c("M-SPHARM (morphology)", "SP-SPHARM (scar direction)"))
+
+descriptor_colors <- c(
+  "M-SPHARM (morphology)"      = "#4A6E8A",
+  "SP-SPHARM (scar direction)" = "#BA8530")
+
+# Long form so the two diagnostics share one faceted figure.
+deg_long <- tidyr::pivot_longer(deg_df, c(cv_pct, cumul_pct),
+                                names_to = "metric", values_to = "value")
+deg_long$metric <- factor(deg_long$metric, c("cv_pct", "cumul_pct"),
+  labels = c("Across-specimen CV (%)", "Cumulative power (%)"))
+
+# Panel-specific reference lines: CV = 100% (noise threshold), and the 95 / 99%
+# cumulative-power levels.
+ref_lines <- data.frame(
+  metric = factor(c("Across-specimen CV (%)",
+                    "Cumulative power (%)", "Cumulative power (%)"),
+                  levels = levels(deg_long$metric)),
+  yint   = c(100, 95, 99))
+
+ggplot(deg_long, aes(degree, value, colour = descriptor)) +
+  geom_hline(data = ref_lines, aes(yintercept = yint),
+             linetype = "dashed", colour = "grey55", linewidth = 0.3) +
+  geom_vline(xintercept = c(6, 8), colour = "red",
+             linetype = "dashed", linewidth = 0.3) +
+  geom_line(linewidth = 0.6) +
+  geom_point(size = 1.4) +
+  scale_colour_manual(values = descriptor_colors) +
+  scale_x_continuous(breaks = seq(2, 20, 2)) +
+  facet_wrap(~ metric, scales = "free_y") +
+  labs(x = "Spherical harmonic degree", y = NULL, colour = NULL) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(), legend.position = "bottom")
+```
+
+The two spectra behave differently and are truncated on different grounds. For scar direction (SP-SPHARM), power is effectively exhausted by the sixth degree (cumulative energy ≈ 99.9%), and higher degrees are noise-dominated (CV \> 100% from degree 9 onward); we therefore retain degrees 1–6. For morphology (M-SPHARM), between-specimen signal remains reliable across all degrees (CV \< 90% throughout), but variance is strongly concentrated in the low degrees, with \~98% of cumulative power captured by the eighth degree; we retain degrees 1–8, since the reliable but very low-energy higher degrees (together under 2% of power) would inflate dimensionality and dilute multivariate comparisons without materially improving discrimination.
 
 ## 1. Exploring variation with PCA
 
@@ -196,7 +247,7 @@ ggplot(pca_df, aes(PC1, PC2, colour = Strategy)) +
   theme(panel.grid = element_blank())
 ```
 
-The convex hulls give a first impression of both *location* (do the groups sit in different places?) and *spread* (are some groups tighter than others?) — the two things we test formally below.
+The convex hulls give a first impression of both **location** (do the groups sit in different places?) and **spread** (are some groups tighter than others?), the two things we test formally below.
 
 It is also informative to look at the **mean power spectrum** of each strategy (on the original closed scale): the degree at which energy concentrates reflects the angular scale of the dominant structure.
 
@@ -231,11 +282,9 @@ ggplot(spec_summ, aes(degree, power.m, colour = Strategy, fill = Strategy)) +
   theme(panel.grid = element_blank())
 ```
 
-## 2. Do reduction strategies differ? (PERMANOVA)
+## 2. Do reduction strategies differ?
 
-PCA is descriptive. To *test* whether the strategies differ in their SH descriptors we use **PERMANOVA** (Anderson 2001), implemented in `vegan::adonis2()`. PERMANOVA partitions a distance matrix among groups and assesses the group effect by permutation, so it copes gracefully with many variables and few specimens.
-
-Dissimilarity is the **Aitchison distance** — ordinary Euclidean distance on the ILR coordinates:
+PCA is descriptive. To test whether the strategies differ in their SH descriptors we use **PERMANOVA** (Anderson 2001), implemented in `vegan::adonis2()`. PERMANOVA partitions a distance matrix among groups and assesses the group effect by permutation, so it copes gracefully with many variables and few specimens.
 
 ```{r permanova}
 library(vegan)
@@ -261,11 +310,11 @@ knitr::kable(permanova_summary, digits = 3,
   caption = "PERMANOVA for differences among reduction strategies, by domain")
 ```
 
-The scar-direction PERMANOVA returns p = `r if (can_run) round(pm_scar[["Pr(>F)"]][1], 3)`, with R<sup>2</sup> = `r if (can_run) round(pm_scar[["R2"]][1], 3)` of the variation in scar-pattern organisation attributable to reduction strategy. In other words, **knowing how a core was reduced tells us a meaningful amount about its scar-direction signature.** Read the morphology row of the table the same way.
+The scar direction PERMANOVA returns p = `r if (can_run) round(pm_scar[["Pr(>F)"]][1], 3)`, with R<sup>2</sup> = `r if (can_run) round(pm_scar[["R2"]][1], 3)` of the variation in scar pattern attributable to reduction strategy. In other words, knowing core types tell us a meaningful amount about its scar pattern signature.
 
-### Which strategies differ? (pairwise PERMANOVA)
+### Which reduction strategies differ?
 
-The omnibus PERMANOVA tells us *that* the strategies differ, but not *which* pairs. For that we run PERMANOVA on each pair of strategies and correct the p-values for multiple comparisons. No extra package is needed — we loop over `vegan::adonis2()` and adjust with `stats::p.adjust()`:
+The omnibus PERMANOVA tells us that the strategies differ, but not which pairs. For that we run PERMANOVA on each pair of strategies and correct the p-values for multiple comparisons:
 
 ```{r pairwise-permanova}
 pairwise_permanova <- function(ilr_df, grp, permutations = 999,
@@ -298,13 +347,13 @@ knitr::kable(pw_all, digits = 3, row.names = FALSE,
   caption = "Pairwise PERMANOVA between reduction strategies. p_adj: Holm-Bonferroni correction within each domain.")
 ```
 
-Read `p_adj` rather than the raw `p` to decide which pairs differ: with five strategies there are ten comparisons per domain, and the correction guards against false positives from repeated testing. We use the **Holm-Bonferroni** step-down correction (`method = "holm"`), which controls the family-wise error rate while being uniformly more powerful than plain Bonferroni; switch `p.adjust.method` to `"BH"` for a less conservative false-discovery-rate criterion.
+Read `p_adj` rather than the raw `p` to decide which pairs differ: with five strategies there are ten comparisons per domain, and the correction guards against false positives from repeated testing. We use the **Holm-Bonferroni** step-down correction (`method = "holm"`), which controls the family-wise error rate (FWER) while being uniformly more powerful than plain Bonferroni; switch `p.adjust.method` to `"BH"` for a less conservative false-discovery-rate criterion.
 
-## 3. Is one strategy more standardised? (multivariate dispersion)
+## 3. Is one strategy more standardised?
 
-"Difference in *location*" (PERMANOVA, above) is not the same as "difference in *variability*". A central question in lithic studies — how *standardised* a reduction strategy is — is a question about variability: a more standardised strategy produces a tighter cluster of specimens.
+"Difference in location" (PERMANOVA, above) is not the same as "difference in variability". A central question in lithic studies concerns how standardised a reduction strategy is, which is a question about variability: a more standardised strategy produces a tighter cluster of specimens.
 
-`vegan::betadisper()` is the multivariate analogue of Levene's test: it measures each specimen's Aitchison distance to its group centroid and tests whether those distances differ among groups (Anderson 2006). **Smaller average distance = tighter cluster = more standardised.** (This is the PERMDISP test reported in the source study.)
+`vegan::betadisper()` is the multivariate analogue of Levene's test: it measures each specimen's Aitchison distance to its group centroid and tests whether those distances differ among groups (Anderson 2006). Smaller average distance = tighter cluster = more standardised.
 
 ```{r betadisper}
 # type = "centroid" gives the original PERMDISP of Anderson (2006): distances are
@@ -348,11 +397,9 @@ ggplot(disp_df, aes(Strategy, distance, colour = Strategy, fill = Strategy)) +
         legend.position = "none")
 ```
 
-A significant `permutest` p-value (table above) means the strategies are *not* equally variable in that domain; the boxplots show which are tighter (more standardised) and which are more dispersed. For a direct ranking within a domain, average each group's distance to its centroid — e.g. `tapply(bd_scar$distances, groups, mean)` for scar direction.
+A significant `permutest` p-value (table above) means the strategies are not equally variable in that domain; the boxplots show which are tighter (more standardised) and which are more dispersed. For a direct ranking within a domain, average each group's distance to its centroid, e.g. `tapply(bd_scar$distances, groups, mean)` for scar direction.
 
-**Read the two tests together.** PERMANOVA and PERMDISP are not independent: a PERMANOVA is sensitive to differences in *dispersion* as well as in *location*, so when `betadisper` is *also* significant, a significant PERMANOVA can no longer be read as unambiguous evidence of a *location* (mean-shape) difference — the groups may differ in spread, in centroid, or both. In that situation interpret the group "difference" cautiously and lean on the ordination and the dispersion boxplots to tell the two apart (Anderson & Walsh 2013).
-
-> **Why not a coefficient-of-variation test here?** Because the power spectrum is closed (every specimen sums to 1), it carries no absolute-size information — the total is constant — and the ILR coordinates are interval-scaled (they can be negative). The coefficient of variation is only meaningful for a ratio-scale, non-negative variable with a true zero, so it applies to neither. To compare the *variability of size* across strategies you would bring in an external measurement (e.g. a linear core dimension or mass) and test it with, for example, the `cvequality` package.
+**Read the two tests together.** PERMANOVA and PERMDISP are not independent: a PERMANOVA is sensitive to differences in dispersion as well as in location, so when `betadisper` is also significant, a significant PERMANOVA can no longer be read as unambiguous evidence of a location difference. The groups may differ in spread, in centroid, or both. In that situation interpret the group "difference" cautiously and lean on the ordination and the dispersion boxplots to tell the two apart (Anderson & Walsh 2013).
 
 ## Reproducibility
 
@@ -360,22 +407,22 @@ PERMANOVA and `permutest` are randomised, so call `set.seed()` immediately befor
 
 ## Where to go next
 
-- Swap in the **full coefficient vectors** (`include_coeffs = TRUE` in `spharm_to_dataframe()`) for a finer-grained, alignment-dependent analysis. These are real-valued (not compositional), so use them directly with Euclidean distances — no ILR.
-- Add specimen metadata (raw material, archaeological layer, …) and test those factors the same way — this is how the source study analyses its archaeological core assemblage (Xiao, Li, & Marwick, in preparation).
+- Swap in the full coefficient vectors (`include_coeffs = TRUE` in `spharm_to_dataframe()`) for a finer-grained, alignment-dependent analysis. These are real value (not compositional), so use them directly with Euclidean distances.
+- Add specimen metadata (raw material, layer, reduction intensity…) and test those factors the same way.
 - Use `export_spharm_html()` to inspect, in 3D, the specimens that sit at the extremes of a PC axis or a dispersion boxplot.
 
 ## References
 
-Aitchison, J. (1986). *The Statistical Analysis of Compositional Data*. London: Chapman & Hall.
+Aitchison, J. (1986). The Statistical Analysis of Compositional Data. London: Chapman & Hall.
 
-Anderson, M. J. (2001). A new method for non-parametric multivariate analysis of variance. *Austral Ecology*, 26(1), 32–46.
+Anderson, M. J. (2001). A new method for non-parametric multivariate analysis of variance. Austral Ecology, 26(1), 32–46.
 
-Anderson, M. J. (2006). Distance-based tests for homogeneity of multivariate dispersions. *Biometrics*, 62(1), 245–253.
+Anderson, M. J. (2006). Distance-based tests for homogeneity of multivariate dispersions. Biometrics, 62(1), 245–253.
 
-Anderson, M. J., & Walsh, D. C. I. (2013). PERMANOVA, ANOSIM, and the Mantel test in the face of heterogeneous dispersions: What null hypothesis are you testing? *Ecological Monographs*, 83(4), 557–574.
+Anderson, M. J., & Walsh, D. C. I. (2013). PERMANOVA, ANOSIM, and the Mantel test in the face of heterogeneous dispersions: What null hypothesis are you testing? Ecological Monographs, 83(4), 557–574.
 
-Egozcue, J. J., Pawlowsky-Glahn, V., Mateu-Figueras, G., & Barceló-Vidal, C. (2003). Isometric logratio transformations for compositional data analysis. *Mathematical Geology*, 35(3), 279–300.
+Egozcue, J. J., Pawlowsky-Glahn, V., Mateu-Figueras, G., & Barceló-Vidal, C. (2003). Isometric logratio transformations for compositional data analysis. Mathematical Geology, 35(3), 279–300.
 
-Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8), 2574–2592.
+Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with spherical harmonics. Geochemistry, Geophysics, Geosystems, 19(8), 2574–2592.
 
 Xiao, P., Li, H., & Marwick, B. (in preparation). Characterizing core morphology and scar patterning within a unified spherical harmonic framework.
