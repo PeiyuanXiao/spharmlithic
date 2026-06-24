@@ -33,23 +33,23 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The goal of this vignette is to walk you through using the spharmlithic package to tackle three research questions that are central to many analyses of archaeological stone artefact assemblages:
+The goal of this vignette is to walk you through using the spharmlithic package to tackle three research questions that are central to many analyses of stone artefact assemblages from archaeological sites:
 
 1.  **Exploration**: how is artefact shape/scar pattern variation structured across specimens? We will demonstrate how to use Principal Component Analysis (PCA) for this.
 2.  **Group difference**: do artefacts made by different reduction strategies differ in their SPHARM descriptors? PERMANOVA is a classic statistical method for this question. 
-3.  **Standardisation**: is one reduction strategy more standardised (less variable) than another? Multivariate dispersion (PERMIDSP) is our approach to answer this question. 
+3.  **Standardisation**: is one reduction strategy more standardised (less variable) than another? Multivariate dispersion (PERMIDSP) is useful to answer this question. 
 
 This vignette follows from our companion vignette `vignette("Introduction", package = "spharmlithic")` that walks through how to turn 3D artefacts into spherical harmonic (SH) coefficients with `spharm_from_directions()` and `spharm_from_meshes()`, and how to flatten the result with `spharm_to_dataframe()`. Here we demonstrate functions in the package that are designed for typical research applications. 
 
-Our choice of statistical methods for this walk through is informed by three features of SPHARM power spectra:
+Our choice of statistical methods for this walk-through is informed by three features of SPHARM power spectra:
 
 - Power spectra are rotation-invariant. Each `power_lN` value summarises the energy at spherical harmonic degree `N`, independent of how the specimen was oriented. This makes a power spectrum a robust feature set for cross-specimen comparison, so we use it throughout this workflow.
 - Power spectra are compositional data. Each specimen's spectrum is closed to a constant sum (here, 1): the values are relative proportions of energy across degrees, not absolute magnitudes. Compositional data live on the simplex, not in Euclidean space, so applying Euclidean-based methods (PCA, distances) to the raw proportions induces spurious negative correlations (the closure problem). To fix this we use the isometric log-ratio (ILR) transform (Egozcue et al. 2003), which maps the composition into ordinary Euclidean coordinates where standard methods are valid. Distances computed on ILR coordinates are Aitchison distances.
-- `p` is often comparable to or larger than `n`. Even the power spectrum has 20+ columns. Classical MANOVA breaks down when variables approach the number of specimens, so to avoid this we use distance- and permutation-based methods (PERMANOVA, `betadisper`) and dimension reduction (PCA).
+- The number of variables measured on each artefact via spherical harmonics power spectra, `p`,  is often comparable to or larger than `n`. A typical power spectrum may have 20+ columns. Classical MANOVA becomes unstable and unreliable when the number of variables approaches the number of specimens. To avoid this we use distance- and permutation-based methods (PERMANOVA, `betadisper`) and dimension reduction (PCA).
 
-## The example data
+## The Example Data
 
-The spharmlithic package bundles a worked example: spherical harmonic power spectra for 58 experimental cores knapped in five known reduction strategies by Professor Chris Clarkson and included here with his permission. Here we load the data, two parallel tables that describe the artefacts in two domains: scar direction (how flaking removals are organised) and morphology (overall shape). These tables were produced by following the steps in our Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`). We also include with the package the flattened tables resulting from the Introduction vignette. This means that all the code in this statistical analysis vignette can be run without needing the Python backend. 
+The spharmlithic package bundles a worked example: spherical harmonic power spectra for 58 experimental cores knapped in five known reduction strategies by Professor Chris Clarkson. These data are included here with his permission. In this section we load the data, two parallel tables that describe the artefacts in two domains: scar direction (how flaking removals are organised) and morphology (overall shape). These tables were produced by following the steps in our Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`). We also include with the package the flattened tables resulting from the Introduction vignette. This means that all the code in this statistical analysis vignette can be run without needing the Python backend. 
 
 ```{r load-data}
 # load the tables
@@ -93,77 +93,41 @@ knitr::kable(
 range(rowSums(scar[, grep("^power_l", names(scar))]))
 ```
 
-It is convenient to separate the numeric feature matrix from the grouping variable:
+To prepare for answering our research questions in the next sections, we separate the numeric feature matrix from the grouping variable:
 
 ```{r feature-matrices}
-scar_cols   <- paste0("power_l", 1:6)
-morph_cols  <- paste0("power_l", 1:8)
+scar_cols   <- paste0("power_l", 1:6) # first 6 degrees of the power spectrum
+morph_cols  <- paste0("power_l", 1:8) # first 8 degrees of the power spectrum
 scar_feat   <- scar[,  scar_cols]
 morph_feat  <- morph[, morph_cols]
 groups      <- scar$Typology     
 ```
 
-## CoDA of the power spectrum
+## Compositional Data Analyses of the Power Spectra
 
-Before any Euclidean-based analysis we move the spectra off the simplex with the ILR transform. ILR (like any log-ratio) requires strictly positive values, but the scar spectra contain exact zeros (degrees with no energy). We handle them with a multiplicative zero replacement that preserves the unit sum, following Xiao et al (in preparation):
+Before any Euclidean-based analysis, we move the spectra off the simplex with the ILR transform. ILR (like any log-ratio) requires strictly positive values, but the scar spectra contain exact zeros (degrees with no energy). We handle them with the function `make_ilr` which includes a multiplicative zero replacement function that preserves the unit sum `replace_zeros`, following Xiao et al (in preparation):
 
 ```{r ilr}
-# Replace zeros with a small fraction of the smallest non-zero value in the
-# row, then rescale the non-zeros so the row still sums to 1.
-replace_zeros <- function(X, delta = NULL) {
-  X <- as.matrix(X)
-  for (i in seq_len(nrow(X))) {
-    row_i    <- X[i, ]
-    zero_idx <- row_i == 0
-    if (!any(zero_idx)) next
-    d  <- if (is.null(delta)) min(row_i[!zero_idx]) * 0.65 else delta
-    nz <- sum(zero_idx)
-    row_i[zero_idx]  <- d
-    row_i[!zero_idx] <- row_i[!zero_idx] * (1 - nz * d)
-    X[i, ] <- row_i
-  }
-  X
-}
-
-# Wrap the transform in a helper that first drops any zero-variance degree (a
-# column identical across all specimens carries no information and would break
-# the log-ratio), then replaces zeros and applies ILR. This mirrors the
-# make_ilr() helper in the source study.
-make_ilr <- function(power_df) {
-  X    <- as.matrix(power_df)
-  keep <- apply(X, 2, function(v) sd(v, na.rm = TRUE) > 0)
-  as.data.frame(compositions::ilr(replace_zeros(X[, keep, drop = FALSE])))
-}
-
 # ILR coordinates: D parts -> (D - 1) real-valued coordinates per specimen.
 scar_ilr  <- make_ilr(scar_feat)    # 6 degrees -> 5 ILR coordinates
 morph_ilr <- make_ilr(morph_feat)   # 8 degrees -> 7 ILR coordinates
 
-dim(scar_ilr)
+# first few rows
+head(scar_ilr)
 ```
 
-All of the analyses below operate on these ILR coordinates. Note that this is specific to the power spectrum (a composition); the **raw coefficients** returned by `spharm_to_dataframe(include_coeffs = TRUE)` are ordinary real-valued numbers and would be analysed directly, not log-ratio transformed.
+The output is a data frame with one row per artefact, and one column for each ILR coordinate (the transformed power spectra). All of the analyses below operate on these ILR coordinates. Note that this is specific to the power spectrum (a composition); the **raw coefficients** returned by `spharm_to_dataframe(include_coeffs = TRUE)` are ordinary real-valued numbers and would be analysed directly, not log-ratio transformed.
 
-## Example of power degree selection
+## How to choose an appropriate number of degrees from the power spectra?
 
-The feature matrices defined above keep only the first 6 degrees for scar direction and the first 8 for morphology, rather than all 20. This section shows the diagnostic behind that choice; it operates on the full 20-degree spectra, before the truncation used everywhere else.
+The feature matrices defined above keep only the first 6 degrees for scar direction and the first 8 for morphology, rather than all 20. This section shows the diagnostic behind that choice. 
 
 Although coefficients were computed to degree 20 for faithful reconstruction, retaining all 20 degrees for statistical comparison would add dimensionality and, for scar patterns, noise. We therefore screen degrees prior to all statistical analyses using two diagnostics: the across-specimen coefficient of variation (CV), indexing the reliability of each degree's between-specimen signal, and cumulative power, indexing the share of total variance each degree carries.
 
+We provide the function `degree_diagnostics` to operate on the full 20-degree spectra and calculate per-degree coefficients of variation and cumulative mean power from a power spectrum before the truncation used in the next steps.
+
 ```{r degree-selection, fig.width = 7, fig.height = 3.4, fig.cap = "Per-degree diagnostics for the two power spectra (experimental cores, n = 58): across-specimen coefficient of variation (left) and cumulative power (right), each overlaying the two domains. Red dashed lines mark the retained truncations (degree 6 for scar direction, degree 8 for morphology); grey dashed lines mark CV = 100% and the 95% / 99% cumulative-power levels."}
 library(ggplot2)
-
-# Per-degree CV and cumulative power on the full 20-degree spectra (before the
-# 1:6 / 1:8 truncation used elsewhere). One row per degree per domain.
-degree_diagnostics <- function(power_df, descriptor) {
-  mat <- as.matrix(power_df[, paste0("power_l", 1:20)])
-  mu  <- colMeans(mat)
-  data.frame(
-    descriptor = descriptor,
-    degree     = 1:20,
-    cv_pct     = apply(mat, 2, sd) / mu * 100,  # across-specimen reliability
-    cumul_pct  = cumsum(mu) / sum(mu) * 100)    # share of total variance
-}
 
 deg_df <- rbind(
   degree_diagnostics(scar,  "SP-SPHARM (scar direction)"),

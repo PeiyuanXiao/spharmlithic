@@ -117,3 +117,304 @@ test_that("compute_EI: E and I in [0, 1]", {
   expect_true(res$E >= 0 && res$E <= 1)
   expect_true(res$I >= 0 && res$I <= 1)
 })
+
+
+# ---- replace_zeros --------------------------------------------------------------
+
+test_that("rows without zeros are unchanged", {
+  x <- matrix(
+    c(0.2, 0.3, 0.5,
+      0.1, 0.4, 0.5),
+    nrow = 2,
+    byrow = TRUE
+  )
+  
+  expect_equal(replace_zeros(x), x)
+})
+
+test_that("zeros are replaced and rows still sum to one", {
+  x <- matrix(
+    c(0.5, 0.5, 0,
+      0.2, 0.3, 0.5),
+    nrow = 2,
+    byrow = TRUE
+  )
+  
+  y <- replace_zeros(x)
+  
+  expect_true(all(y > 0))
+  expect_equal(rowSums(y), c(1, 1))
+})
+
+test_that("fixed delta is applied correctly", {
+  x <- matrix(c(0.5, 0.5, 0), nrow = 1)
+  
+  y <- replace_zeros(x, delta = 0.01)
+  
+  expect_equal(y[1, 3], 0.01)
+  expect_equal(sum(y), 1)
+})
+
+test_that("all-zero rows generate a warning and are unchanged", {
+  x <- matrix(
+    c(0, 0, 0,
+      0.5, 0.5, 0),
+    nrow = 2,
+    byrow = TRUE
+  )
+  
+  expect_warning(
+    y <- replace_zeros(x),
+    "contains only zeros"
+  )
+  
+  expect_equal(y[1, ], c(0, 0, 0))
+})
+
+test_that("non-numeric input throws an error", {
+  x <- matrix(c("a", "b", "c"), nrow = 1)
+  
+  expect_error(
+    replace_zeros(x),
+    "`x` must be numeric"
+  )
+})
+
+test_that("rows remain compositional after replacement", {
+  x <- matrix(
+    c(0.7, 0.3, 0,
+      0.4, 0, 0.6,
+      0, 0.2, 0.8),
+    nrow = 3,
+    byrow = TRUE
+  )
+  
+  y <- replace_zeros(x)
+  
+  expect_equal(
+    rowSums(y),
+    rep(1, nrow(y)),
+    tolerance = 1e-12
+  )
+  
+  expect_true(all(y[y != 0] > 0))
+})
+
+test_that("delta that is too large throws an error", {
+  x <- matrix(c(0.5, 0.5, 0), nrow = 1)
+  
+  expect_error(
+    replace_zeros(x, delta = 1),
+    "Replacement value is too large"
+  )
+})
+
+test_that("fraction controls replacement value", {
+  x <- matrix(c(0.5, 0.5, 0), nrow = 1)
+  y <- replace_zeros(x, fraction = 0.5)
+  expect_equal(y[1, 3], 0.25)
+})
+
+# ---- make_ilr ------------------------------------------------------------------------
+
+test_that("returns a data frame", {
+  x <- data.frame(
+    a = c(0.5, 0.4, 0.6),
+    b = c(0.3, 0.4, 0.2),
+    c = c(0.2, 0.2, 0.2)
+  )
+  
+  expect_s3_class(make_ilr(x), "data.frame")
+})
+
+test_that("removes constant columns", {
+  x <- data.frame(
+    a = c(0.5, 0.4, 0.6),
+    b = c(0.3, 0.4, 0.2),
+    c = c(0.2, 0.2, 0.2)
+  )
+  
+  result <- make_ilr(x)
+  
+  expect_equal(ncol(result), 1)
+})
+
+test_that("preserves number of rows", {
+  x <- data.frame(
+    a = c(0.5, 0.4, 0.6),
+    b = c(0.3, 0.4, 0.2),
+    c = c(0.2, 0.2, 0.2)
+  )
+  
+  expect_equal(
+    nrow(make_ilr(x)),
+    nrow(x)
+  )
+})
+
+test_that("handles zeros via replacement", {
+  x <- data.frame(
+    a = c(0.5, 0.4, 0.6),
+    b = c(0.5, 0.6, 0.4),
+    c = c(0, 0, 0)
+  )
+  
+  expect_no_error(make_ilr(x))
+})
+
+test_that("errors when fewer than two variable columns remain", {
+  x <- data.frame(
+    a = c(1, 1, 1),
+    b = c(2, 2, 2),
+    c = c(3, 3, 3)
+  )
+  
+  expect_error(
+    make_ilr(x),
+    "At least two non-constant columns"
+  )
+})
+
+test_that("errors for non-numeric input", {
+  x <- data.frame(
+    a = c("a", "b", "c"),
+    b = c("d", "e", "f")
+  )
+  
+  expect_error(
+    make_ilr(x),
+    "`x` must be numeric"
+  )
+})
+
+test_that("assigns ILR column names", {
+  x <- data.frame(
+    a = c(0.5, 0.4, 0.6),
+    b = c(0.3, 0.4, 0.2),
+    c = c(0.2, 0.2, 0.2)
+  )
+  
+  result <- make_ilr(x)
+  
+  expect_equal(
+    colnames(result),
+    "ilr_1"
+  )
+})
+
+# ---- degree_diagnostics ----------------------------------------------------
+
+test_that("returns expected columns", {
+  
+  x <- data.frame(
+    power_l1 = c(0.5, 0.6),
+    power_l2 = c(0.3, 0.2),
+    power_l3 = c(0.2, 0.2)
+  )
+  
+  result <- degree_diagnostics(
+    x,
+    descriptor = "test",
+    max_degree = 3
+  )
+  
+  expect_equal(
+    names(result),
+    c(
+      "descriptor",
+      "degree",
+      "mean_power",
+      "cv_pct",
+      "cumul_pct"
+    )
+  )
+})
+
+test_that("returns one row per degree", {
+  
+  x <- data.frame(
+    power_l1 = c(0.5, 0.6),
+    power_l2 = c(0.3, 0.2),
+    power_l3 = c(0.2, 0.2)
+  )
+  
+  result <- degree_diagnostics(
+    x,
+    descriptor = "test",
+    max_degree = 3
+  )
+  
+  expect_equal(nrow(result), 3)
+})
+
+test_that("cumulative power ends at 100 percent", {
+  
+  x <- data.frame(
+    power_l1 = c(0.5, 0.6),
+    power_l2 = c(0.3, 0.2),
+    power_l3 = c(0.2, 0.2)
+  )
+  
+  result <- degree_diagnostics(
+    x,
+    descriptor = "test",
+    max_degree = 3
+  )
+  
+  expect_equal(
+    tail(result$cumul_pct, 1),
+    100,
+    tolerance = 1e-10
+  )
+})
+
+test_that("descriptor is propagated", {
+  
+  x <- data.frame(
+    power_l1 = c(0.5, 0.6),
+    power_l2 = c(0.3, 0.2),
+    power_l3 = c(0.2, 0.2)
+  )
+  
+  result <- degree_diagnostics(
+    x,
+    descriptor = "power",
+    max_degree = 3
+  )
+  
+  expect_true(all(result$descriptor == "power"))
+})
+
+test_that("zero mean power yields NA cv", {
+  
+  x <- data.frame(
+    power_l1 = c(0, 0),
+    power_l2 = c(0.5, 0.5),
+    power_l3 = c(0.5, 0.5)
+  )
+  
+  result <- degree_diagnostics(
+    x,
+    descriptor = "test",
+    max_degree = 3
+  )
+  
+  expect_true(is.na(result$cv_pct[1]))
+})
+
+test_that("missing power columns trigger error", {
+  
+  x <- data.frame(
+    power_l1 = c(0.5, 0.6),
+    power_l2 = c(0.3, 0.2)
+  )
+  
+  expect_error(
+    degree_diagnostics(
+      x,
+      descriptor = "test",
+      max_degree = 3
+    ),
+    "Missing required columns"
+  )
+})

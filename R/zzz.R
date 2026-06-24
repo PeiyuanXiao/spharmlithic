@@ -65,3 +65,224 @@ sh_py <- NULL
 #' @importFrom magrittr %>%
 #' @export
 magrittr::`%>%`
+
+
+#' Replace zeros in compositional data
+#'
+#' Replaces zeros in each row of a compositional data matrix with a small
+#' positive value and rescales the remaining non-zero entries so that each row
+#' continues to sum to one.
+#'
+#' This function is intended for compositional data that contain structural
+#' zeros which would otherwise prevent log-ratio transformations such as the
+#' centred log-ratio (CLR) transform.
+#'
+#' By default, zeros are replaced with 65% of the smallest non-zero value in
+#' each row.
+#'
+#' @param x A numeric matrix or data frame whose rows represent compositions
+#'   that sum to one.
+#' @param delta Optional numeric scalar giving the value used to replace zeros.
+#'   If `NULL` (default), the replacement value is computed separately for each
+#'   row as `fraction * min(non_zero_values)`.
+#' @param fraction Numeric scalar in `(0, 1]` giving the fraction of the
+#'   smallest non-zero value to use when calculating `delta`. Ignored if
+#'   `delta` is supplied.
+#'
+#' @return A numeric matrix of the same dimensions as `x`, with zeros replaced
+#'   and rows rescaled to sum to one.
+#'
+#' @export
+replace_zeros <- function(x, delta = NULL, fraction = 0.65) {
+  
+  x <- as.matrix(x)
+  
+  if (!is.numeric(x)) {
+    stop("`x` must be numeric.", call. = FALSE)
+  }
+  
+  if (!is.numeric(fraction) ||
+      length(fraction) != 1 ||
+      fraction <= 0 ||
+      fraction > 1) {
+    stop("`fraction` must be a single number in (0, 1].", call. = FALSE)
+  }
+  
+  for (i in seq_len(nrow(x))) {
+    
+    row_i <- x[i, ]
+    zero_idx <- row_i == 0
+    
+    if (!any(zero_idx)) {
+      next
+    }
+    
+    if (all(zero_idx)) {
+      warning(
+        sprintf("Row %d contains only zeros and was left unchanged.", i),
+        call. = FALSE
+      )
+      next
+    }
+    
+    d <- if (is.null(delta)) {
+      min(row_i[!zero_idx]) * fraction
+    } else {
+      delta
+    }
+    
+    n_zero <- sum(zero_idx)
+    
+    if (n_zero * d >= 1) {
+      stop(
+        sprintf(
+          "Replacement value is too large in row %d: n_zero * delta >= 1.",
+          i
+        ),
+        call. = FALSE
+      )
+    }
+    
+    row_i[zero_idx] <- d
+    row_i[!zero_idx] <- row_i[!zero_idx] * (1 - n_zero * d)
+    
+    x[i, ] <- row_i
+    
+  }
+  
+  x
+}
+
+#' Compute isometric log-ratio coordinates
+#'
+#' Transform compositional data to isometric log-ratio (ILR) coordinates.
+#'
+#' Columns with zero variance are removed before transformation because they
+#' do not contribute information and can cause numerical problems.
+#'
+#' Zeros are replaced using [replace_zeros()] prior to transformation.
+#'
+#' @param x A numeric matrix or data frame of compositional data.
+#' @param delta Optional replacement value passed to [replace_zeros()].
+#' @param fraction Fraction of the smallest non-zero value used by
+#'   [replace_zeros()] when `delta = NULL`.
+#'
+#' @return A data frame containing ILR coordinates.
+#'
+#' @examples
+#' x <- data.frame(
+#'   a = c(0.5, 0.4, 0.6),
+#'   b = c(0.3, 0.4, 0.2),
+#'   c = c(0.2, 0.2, 0.2)
+#' )
+#'
+#' make_ilr(x)
+#'
+#' @export
+make_ilr <- function(x, delta = NULL, fraction = 0.65) {
+  
+  x <- as.matrix(x)
+  if (!is.numeric(x)) {
+    stop("`x` must be numeric.", call. = FALSE)
+  }
+  
+  keep <- apply(
+    x,
+    2,
+    function(v) stats::sd(v, na.rm = TRUE) > 0
+  )
+  
+  if (sum(keep) < 2) {
+    stop(
+      "At least two non-constant columns are required for ILR transformation.",
+      call. = FALSE
+    )
+  }
+  
+  x <- x[, keep, drop = FALSE]
+  
+  ilr_mat <- compositions::ilr(
+    replace_zeros(
+      x,
+      delta = delta,
+      fraction = fraction
+    )
+  )
+  
+  ilr_df <- as.data.frame(ilr_mat)
+  colnames(ilr_df) <- paste0("ilr_", seq_len(ncol(ilr_df)))
+  rownames(ilr_df) <- rownames(x)
+  ilr_df
+}
+
+#' Summarise power spectrum diagnostics by degree
+#'
+#' Calculate per-degree coefficients of variation and cumulative mean power
+#' from a power spectrum.
+#'
+#' The coefficient of variation (CV) quantifies across-specimen variability
+#' for each harmonic degree. The cumulative power indicates the proportion of
+#' total mean power explained by successive degrees.
+#'
+#' @param power_df A data frame containing columns named
+#'   `"power_l1"`, `"power_l2"`, ..., `"power_lN"`.
+#' @param descriptor Character string identifying the descriptor type
+#'   (e.g., `"shape"`, `"amplitude"`, `"power"`).
+#' @param max_degree Maximum harmonic degree to analyse.
+#'
+#' @return A data frame with one row per degree containing:
+#' \describe{
+#'   \item{descriptor}{Descriptor name supplied by the user.}
+#'   \item{degree}{Harmonic degree.}
+#'   \item{mean_power}{Mean power at that degree.}
+#'   \item{cv_pct}{Coefficient of variation (%).}
+#'   \item{cumul_pct}{Cumulative percentage of total mean power.}
+#' }
+#'
+#' @examples
+#' x <- data.frame(
+#'   power_l1 = c(0.4, 0.5, 0.6),
+#'   power_l2 = c(0.3, 0.3, 0.2),
+#'   power_l3 = c(0.3, 0.2, 0.2)
+#' )
+#'
+#' degree_diagnostics(x, "example", max_degree = 3)
+#'
+#' @export
+degree_diagnostics <- function(power_df, descriptor, max_degree = 20) {
+  cols <- paste0("power_l", seq_len(max_degree))
+  
+  missing_cols <- setdiff(cols, names(power_df))
+  
+  if (length(missing_cols) > 0) {
+    stop(sprintf(
+      "Missing required columns: %s",
+      paste(missing_cols, collapse = ", ")
+    ), call. = FALSE)
+  }
+  
+  mat <- as.matrix(power_df[, cols, drop = FALSE])
+  
+  if (!is.numeric(mat)) {
+    stop("Power spectrum columns must be numeric.", call. = FALSE)
+  }
+  
+  mu <- colMeans(mat, na.rm = TRUE)
+  
+  cv <- vapply(seq_along(mu), function(i) {
+    if (mu[i] == 0) {
+      NA_real_
+    } else {
+      stats::sd(mat[, i], na.rm = TRUE) / mu[i] * 100
+    }
+  }, numeric(1))
+  
+  data.frame(
+    descriptor = rep(descriptor, max_degree),
+    degree = seq_len(max_degree),
+    mean_power = mu,
+    cv_pct = cv,
+    cumul_pct = cumsum(mu) / sum(mu) * 100,
+    row.names = NULL
+  )
+}

@@ -61,6 +61,14 @@ direction, or both side-by-side).
 
 }
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/PeiyuanXiao/spharmlithic}
+  \item Report bugs at \url{https://github.com/PeiyuanXiao/spharmlithic/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Peiyuan Xiao \email{pyxiao@uw.edu}
 

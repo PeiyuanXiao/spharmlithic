@@ -257,7 +257,7 @@ Use `dplyr::group_by()` to compute the descriptive statistics for each specimen 
 
 ```{r per-specimen, eval = FALSE}
 library(dplyr)
-aligned_svd %>%
+aligned_svd %>% 
   group_by(ID) %>%
   summarise(
     SPI       = compute_SPI(d_x, d_y, d_z),
