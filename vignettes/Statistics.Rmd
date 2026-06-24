@@ -108,6 +108,8 @@ groups      <- scar$Typology
 Before any Euclidean-based analysis, we move the spectra off the simplex with the ILR transform. ILR (like any log-ratio) requires strictly positive values, but the scar spectra contain exact zeros (degrees with no energy). We handle them with the function `make_ilr` which includes a multiplicative zero replacement function that preserves the unit sum `replace_zeros`, following Xiao et al (in preparation):
 
 ```{r ilr}
+library(spharmlithic)
+
 # ILR coordinates: D parts -> (D - 1) real-valued coordinates per specimen.
 scar_ilr  <- make_ilr(scar_feat)    # 6 degrees -> 5 ILR coordinates
 morph_ilr <- make_ilr(morph_feat)   # 8 degrees -> 7 ILR coordinates
