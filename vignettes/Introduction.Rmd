@@ -17,18 +17,18 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-**spharmlithic** supports two complementary lines of quantitative analysis on 3D stone artefacts:
+**spharmlithic** is an R package aimed at supporting two complementary lines of quantitative analysis of 3D shapes, with a focus on stone artefacts:
 
-- **Morphological analysis.** Spherical harmonic decomposition of 3D mesh surfaces (.stl), capturing overall artefact shape.
-- **Scar pattern analysis.** Alignment, descriptive statistics, and spherical harmonic decomposition of scar orientation vectors, capturing how flaking removals are organised during core reduction.
+- **Morphological analysis.** Spherical harmonic decomposition of 3D mesh surfaces (.stl), capturing overall artefact shape. This analysis can be adapted to any object that can be represented with a 3D mesh surface.
+- **Scar pattern analysis.** Alignment, descriptive statistics, and spherical harmonic decomposition of flake scar orientation vectors, capturing how flaking removals are organised during core reduction.
 
-This vignette is a **getting-started guide**: it walks through both workflows using the small example data bundled with the package, taking you from raw artefacts to spherical harmonic coefficients and an exported results table. Once you have that table, the companion vignette `vignette("Statistics", package = "spharmlithic")` shows how to analyse it statistically — exploration with PCA, group comparison with PERMANOVA, and tests of standardisation.
+This vignette is a getting-started guide: it walks through both workflows using the small example data bundled with the package, taking you from raw artefact data files to spherical harmonic coefficients and an exported results table. Once you have that table, our companion vignette `vignette("Statistics", package = "spharmlithic")` shows how to explore, analyse and visualize it with widely used statistical methods. That companion vignette guides you through a exploration of the data with PCA, group comparisons with PERMANOVA, and tests of standardisation. These steps form the core of a typical research project into 3D shapes. 
 
 ------------------------------------------------------------------------
 
-## 1. Setup
+## Setup: Install the Package and the Python Environment
 
-### Installing from R
+### Installing the R package
 
 ```{r install, eval = FALSE}
 # install.packages("remotes")
@@ -37,36 +37,23 @@ remotes::install_github("PeiyuanXiao/spharmlithic")
 
 ### Installing the Python back-end
 
-Spherical harmonic analysis requires a Python environment with `pyshtools` and related packages. If you only need alignment and descriptive statistics you can skip this step.
+Spherical harmonic analysis requires a Python environment with `pyshtools` and related packages. This step creates (or recreates) a conda environment containing the Python packages required for spherical harmonic analysis. This is a one-time setup step. Similar to `install.pacakges()` you only need to do this once per computer, not every time you work on your project. If you only need alignment and descriptive statistics you can skip this step entirely.
 
 ```{r install-python, eval = FALSE}
 library(spharmlithic)
 
-# Core install (scar pattern analysis)
+# Core install (scar pattern analysis only)
 install_spharmlithic_python()
 
 # Full install (also enables morphological analysis from meshes)
 install_spharmlithic_python(mesh = TRUE)
 ```
 
-### Activating the Python environment
+### Optional: Docker 
 
-At the start of each R session, point `reticulate` to the conda environment:
+Another option for setting up the Python environment is to work within a Docker container. This is convenient if you have an existing Python install that you don't want to modify, or are unable to. 
 
-```{r load-package, eval = TRUE, message = FALSE}
-library(spharmlithic)
-library(readxl)
-```
-
-```{r activate-python}
-use_spharmlithic_python("r-spharmlithic")
-```
-
-> **First-time users:** if you have not yet created the conda environment, run `install_spharmlithic_python()` first. See `?install_spharmlithic_python` for details.
-
-### Docker (recommended for macOS)
-
-On **macOS** (especially Apple Silicon), `spharm_from_meshes()` may crash the R session because `open3d`'s OpenGL back-end is incompatible. A pre-built Docker image avoids this entirely:
+Docker is also convenient when working on **macOS** (especially Apple Silicon) because `spharm_from_meshes()` may crash the R session because `open3d`'s OpenGL back-end is incompatible. A pre-built Docker image avoids this entirely:
 
 ```{bash docker, eval = FALSE}
 docker pull peiyuanxiao/spharmlithic
@@ -75,13 +62,23 @@ docker run -d -p 8787:8787 \
   peiyuanxiao/spharmlithic
 ```
 
-Open <http://localhost:8787> in your browser (user: `rstudio`, password: `spharm`). The container includes R, RStudio Server, and the full Python environment pre-configured. Example data and a quick-start script are in `~/examples/`.
+Open <http://localhost:8787> in your browser (user: `rstudio`, password: `rstudio`). The container includes R, RStudio Server, and the full Python environment pre-configured. Example data and a quick-start script are in `~/examples/`. From this point on the instructions are the same if you are working in the Docker container or directly on the desktop.
 
-`spharm_from_directions()` works on all platforms without Docker.
+## Working with the Package: Activating the Python environment
+
+With the Python environment installed, at the start of each R session, all that's required is to point `reticulate` to the conda environment:
+
+```{r load-package, eval = TRUE, message = FALSE}
+library(spharmlithic)
+library(readxl)
+
+# point reticulate to the conda environment
+use_spharmlithic_python("r-spharmlithic")
+```
 
 ------------------------------------------------------------------------
 
-## 2. Input Data Format
+## Inputting Data: Formats
 
 ### Scar orientation data (Excel / CSV)
 
@@ -153,9 +150,11 @@ Both alignment pipelines (`align_scar_batch()` and `align_morph_batch()`) add ni
 
 ------------------------------------------------------------------------
 
-## 3. Scar Pattern Analysis
+## Scar Pattern Analysis
 
-### 3.1 Load the example data
+This is the first major line of quantitative analysis that this package supports. We draw on the pioneering work of Clarkson et al. (2006) and Lin et al. (2024) to provide functions to streamline the analyses they introduced.  
+
+### Load the example data
 
 ```{r load-scar-data, eval = TRUE}
 scar_path <- system.file("extdata", "example_scars.xlsx",
@@ -164,7 +163,7 @@ raw_data  <- read_excel(scar_path)
 head(raw_data)
 ```
 
-### 3.2 Alignment
+### Alignment
 
 Before comparing scar patterns across specimens, the orientation vectors need to be rotated into a common coordinate frame. **spharmlithic** provides two alignment pipelines.
 
@@ -177,7 +176,7 @@ aligned_svd <- align_scar_batch(raw_data)
 head(aligned_svd)
 ```
 
-#### Lin 2024 alignment (`align_morph_batch`)
+#### Lin et al. 2024 alignment (`align_morph_batch`)
 
 The method of Lin et al. (2024) first orients the specimen along a morphological long-axis and then rotates around that axis to align the dominant flaking direction. It requires `Norm_X/Y/Z` and `Pos_X/Y/Z` columns in the input data.
 
@@ -188,45 +187,62 @@ head(aligned_lin)
 
 Both pipelines produce output in the same format, so all downstream functions work identically regardless of which alignment you choose. We use the SVD-aligned data for the rest of this vignette.
 
-### 3.3 Descriptive statistics
+#### Alignment visualisation
+
+To export an interactive HTML report showing 3D visualisations of the alignment steps:
+
+```{r export-html-svd}
+export_alignment_html_svd(raw_data, out_path = "alignment_svd.html")
+export_alignment_html_lin2024(raw_data, out_path = "alignment_lin2024.html")
+```
+
+### Descriptive statistics
 
 #### Scar Pattern Index (SPI)
 
-The SPI quantifies the overall directionality of flaking removals. Higher values indicate a more unidirectional pattern.
+The SPI quantifies the overall directionality of flaking removals. The default behaviour is unweighted, following Bretzke & Conard (2012), where all scars contribute equally regardless of length. Values close to 1 indicate strong preferred orientation; values close to 0 indicate isotropic / random patterning.
 
 ```{r spi, eval = TRUE}
-spi <- compute_SPI(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
+spi <- compute_SPI(aligned_svd$d_x, 
+                   aligned_svd$d_y, 
+                   aligned_svd$d_z)
 spi
 ```
 
-An angular variant is also available:
-
-```{r spi-angle, eval = TRUE}
-spi_angle <- compute_spi_angle(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
-spi_angle
-```
-
-For the original length-weighted SPI (Clarkson et al. 2006), pass scar lengths:
+For the original, length-weighted SPI (Clarkson et al. 2006), pass scar lengths:
 
 ```{r spi-weighted, eval = TRUE}
 lens <- get_scar_length(aligned_svd)
-spi_w <- compute_SPI(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z,
+spi_w <- compute_SPI(aligned_svd$d_x, 
+                     aligned_svd$d_y, 
+                     aligned_svd$d_z,
                      lengths = lens)
 spi_w
 ```
 
+An angular variant is also available, this converts the Scar Pattern Index into the expected pairwise angle between two randomly-selected scars, following Clarkson et al.'s (2006) interpretation:
+
+```{r spi-angle, eval = TRUE}
+spi_angle <- compute_spi_angle(aligned_svd$d_x,
+                               aligned_svd$d_y,
+                               aligned_svd$d_z)
+spi_angle
+```
+
 #### Elongation and Isotropy
 
-`compute_EI()` returns the elongation (E) and isotropy (I) ratios derived from the orientation tensor eigenvalues (Lin et al. 2024):
+`compute_EI()` returns the elongation (E) and isotropy (I) ratios derived from the orientation tensor eigenvalues (Lin et al. 2024), whose implementation adapts the fabric analysis of McPherron (2018):
 
 ```{r ei, eval = TRUE}
-ei <- compute_EI(aligned_svd$d_x, aligned_svd$d_y, aligned_svd$d_z)
+ei <- compute_EI(aligned_svd$d_x, 
+                 aligned_svd$d_y, 
+                 aligned_svd$d_z)
 ei
 ```
 
 #### Per-specimen statistics
 
-Use `dplyr::group_by()` to compute statistics for each specimen:
+Use `dplyr::group_by()` to compute the descriptive statistics for each specimen (row):
 
 ```{r per-specimen, eval = FALSE}
 library(dplyr)
@@ -239,25 +255,16 @@ aligned_svd %>%
   )
 ```
 
-### 3.4 Alignment visualisation
+### Spherical harmonic analysis
 
-To export an interactive HTML report showing the alignment steps:
-
-```{r export-html-svd}
-export_alignment_html_svd(raw_data, out_path = "alignment_svd.html")
-export_alignment_html_lin2024(raw_data, out_path = "alignment_lin2024.html")
-```
-
-### 3.5 Spherical harmonic analysis
-
-With the Python back-end active, scar orientation vectors can be decomposed into spherical harmonic coefficients. This applies von Mises–Fisher kernel density estimation on the sphere and then fits the harmonic expansion:
+This step is a novel application of spherical harmonic analysis that extends the work of Clarkson et al. (2006) and Lin et al. (2024). With the Python back-end active, scar orientation vectors can be decomposed into spherical harmonic coefficients. This function applies von Mises–Fisher kernel density estimation on the sphere and then fits the harmonic expansion:
 
 ```{r spharm-scar}
 sh_scar <- spharm_from_directions(aligned_svd, lmax = 20, bandwidth = 0.35)
 sh_scar
 ```
 
-To convert the results into a flat data frame for downstream multivariate analysis (PCA, clustering, distance matrices):
+The output here is a list, so to convert the results into a flat data frame for downstream multivariate analysis (PCA, clustering, distance matrices) we have a convenient fucntion: 
 
 ```{r df-scar}
 df_scar <- spharm_to_dataframe(sh_scar)
@@ -266,11 +273,20 @@ head(df_scar)
 
 ------------------------------------------------------------------------
 
-## 4. Morphological Analysis
+## Morphological Analysis
 
-Morphological analysis takes 3D mesh files (.stl) as input and characterises overall artefact shape via spherical harmonics. This requires the mesh extension: `install_spharmlithic_python(mesh = TRUE)`.
+This is the second major line of quantitative analysis that this package supports. Morphological analysis takes 3D mesh files (.stl) as input and characterises overall artefact shape via spherical harmonics. This requires the correctly configured Python environment and mesh extension: `install_spharmlithic_python(mesh = TRUE)`. This `spharm_from_meshes()` function executes the morphological analysis pipline with the following steps, per STL file:
 
-> **macOS users:** `spharm_from_meshes()` may crash the R session on macOS due to `open3d` OpenGL incompatibilities. Use the Docker image instead (see Section 1).
+- Read mesh via open3d. Files exceeding 3M faces are pre-decimated by streaming face sub-sampling to avoid memory pressure.    
+- Quadric-error decimation to target_faces.    
+- Laplacian smoothing (smooth_iterations passes).    
+- Volume-centroid normalization to a unit sphere.     
+- Area-weighted PCA alignment with energy-based sign convention.
+- Cartesian-to-spherical conversion of the aligned vertices.
+- Interpolation onto a regular grid.
+- Spherical harmonic expansion via pyshtools (4pi normalization, zero-component normalized: all coefficients divided by c(0, 0)).
+
+> **macOS users:** `spharm_from_meshes()` may crash the R session on macOS due to `open3d` OpenGL incompatibilities. We recommend using the Docker image instead, see the Setup section above
 
 ```{r spharm-morph}
 stl_dir  <- system.file("extdata", "meshes", package = "spharmlithic")
@@ -278,18 +294,34 @@ sh_morph <- spharm_from_meshes(stl_dir, lmax = 20)
 sh_morph
 ```
 
-To convert to a flat data frame:
+The output is a list with one element per successfully-processed STL, we can convert to a flat data frame with a convenience function: 
 
 ```{r df-morph}
 df_morph <- spharm_to_dataframe(sh_morph)
 head(df_morph)
 ```
 
+### Harmonic Degree (`lmax`)
+
+The maximum spherical harmonic degree controls the level of detail in the decomposition. The default is `lmax = 20`, which captures the dominant features for most artefacts.
+
+Morphological analysis can benefit from higher degrees if you need finer geometric detail:
+
+```{r lmax-morph}
+sh_fine <- spharm_from_meshes(stl_dir, lmax = 50)
+```
+
+Note that computation time and output size grow substantially with higher degrees (the number of coefficients scales as `2 × (lmax + 1)²`). When increasing `lmax` for morphology, you may also want to increase `grid_size` (default 256) for adequate sampling.
+
+Scar pattern analysis does not benefit from degrees above 20. The underlying von Mises–Fisher KDE already smooths the directional density, so increasing `lmax` beyond 20 adds noise fitting rather than meaningful detail. If you do increase `lmax`, the DH grid size must satisfy `dh_size >= 2 * (lmax + 1)`.
+
+At this point you have all the outputs you need to use the statistical methods we walk through in the next vignette. The remainder of this vignette are optional visualisation steps. 
+
 ------------------------------------------------------------------------
 
-## 5. Interactive SPHARM Viewer
+##  Interactive SPHARM Viewer
 
-`export_spharm_html()` generates a self-contained HTML file with an interactive Three.js-based 3D viewer for exploring spherical harmonic reconstructions. The viewer synthesises the harmonic expansion in real time on the client side — only the coefficients are embedded, so file sizes stay small.
+It can be useful to visually inspect the 3D models and scar patterns. We provide `export_spharm_html()` to generate a self-contained HTML file with an interactive Three.js-based 3D viewer for exploring spherical harmonic reconstructions. The viewer synthesizes the harmonic expansion in real time on the client side — only the coefficients are embedded, so file sizes stay small.
 
 You can pass results from either analysis, or both:
 
@@ -335,25 +367,8 @@ export_spharm_html(
 - **Type Mean** — average coefficients across specimens sharing the same Typology.
 - **PNG screenshot** and **OBJ mesh export** at the current degree.
 
-------------------------------------------------------------------------
 
-## 6. Harmonic Degree (`lmax`)
-
-The maximum spherical harmonic degree controls the level of detail in the decomposition. The default is `lmax = 20`, which captures the dominant features for most artefacts.
-
-**Morphological analysis** can benefit from higher degrees if you need finer geometric detail:
-
-```{r lmax-morph}
-sh_fine <- spharm_from_meshes(stl_dir, lmax = 50)
-```
-
-Note that computation time and output size grow substantially with higher degrees (the number of coefficients scales as `2 × (lmax + 1)²`). When increasing `lmax` for morphology, you may also want to increase `grid_size` (default 256) for adequate sampling.
-
-**Scar pattern analysis** does not benefit from degrees above 20. The underlying von Mises–Fisher KDE already smooths the directional density, so increasing `lmax` beyond 20 adds noise fitting rather than meaningful detail. If you do increase `lmax`, the DH grid size must satisfy `dh_size >= 2 * (lmax + 1)`.
-
-------------------------------------------------------------------------
-
-## 7. Low-level Reconstruction
+### Low-level Reconstruction
 
 For users who need the reconstructed density as numerical data rather than an interactive visualisation, `spharm_reconstruct()` performs the inverse spherical harmonic transform and returns:
 
