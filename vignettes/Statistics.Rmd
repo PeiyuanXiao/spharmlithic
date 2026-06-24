@@ -1,5 +1,5 @@
 ---
-title: "Statistical analysis of spherical harmonic data"
+title: "Statistical Analysis of Spherical Harmonic Data"
 author: "Peiyuan Xiao, Ben Marwick"
 date: "`r Sys.Date()`"
 output:
@@ -33,35 +33,40 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The companion vignette `vignette("Introduction", package = "spharmlithic")` shows how to turn 3D artefacts into spherical harmonic (SH) coefficients with `spharm_from_directions()` and `spharm_from_meshes()`, and how to flatten the result with `spharm_to_dataframe()`. **This vignette picks up where that one leaves off: you have a table of SH descriptors, one row per specimen — now what?**
+The goal of this vignette is to walk you through using the spharmlithic package to tackle three research questions that are central to many analyses of archaeological stone artefact assemblages:
 
-We work through three questions that recur in lithic analysis:
+1.  **Exploration**: how is artefact shape/scar pattern variation structured across specimens? We will demonstrate how to use Principal Component Analysis (PCA) for this.
+2.  **Group difference**: do artefacts made by different reduction strategies differ in their SPHARM descriptors? PERMANOVA is a classic statistical method for this question. 
+3.  **Standardisation**: is one reduction strategy more standardised (less variable) than another? Multivariate dispersion (PERMIDSP) is our approach to answer this question. 
 
-1.  **Exploration**: how is shape/scar pattern variation structured across specimens? (Principal Component Analysis, PCA)
-2.  **Group difference**: do specimens made by different reduction strategies differ in their SPHARM descriptors? (PERMANOVA)
-3.  **Standardisation**: is one strategy more standardised (less variable) than another? (Multivariate dispersion, PERMIDSP)
+This vignette follows from our companion vignette `vignette("Introduction", package = "spharmlithic")` that walks through how to turn 3D artefacts into spherical harmonic (SH) coefficients with `spharm_from_directions()` and `spharm_from_meshes()`, and how to flatten the result with `spharm_to_dataframe()`. Here we demonstrate functions in the package that are designed for typical research applications. 
 
-Three features of SPHARM power spectra shape the choice of method:
+Our choice of statistical methods for this walk through is informed by three features of SPHARM power spectra:
 
-- **The power spectrum is rotation-invariant.** Each `power_lN` value summarises the energy at spherical harmonic degree `N`, independent of how the specimen was oriented. This makes the power spectrum a robust feature set for cross-specimen comparison, we use it throughout.
-- **The power spectrum is compositional data.** Each specimen's spectrum is closed to a constant sum (here, 1): the values are relative proportions of energy across degrees, not absolute magnitudes. Compositional data live on the simplex, not in Euclidean space, so applying Euclidean-based methods (PCA, distances) to the raw proportions induces spurious negative correlations (the closure problem). The fix is a log-ratio transform. We use the **isometric log-ratio (ILR)** transform (Egozcue et al. 2003), which maps the composition into ordinary Euclidean coordinates where standard methods are valid. Distances computed on ILR coordinates are **Aitchison distances.**
-- **`p` is often comparable to or larger than `n`.** Even the power spectrum has 20+ columns. Classical MANOVA breaks down when variables approach the number of specimens, so we lean on distance- and permutation-based methods (PERMANOVA, `betadisper`) and dimension reduction (PCA).
+- Power spectra are rotation-invariant. Each `power_lN` value summarises the energy at spherical harmonic degree `N`, independent of how the specimen was oriented. This makes a power spectrum a robust feature set for cross-specimen comparison, so we use it throughout this workflow.
+- Power spectra are compositional data. Each specimen's spectrum is closed to a constant sum (here, 1): the values are relative proportions of energy across degrees, not absolute magnitudes. Compositional data live on the simplex, not in Euclidean space, so applying Euclidean-based methods (PCA, distances) to the raw proportions induces spurious negative correlations (the closure problem). To fix this we use the isometric log-ratio (ILR) transform (Egozcue et al. 2003), which maps the composition into ordinary Euclidean coordinates where standard methods are valid. Distances computed on ILR coordinates are Aitchison distances.
+- `p` is often comparable to or larger than `n`. Even the power spectrum has 20+ columns. Classical MANOVA breaks down when variables approach the number of specimens, so to avoid this we use distance- and permutation-based methods (PERMANOVA, `betadisper`) and dimension reduction (PCA).
 
 ## The example data
 
-The package bundles a worked example: spherical harmonic power spectra for **58 experimental cores** knapped with five known reduction strategies, from the Professor Chris Clarkson, also used in Xiao et al (in preparation). Two parallel tables describe the same specimens in two domains: **scar direction** (how flaking removals are organised) and **morphology** (overall shape). Each was produced exactly as in the Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`); we ship the flattened tables so this vignette needs no Python backend.
+The spharmlithic package bundles a worked example: spherical harmonic power spectra for 58 experimental cores knapped in five known reduction strategies by Professor Chris Clarkson and included here with his permission. Here we load the data, two parallel tables that describe the artefacts in two domains: scar direction (how flaking removals are organised) and morphology (overall shape). These tables were produced by following the steps in our Introduction vignette (`spharm_from_*()` → `spharm_to_dataframe()`). We also include with the package the flattened tables resulting from the Introduction vignette. This means that all the code in this statistical analysis vignette can be run without needing the Python backend. 
 
 ```{r load-data}
+# load the tables
 scar  <- read.csv(
   system.file("extdata", "exp_cores_scar.csv",  package = "spharmlithic"),
   check.names = FALSE)
 morph <- read.csv(
   system.file("extdata", "exp_cores_morph.csv", package = "spharmlithic"),
   check.names = FALSE)
+
+# set metadata
 strategy_levels <- c("Unidirectional", "Bidirectional",
                      "Levallois", "Discoid", "Multiplatform")
 scar$Typology  <- factor(scar$Typology,  levels = strategy_levels)
 morph$Typology <- factor(morph$Typology, levels = strategy_levels)
+
+# prepare a palette for visualization
 typology_colors <- c(
   "Unidirectional" = "#BA8530",
   "Bidirectional"  = "#788C4A",
@@ -69,13 +74,15 @@ typology_colors <- c(
   "Discoid"        = "#802520",
   "Multiplatform"  = "#8A7A68"
 )
+
+# display summary table
 knitr::kable(
   as.data.frame(table(Strategy = scar$Typology)),
   col.names = c("Reduction strategy", "n"),
   caption   = "Experimental cores per reduction strategy")
 ```
 
-Each table has an `ID`, a `Typology`, and the power spectrum from degree 1 to 20 (`power_l1` … `power_l20`; degree 0, the constant term, is dropped because it carries no shape information). Each row sums to 1:
+Each of the two tables has an `ID`, a `Typology`, and the power spectrum from degree 1 to 20 (`power_l1` … `power_l20`; degree 0, the constant term, is dropped because it carries no shape information). Each row sums to 1:
 
 ```{r preview}
 knitr::kable(

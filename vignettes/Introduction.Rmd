@@ -13,6 +13,12 @@ knitr::opts_chunk$set(
   comment  = "#>",
   eval     = FALSE
 )
+
+# run these lines here because the block we show the reader has to be
+# eval=FALSE for GitHub Actions because the workflows config file already 
+# runs the Python env setup functions
+library(spharmlithic)
+library(readxl)
 ```
 
 ## Overview
@@ -22,7 +28,9 @@ knitr::opts_chunk$set(
 - **Morphological analysis.** Spherical harmonic decomposition of 3D mesh surfaces (.stl), capturing overall artefact shape. This analysis can be adapted to any object that can be represented with a 3D mesh surface.
 - **Scar pattern analysis.** Alignment, descriptive statistics, and spherical harmonic decomposition of flake scar orientation vectors, capturing how flaking removals are organised during core reduction.
 
-This vignette is a getting-started guide: it walks through both workflows using the small example data bundled with the package, taking you from raw artefact data files to spherical harmonic coefficients and an exported results table. Once you have that table, our companion vignette `vignette("Statistics", package = "spharmlithic")` shows how to explore, analyse and visualize it with widely used statistical methods. That companion vignette guides you through a exploration of the data with PCA, group comparisons with PERMANOVA, and tests of standardisation. These steps form the core of a typical research project into 3D shapes. 
+This vignette is a getting-started guide: it walks through both workflows using the small example data bundled with the package, taking you from raw artefact data files to spherical harmonic coefficients and an exported results table. 
+
+Once you have that table, our companion vignette `vignette("Statistics", package = "spharmlithic")` shows how to explore, analyse and visualize it with widely used statistical methods. That companion vignette guides you through a exploration of the data with PCA, group comparisons with PERMANOVA, and tests of standardisation. These steps form the core of a typical research project into 3D shapes. 
 
 ------------------------------------------------------------------------
 
@@ -37,7 +45,7 @@ remotes::install_github("PeiyuanXiao/spharmlithic")
 
 ### Installing the Python back-end
 
-Spherical harmonic analysis requires a Python environment with `pyshtools` and related packages. This step creates (or recreates) a conda environment containing the Python packages required for spherical harmonic analysis. This is a one-time setup step. Similar to `install.pacakges()` you only need to do this once per computer, not every time you work on your project. If you only need alignment and descriptive statistics you can skip this step entirely.
+Spherical harmonic analysis requires a Python environment with `pyshtools` and related packages. This step creates (or recreates) a conda environment containing the Python packages required for spherical harmonic analysis. This is a one-time setup step. Similar to `install.packages()` you only need to do this once per computer, not every time you work on your project. If you only need alignment and descriptive statistics you can skip this step entirely.
 
 ```{r install-python, eval = FALSE}
 library(spharmlithic)
@@ -68,7 +76,7 @@ Open <http://localhost:8787> in your browser (user: `rstudio`, password: `rstudi
 
 With the Python environment installed, at the start of each R session, all that's required is to point `reticulate` to the conda environment:
 
-```{r load-package, eval = TRUE, message = FALSE}
+```{r load-package, eval = FALSE, message = FALSE}
 library(spharmlithic)
 library(readxl)
 
@@ -192,8 +200,11 @@ Both pipelines produce output in the same format, so all downstream functions wo
 To export an interactive HTML report showing 3D visualisations of the alignment steps:
 
 ```{r export-html-svd}
-export_alignment_html_svd(raw_data, out_path = "alignment_svd.html")
-export_alignment_html_lin2024(raw_data, out_path = "alignment_lin2024.html")
+export_alignment_html_svd(raw_data, 
+                          out_path = "alignment_svd.html")
+
+export_alignment_html_lin2024(raw_data, 
+                              out_path = "alignment_lin2024.html")
 ```
 
 ### Descriptive statistics
