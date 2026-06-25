@@ -25,12 +25,14 @@ Depends:
     R (>= 4.1.0)
 Imports:
     dplyr,
+    readr,
+    forcats,
+    rlang,
     htmltools,
     jsonlite,
     magrittr,
     plotly,
     reticulate (>= 1.41),
-    rlang,
     tibble,
     utils
 Suggests:

@@ -1,0 +1,34 @@
+align_morph_batch       Batch Lin 2024 alignment for all specimens
+align_scar_batch        Batch SVD alignment for all specimens
+compute_EI              Elongation (E) and Isotropy (I) from the
+                        orientation tensor
+compute_SPI             Scar Pattern Index (Clarkson et al. 2006)
+compute_spi_angle       Convert SPI to a scar-pattern angle (Clarkson
+                        et al. 2006)
+degree_diagnostics      Summarise power spectrum diagnostics by degree
+export_alignment_html_lin2024
+                        Export an interactive Lin 2024 alignment HTML
+                        page
+export_alignment_html_svd
+                        Export an interactive SVD alignment HTML page
+export_spharm_html      Export interactive SPHARM reconstruction viewer
+                        as a self-contained HTML file
+get_rot_matrix          Compute a rotation matrix that maps vector 'a'
+                        onto vector 'b'
+get_scar_length         Get scar lengths from a data frame
+install_spharmlithic_python
+                        Install the Python backend for 'spharmlithic'
+make_ilr                Compute isometric log-ratio coordinates
+pairwise_permanova      Pairwise PERMANOVA comparisons
+replace_zeros           Replace zeros in compositional data
+spharm_from_directions
+                        Spherical harmonic analysis from scar direction
+                        vectors
+spharm_from_meshes      Spherical harmonic analysis from STL meshes
+spharm_reconstruct      Inverse spherical harmonic transform:
+                        coefficients to spherical density
+spharm_to_dataframe     Flatten SPHARM result list into a wide-format
+                        data frame
+use_spharmlithic_python
+                        Point 'spharmlithic' at an existing Python
+                        environment

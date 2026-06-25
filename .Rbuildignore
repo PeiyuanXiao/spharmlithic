@@ -13,3 +13,6 @@ __pycache__
 \.Rhistory$
 \.RData$
 \.DS_Store$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

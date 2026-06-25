@@ -1,0 +1,38 @@
+Package: spharmlithic
+Title: Spherical Harmonic Analysis of Lithic Morphology and Flaking
+        Scar Patterns
+Version: 0.1.0
+Authors@R: 
+    c(
+      person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre")),
+      person("Ben", "Marwick", , "bmarwick@uw.edu", role = c("aut"))
+      )
+Description: A complete toolkit for the geometric alignment, directional
+    statistics, and spherical harmonic analysis of three-dimensional
+    lithic flaking scar orientation data. Provides two alignment pipelines
+    (SVD and Lin 2024), classical orientation statistics (SPI with
+    Clarkson length weighting, elongation/isotropy from the orientation
+    tensor), and a Python-backed spherical harmonic pipeline (von
+    Mises-Fisher kernel density estimation followed by Driscoll-Healy
+    spherical harmonic expansion via pyshtools), supporting both
+    direction-vector and mesh-based inputs.
+License: MIT + file LICENSE
+URL: https://github.com/PeiyuanXiao/spharmlithic
+BugReports: https://github.com/PeiyuanXiao/spharmlithic/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: R (>= 4.1.0)
+Imports: dplyr, readr, forcats, rlang, htmltools, jsonlite, magrittr,
+        plotly, reticulate (>= 1.41), tibble, utils
+Suggests: readxl, rstudioapi, testthat (>= 3.0.0), knitr, rmarkdown,
+        ggplot2, tidyr, vegan, compositions
+Config/testthat/edition: 3
+SystemRequirements: Python (>= 3.9)
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2026-06-25 01:44:31 UTC; benma
+Author: Peiyuan Xiao [aut, cre],
+  Ben Marwick [aut]
+Maintainer: Peiyuan Xiao <pyxiao@uw.edu>
+Built: R 4.5.0; ; 2026-06-25 01:44:47 UTC; windows
