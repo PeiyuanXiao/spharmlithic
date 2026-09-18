@@ -266,17 +266,18 @@ make_scene <- function() {
 #' @param title_text Character string. Panel title (HTML tags are supported,
 #'   e.g. `"<b>Step 0</b>: Raw data"`).
 #'
-#' @return A named list for use in `plotly::layout()`.
+#' @return A named list of `plotly::layout()` arguments; apply it with
+#'   `apply_panel_layout()`.
 #'
 #' @examples
 #' \dontrun{
 #' library(plotly)
-#' fig <- plot_ly() %>%
-#'   plotly::layout(panel_layout("<b>Step 0</b>: Raw data"))
+#' fig <- apply_panel_layout(plot_ly(), "<b>Step 0</b>: Raw data")
 #' fig
 #' }
 #'
-#' @seealso `make_scene()`, `build_panel_scar()`, `build_panel_morph()`
+#' @seealso `apply_panel_layout()`, `make_scene()`, `build_panel_scar()`,
+#'   `build_panel_morph()`
 #' @noRd
 panel_layout <- function(title_text) {
   list(
@@ -286,6 +287,24 @@ panel_layout <- function(title_text) {
     paper_bgcolor = "#f5f7fa",
     scene         = make_scene()
   )
+}
+
+
+#' Apply the standard panel layout to a Plotly 3-D figure
+#'
+#' Passes the settings from `panel_layout()` to `plotly::layout()` as named
+#' arguments. `plotly::layout()` silently ignores a list passed as a single
+#' unnamed argument, so the list has to be spread with `do.call()`.
+#'
+#' @param fig A `plotly` figure object.
+#' @param title_text Character string. Panel title (HTML tags are supported).
+#'
+#' @return The modified `plotly` figure object.
+#'
+#' @seealso `panel_layout()`, `build_panel_scar()`, `build_panel_morph()`
+#' @noRd
+apply_panel_layout <- function(fig, title_text) {
+  do.call(plotly::layout, c(list(fig), panel_layout(title_text)))
 }
 
 

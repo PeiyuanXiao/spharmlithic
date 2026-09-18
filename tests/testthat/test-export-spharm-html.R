@@ -85,6 +85,112 @@ test_that("export_spharm_html errors when meta lacks ID column", {
 })
 
 
+# ---- export_spharm_html output -----------------------------------------------
+
+# Stand-in for a spharm_from_*() result: a named list of specimens, each with
+# a (2, lmax + 1, lmax + 1) coefficient array
+fake_spharm <- function(ids, lmax = 6, seed = 1) {
+  set.seed(seed)
+  n <- lmax + 1
+  stats::setNames(lapply(ids, function(id) {
+    cf <- array(round(rnorm(2 * n * n), 3), dim = c(2, n, n))
+    cf[1, 1, 1] <- 1
+    list(coefficients = cf, power_spectrum = rep(0, n))
+  }), ids)
+}
+
+# The specimen records the viewer embeds as `const DATA=[...];`
+read_viewer_data <- function(path) {
+  html <- readLines(path, encoding = "UTF-8", warn = FALSE)
+  line <- trimws(html[startsWith(trimws(html), "const DATA=")])
+  jsonlite::fromJSON(sub(";$", "", sub("^const DATA=", "", line)),
+                     simplifyVector = FALSE)
+}
+
+test_that("export_spharm_html embeds every specimen from both tracks", {
+  morph <- fake_spharm(c("A", "B"))
+  scar  <- fake_spharm(c("B", "C"), seed = 2)
+  out   <- tempfile(fileext = ".html")
+
+  res <- expect_invisible(
+    export_spharm_html(morph, scar, out_path = out, verbose = FALSE)
+  )
+  expect_identical(res, out)
+  expect_false(any(grepl("{{", readLines(out, warn = FALSE), fixed = TRUE)))
+
+  recs <- read_viewer_data(out)
+  expect_identical(vapply(recs, `[[`, character(1), "id"), c("A", "B", "C"))
+  expect_null(recs[[1]]$scar)     # A is morphology only
+  expect_null(recs[[3]]$morph)    # C is scar only
+
+  # Coefficients arrive as cilm[layer][l][m]
+  cf <- morph$B$coefficients
+  expect_equal(recs[[2]]$morph[[1]][[3]][[2]], cf[1, 3, 2])
+  expect_equal(recs[[2]]$morph[[2]][[4]][[3]], cf[2, 4, 3])
+  expect_equal(recs[[2]]$scar[[1]][[1]][[1]], 1)
+})
+
+test_that("export_spharm_html truncates to lmax and fills in the title", {
+  out <- tempfile(fileext = ".html")
+  export_spharm_html(scar = fake_spharm("A", lmax = 10), out_path = out,
+                     lmax = 4, title = "Clarkson cores", verbose = FALSE)
+
+  cilm <- read_viewer_data(out)[[1]]$scar
+  expect_length(cilm[[1]], 5)
+  expect_length(cilm[[1]][[5]], 5)
+
+  html <- readLines(out, encoding = "UTF-8", warn = FALSE)
+  expect_true(any(grepl("const LMAX=4;", html, fixed = TRUE)))
+  expect_true(any(grepl("Clarkson cores", html, fixed = TRUE)))
+})
+
+test_that("export_spharm_html writes metadata and escapes quotes", {
+  scar <- fake_spharm(c("A", "B", 'Core "7"', "D"))
+  meta <- data.frame(
+    ID       = c("A", "B", 'Core "7"'),
+    Site     = c('Say "hi"', "back\\slash", NA),
+    Typology = c("Levallois", "Discoid", "Discoid")
+  )
+  out <- tempfile(fileext = ".html")
+  export_spharm_html(scar = scar, meta = meta, out_path = out,
+                     verbose = FALSE)
+
+  recs <- read_viewer_data(out)
+  by_id <- stats::setNames(recs, vapply(recs, `[[`, character(1), "id"))
+  expect_identical(by_id$A$meta$Site, 'Say "hi"')
+  expect_identical(by_id$B$meta$Site, "back\\slash")
+  expect_null(by_id[['Core "7"']]$meta$Site)          # NA is left out
+  expect_identical(by_id[['Core "7"']]$meta$Typology, "Discoid")
+  expect_length(by_id$D$meta, 0)                      # not in meta
+})
+
+test_that("export_spharm_html skips specimens without coefficients", {
+  morph <- fake_spharm(c("A", "B"))
+  morph$B$coefficients <- NULL
+  out <- tempfile(fileext = ".html")
+
+  msgs <- capture_messages(export_spharm_html(morph, out_path = out))
+  expect_true(any(grepl("B -- skipped (no data)", msgs, fixed = TRUE)))
+  expect_identical(vapply(read_viewer_data(out), `[[`, character(1), "id"),
+                   "A")
+
+  morph$A$coefficients <- NULL
+  expect_error(
+    export_spharm_html(morph, out_path = tempfile(), verbose = FALSE),
+    "No valid specimens"
+  )
+})
+
+test_that("export_spharm_html creates the output folder and reports progress", {
+  out  <- file.path(tempfile(), "nested", "viewer.html")
+  msgs <- capture_messages(
+    export_spharm_html(scar = fake_spharm("A"), out_path = out)
+  )
+  expect_true(file.exists(out))
+  expect_true(any(grepl("Exported: ", msgs, fixed = TRUE)))
+})
+
+
 # ---- Viewer JavaScript: Legendre functions ----------------------------------
 
 test_that("viewer computePlm() uses pyshtools 4pi normalization", {
