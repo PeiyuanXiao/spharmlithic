@@ -23,10 +23,12 @@
 #' Requires the **mesh** Python extension. Run
 #' `install_spharmlithic_python(mesh = TRUE)` once before first use.
 #'
-#' **macOS:** not supported in a native installation. `open3d` and the
-#' conda-forge scientific stack each load their own copy of the OpenMP
-#' runtime, and the R session aborts with `OMP: Error #15`. Use the Docker
-#' image instead (see `vignette("Introduction", package = "spharmlithic")`).
+#' **macOS:** not supported in a native installation. `open3d` ships its own
+#' copy of the OpenMP runtime (`libomp`), which clashes with the copy that
+#' comes with CRAN's R for macOS (used by R packages such as `data.table`),
+#' and the R session aborts with `OMP: Error #15`. Use the Docker image
+#' instead (see `vignette("Introduction", package = "spharmlithic")`).
+#' [spharm_from_directions()] is not affected.
 #'
 #' @param stl_dir Character. Path to a directory containing `.stl` files.
 #'   Each STL is treated as one specimen; the file basename (without

@@ -1,8 +1,8 @@
 # =============================================================================
 # Dockerfile for spharmlithic
 # Pre-built R + Python environment for spherical harmonic analysis of lithics.
-# Supported route for the mesh pipeline on macOS: natively, open3d and the
-# conda-forge stack load two OpenMP runtimes and R aborts (OMP: Error #15).
+# Supported route for the mesh pipeline on macOS: natively, open3d's bundled
+# OpenMP runtime clashes with the one CRAN R ships and R aborts (OMP: Error #15).
 #
 # Usage:
 #   docker build -t peiyuanxiao/spharmlithic .

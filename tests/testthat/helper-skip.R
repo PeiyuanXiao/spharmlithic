@@ -10,10 +10,11 @@ skip_if_no_python_core <- function() {
 }
 
 skip_if_no_python_mesh <- function() {
-  # Must run before anything imports open3d. On macOS the pip open3d wheel
-  # and the conda-forge stack each load their own OpenMP runtime (libomp),
-  # and the second one aborts the whole R process with "OMP: Error #15".
-  # The mesh pipeline is not supported natively on macOS (use Docker).
+  # Must run before anything imports open3d. On macOS the open3d wheel ships
+  # its own OpenMP runtime (libomp), which clashes with the one CRAN R ships
+  # (initialised by data.table), and the second copy aborts the whole R
+  # process with "OMP: Error #15". The mesh pipeline is not supported
+  # natively on macOS (use Docker).
   testthat::skip_on_os("mac")
   skip_if_no_python_core()
   testthat::skip_if_not(

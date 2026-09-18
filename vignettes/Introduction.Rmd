@@ -61,7 +61,7 @@ install_spharmlithic_python(mesh = TRUE)
 
 Another option for setting up the Python environment is to work within a Docker container. This is convenient if you have an existing Python install that you don't want to modify, or are unable to.
 
-Docker is also the supported way to run the mesh pipeline on **macOS**. In a native macOS installation `spharm_from_meshes()` aborts the R session with `OMP: Error #15`: the pip-installed `open3d` and the conda-forge scientific stack each bring their own copy of the OpenMP runtime (`libomp`), and the runtime aborts the process when it finds a second copy already loaded. The pre-built Docker image runs Linux, where this conflict does not arise:
+Docker is also the supported way to run the mesh pipeline on **macOS**. The direction-vector pipeline (`spharm_from_directions()`) works in a native macOS installation, but `spharm_from_meshes()` does not: `open3d` ships its own copy of the OpenMP runtime (`libomp`), CRAN's R for macOS ships another (used by R packages such as `data.table`), and when both are loaded into the same R session the runtime aborts it with `OMP: Error #15`. The pre-built Docker image runs Linux, where this conflict does not arise:
 
 ```{bash docker, eval = FALSE}
 docker pull peiyuanxiao/spharmlithic
@@ -297,7 +297,7 @@ This is the second major line of quantitative analysis that this package support
 - Interpolation onto a regular grid.
 - Spherical harmonic expansion via pyshtools (4pi normalization, zero-component normalized: all coefficients divided by c(0, 0)).
 
-> **macOS users:** `spharm_from_meshes()` is not supported in a native macOS installation: two copies of the OpenMP runtime get loaded and the R session aborts with `OMP: Error #15`. Please use the Docker image instead, see the Setup section above.
+> **macOS users:** `spharm_from_meshes()` is not supported in a native macOS installation: the OpenMP runtime bundled with `open3d` clashes with the one that comes with R, and the R session aborts with `OMP: Error #15`. Please use the Docker image instead, see the Setup section above. The direction-vector pipeline is not affected.
 
 ```{r spharm-morph}
 stl_dir  <- system.file("extdata", "meshes", package = "spharmlithic")

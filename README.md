@@ -53,13 +53,13 @@ use_spharmlithic_python("r-spharmlithic")
 > `Sys.setenv(RETICULATE_CONDA = "path/to/conda")` to your
 > `~/.Rprofile`.
 
-#### Option B — Docker (recommended for macOS)
+#### Option B — Docker (recommended for mesh analysis on macOS)
 
 A pre-built Docker image includes R, RStudio Server, and the full Python
-environment. It is the recommended setup on macOS, where
-`spharm_from_meshes()` is not supported natively: `open3d` and the
-conda-forge scientific stack load two copies of the OpenMP runtime,
-which aborts the R session with `OMP: Error #15`.
+environment. On macOS the direction-vector pipeline works in a native
+installation, but `spharm_from_meshes()` does not: the OpenMP runtime
+bundled with `open3d` clashes with the one that comes with R, which
+aborts the R session with `OMP: Error #15`. Use Docker there.
 
 ``` bash
 docker pull peiyuanxiao/spharmlithic

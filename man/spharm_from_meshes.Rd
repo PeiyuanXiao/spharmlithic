@@ -65,10 +65,12 @@ zero-component normalized: all coefficients divided by \code{c(0, 0)}).
 Requires the \strong{mesh} Python extension. Run
 \code{install_spharmlithic_python(mesh = TRUE)} once before first use.
 
-\strong{macOS:} not supported in a native installation. \code{open3d} and the
-conda-forge scientific stack each load their own copy of the OpenMP
-runtime, and the R session aborts with \code{OMP: Error #15}. Use the Docker
-image instead (see \code{vignette("Introduction", package = "spharmlithic")}).
+\strong{macOS:} not supported in a native installation. \code{open3d} ships its own
+copy of the OpenMP runtime (\code{libomp}), which clashes with the copy that
+comes with CRAN's R for macOS (used by R packages such as \code{data.table}),
+and the R session aborts with \code{OMP: Error #15}. Use the Docker image
+instead (see \code{vignette("Introduction", package = "spharmlithic")}).
+\code{\link[=spharm_from_directions]{spharm_from_directions()}} is not affected.
 }
 \examples{
 \dontrun{

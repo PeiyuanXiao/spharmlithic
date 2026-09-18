@@ -30,6 +30,16 @@
 #'
 #' @return Invisibly, the environment name.
 #'
+#' @details
+#' On macOS the conda environment uses the pthreads build of OpenBLAS, so
+#' that it does not load a second copy of the OpenMP runtime next to the one
+#' that comes with R (two copies abort the R session with
+#' `OMP: Error #15`). Results are identical to the default build. If you
+#' created the environment with an earlier version of spharmlithic, run
+#' `install_spharmlithic_python()` again to recreate it. The mesh extension
+#' cannot be used in a native macOS installation; see
+#' [spharm_from_meshes()].
+#'
 #' @examples
 #' \dontrun{
 #' # Core install (direction-vector pipeline only)

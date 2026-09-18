@@ -52,17 +52,13 @@ jobs:
           stopifnot(reticulate::py_module_available("pyshtools"))
 
       # macOS: CRAN R ships its own libomp, which data.table (imported via
-      # plotly) initialises on load. Show which OpenMP runtimes are present,
-      # then load data.table and the Python stack in one R process.
+      # plotly) initialises on load. Show the conda env's BLAS / OpenMP
+      # packages, then load data.table and the Python stack in one R process.
       - name: Diagnose OpenMP runtimes (macOS)
         if: runner.os == 'macOS'
         continue-on-error: true
         shell: bash
         run: |
-          echo "--- libomp shipped with R"
-          find "$(Rscript -e 'cat(R.home())')" -name 'libomp*.dylib'
-          echo "--- data.table's OpenMP linkage"
-          otool -L "$(Rscript -e 'cat(system.file("libs", "data.table.so", package = "data.table"))')" | grep -i omp || echo "(none)"
           echo "--- BLAS / OpenMP packages in the conda env"
           ls "$(dirname "$(dirname "$RETICULATE_PYTHON")")/conda-meta" | grep -i -E 'openblas|openmp|libblas' || true
           echo "--- data.table + Python stack in one R process"

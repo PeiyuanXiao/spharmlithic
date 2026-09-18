@@ -46,6 +46,16 @@ the \strong{core} environment, sufficient for the direction-vector pipeline
 install \code{trimesh} and \code{open3d} for the STL pipeline
 (\code{\link[=spharm_from_meshes]{spharm_from_meshes()}}).
 }
+\details{
+On macOS the conda environment uses the pthreads build of OpenBLAS, so
+that it does not load a second copy of the OpenMP runtime next to the one
+that comes with R (two copies abort the R session with
+\code{OMP: Error #15}). Results are identical to the default build. If you
+created the environment with an earlier version of spharmlithic, run
+\code{install_spharmlithic_python()} again to recreate it. The mesh extension
+cannot be used in a native macOS installation; see
+\code{\link[=spharm_from_meshes]{spharm_from_meshes()}}.
+}
 \examples{
 \dontrun{
 # Core install (direction-vector pipeline only)
