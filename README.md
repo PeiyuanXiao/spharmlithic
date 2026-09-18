@@ -68,7 +68,7 @@ docker run -d -p 8787:8787 \
   peiyuanxiao/spharmlithic
 ```
 
-Open <http://localhost:8787> in your browser (user: `rstudio`, password:
+Open `http://localhost:8787` in your browser (user: `rstudio`, password:
 `rstudio`). Example data and a quick-start script are pre-loaded in
 `~/examples/`.
 

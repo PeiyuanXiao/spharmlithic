@@ -65,17 +65,18 @@ direction, or both side-by-side).
 Useful links:
 \itemize{
   \item \url{https://github.com/PeiyuanXiao/spharmlithic}
+  \item \url{https://peiyuanxiao.github.io/spharmlithic/}
   \item Report bugs at \url{https://github.com/PeiyuanXiao/spharmlithic/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Peiyuan Xiao \email{pyxiao@uw.edu}
+\strong{Maintainer}: Peiyuan Xiao \email{pyxiao@uw.edu} (\href{https://orcid.org/0009-0000-9733-5875}{ORCID})
 
 Authors:
 \itemize{
-  \item Peiyuan Xiao \email{pyxiao@uw.edu}
-  \item Ben Marwick \email{bmarwick@uw.edu}
+  \item Peiyuan Xiao \email{pyxiao@uw.edu} (\href{https://orcid.org/0009-0000-9733-5875}{ORCID})
+  \item Ben Marwick \email{bmarwick@uw.edu} (\href{https://orcid.org/0000-0001-7879-4531}{ORCID})
 }
 
 }

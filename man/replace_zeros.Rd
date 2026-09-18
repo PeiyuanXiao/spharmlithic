@@ -35,3 +35,21 @@ centred log-ratio (CLR) transform.
 By default, zeros are replaced with 65\% of the smallest non-zero value in
 each row.
 }
+\examples{
+# Three compositions (rows sum to one); the first two contain a zero
+x <- rbind(
+  c(0.60, 0.30, 0.10, 0.00),
+  c(0.50, 0.25, 0.25, 0.00),
+  c(0.40, 0.35, 0.15, 0.10)
+)
+
+# Default: each zero becomes 65\% of the smallest non-zero value in its row
+replace_zeros(x)
+
+# Use a fixed replacement value instead
+replace_zeros(x, delta = 0.001)
+
+# Rows still sum to one
+rowSums(replace_zeros(x))
+
+}

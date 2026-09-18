@@ -70,7 +70,7 @@ docker run -d -p 8787:8787 \
   peiyuanxiao/spharmlithic
 ```
 
-Open <http://localhost:8787> in your browser (user: `rstudio`, password: `rstudio`). The container includes R, RStudio Server, and the full Python environment pre-configured. Example data and a quick-start script are in `~/examples/`. From this point on the instructions are the same if you are working in the Docker container or directly on the desktop.
+Open `http://localhost:8787` in your browser (user: `rstudio`, password: `rstudio`). The container includes R, RStudio Server, and the full Python environment pre-configured. Example data and a quick-start script are in `~/examples/`. From this point on the instructions are the same if you are working in the Docker container or directly on the desktop.
 
 ## Working with the Package: Activating the Python environment
 

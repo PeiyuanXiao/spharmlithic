@@ -3,8 +3,10 @@ Title: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Pattern
 Version: 0.1.0
 Authors@R:
     c(
-      person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre")),
-      person("Ben", "Marwick", , "bmarwick@uw.edu", role = c("aut"))
+      person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"),
+             comment = c(ORCID = "0009-0000-9733-5875")),
+      person("Ben", "Marwick", , "bmarwick@uw.edu", role = c("aut"),
+             comment = c(ORCID = "0000-0001-7879-4531"))
       )
 Description: A complete toolkit for the geometric alignment, directional
     statistics, and spherical harmonic analysis of three-dimensional
@@ -16,7 +18,7 @@ Description: A complete toolkit for the geometric alignment, directional
     spherical harmonic expansion via pyshtools), supporting both
     direction-vector and mesh-based inputs.
 License: MIT + file LICENSE
-URL: https://github.com/PeiyuanXiao/spharmlithic
+URL: https://github.com/PeiyuanXiao/spharmlithic, https://peiyuanxiao.github.io/spharmlithic/
 BugReports: https://github.com/PeiyuanXiao/spharmlithic/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
