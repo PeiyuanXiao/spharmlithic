@@ -1,0 +1,26 @@
+name: pkgcheck
+
+# This will cancel running jobs once a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  # Manually trigger the Action under Actions/pkgcheck
+  workflow_dispatch:
+  # Run after R-CMD-check finishes on main: pkgcheck's CI check fails while
+  # other workflows are still running
+  workflow_run:
+    workflows: ["R-CMD-check"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  pkgcheck:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: ropensci-review-tools/pkgcheck-action@main
+        with:
+          post-to-issue: false
