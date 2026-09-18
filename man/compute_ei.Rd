@@ -54,9 +54,9 @@ compute_ei(dx, dy, dz)   # I close to 1
 
 }
 \references{
-Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. \emph{Journal of Archaeological Science},
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
+Sutikna, T. (2024). A new method for quantifying flake scar organisation
+on cores using orientation statistics. \emph{Journal of Archaeological Science},
 \strong{167}, 105998.
 
 McPherron, S. P. (2018). Additional statistical and graphical methods for

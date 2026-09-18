@@ -69,9 +69,9 @@ get_scar_length <- function(df) {
 #' scars themselves, see `align_scar()`.
 #'
 #' @references
-#' Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-#' T. (2024). A new method for quantifying flake scar organisation on cores
-#' using orientation statistics. \emph{Journal of Archaeological Science},
+#' Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
+#' Sutikna, T. (2024). A new method for quantifying flake scar organisation
+#' on cores using orientation statistics. \emph{Journal of Archaeological Science},
 #' \strong{167}, 105998.
 #'
 #' @examples
