@@ -9,6 +9,8 @@ pipelines, descriptive statistics (e.g. SPI, Elongation/Isotropy),
 interactive 3D visualisation, and a Python back-end for spherical
 harmonic decomposition — all in a single, script-based workflow.
 
+Documentation: <https://peiyuanxiao.github.io/spharmlithic/>
+
 ------------------------------------------------------------------------
 
 ### 📦 Installation
@@ -147,33 +149,37 @@ For detailed usage, see the two vignettes:
 Bretzke, K., & Conard, N. J. (2012). Evaluating morphological
 variability in lithic assemblages using 3D models of stone artifacts.
 *Journal of Archaeological Science*, 39(12), 3741–3749.
+<https://doi.org/10.1016/j.jas.2012.06.039>
 
 Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
 patterning on cores using 3D recording techniques. *Journal of
 Archaeological Science*, 33(1), 132–142.
+<https://doi.org/10.1016/j.jas.2005.07.007>
 
-Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. *Journal of Archaeological Science*, 167,
-105998.
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
+Sutikna, T. (2024). A new method for quantifying flake scar organisation
+on cores using orientation statistics. *Journal of Archaeological
+Science*, 167, 105998. <https://doi.org/10.1016/j.jas.2024.105998>
 
 McPherron, S. P. (2018). Additional statistical and graphical methods
 for analyzing site formation processes using artifact orientations.
 *PLoS ONE*, 13(1), e0190195.
+<https://doi.org/10.1371/journal.pone.0190195>
 
 Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
 spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
-2574–2592.
+2574–2592. <https://doi.org/10.1029/2018GC007529>
 
 Xiao, P. Y., Li, H., & Marwick, B. (2027). Characterizing core
 morphology and scar patterning within a unified spherical harmonic
 framework. *Journal of Archaeological Method and Theory*, 34, 16.
 <https://doi.org/10.1007/s10816-026-09828-7>
 
-Ye, Z., Pei, S. W., Ma. D. D., Li, H., Marwick, B. (2026). Spherical
+Ye, Z., Pei, S. W., Ma, D. D., Li, H., & Marwick, B. (2026). Spherical
 harmonic analysis of faceted spheroids identifies shaping strategies and
 standardisation at Qianshangying (North China). *Journal of
 Archaeological Science*, 190, 106551.
+<https://doi.org/10.1016/j.jas.2026.106551>
 
 ------------------------------------------------------------------------
 

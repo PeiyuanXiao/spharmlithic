@@ -55,10 +55,10 @@ allowing direct per-specimen computation.
 
 ## References
 
-Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. *Journal of Archaeological Science*,
-**167**, 105998.
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
+Sutikna, T. (2024). A new method for quantifying flake scar organisation
+on cores using orientation statistics. *Journal of Archaeological
+Science*, **167**, 105998.
 
 McPherron, S. P. (2018). Additional statistical and graphical methods
 for analyzing site formation processes using artifact orientations.

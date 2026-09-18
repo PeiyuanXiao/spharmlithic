@@ -596,10 +596,10 @@ Clarkson, C., Vinicius, L., & Lahr, M. M. (2006). Quantifying flake scar
 patterning on cores using 3D recording techniques. *Journal of
 Archaeological Science*, 33(1), 132–142.
 
-Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., & Sutikna,
-T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. *Journal of Archaeological Science*, 167,
-105998.
+Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
+Sutikna, T. (2024). A new method for quantifying flake scar organisation
+on cores using orientation statistics. *Journal of Archaeological
+Science*, 167, 105998.
 
 McPherron, S. P. (2018). Additional statistical and graphical methods
 for analyzing site formation processes using artifact orientations.
@@ -609,7 +609,7 @@ Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
 spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
 2574–2592.
 
-Ye, Z., Pei, S. W., Ma. D. D., Li, H., Marwick, B. (2026). Spherical
+Ye, Z., Pei, S. W., Ma, D. D., Li, H., & Marwick, B. (2026). Spherical
 harmonic analysis of faceted spheroids identifies shaping strategies and
 standardisation at Qianshangying (North China). *Journal of
 Archaeological Science*, 190, 106551.
