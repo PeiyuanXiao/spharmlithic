@@ -25,9 +25,7 @@
 #'   \item{power_l0, power_l1, ..., power_lN}{Raw power per spherical
 #'     harmonic degree (N = lmax).}
 #'   \item{coeff_0001, coeff_0002, ...}{Flattened real-valued coefficients
-#'     (only when `include_coeffs = TRUE`). For [spharm_from_meshes()],
-#'     which returns complex coefficients with negligible imaginary parts,
-#'     only the real part is retained.}
+#'     (only when `include_coeffs = TRUE`).}
 #' }
 #'
 #' @examples
@@ -71,15 +69,7 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
   # Coefficient columns -----------------------------------------------------
   if (include_coeffs) {
     coeff_mat <- do.call(rbind, lapply(x, function(s) {
-      cf <- s$coefficients
-      if (is.complex(cf)) {
-        # Morphology pipeline (STL) returns complex coefficients with theoretically
-        # zero imaginary parts (real-valued spherical functions).
-        # Explicitly take Re() to avoid spurious "discarding imaginary
-        # parts" warnings from as.numeric().
-        cf <- Re(cf)
-      }
-      as.numeric(cf)
+      as.numeric(.check_real_coefficients(s$coefficients))
     }))
     n_coef    <- ncol(coeff_mat)
     coef_w    <- nchar(as.character(n_coef))  # zero-pad width
@@ -108,10 +98,9 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
 #' an `(n_lat * n_lon, 3)` matrix of unit-sphere Cartesian coordinates,
 #' for direct plotting with `plotly::plot_ly()`.
 #'
-#' @param coefficients Numeric or complex array of shape
-#'   `(2, lmax+1, lmax+1)` — the `coefficients` element of one specimen's
-#'   `spharm_from_*()` result. Both Track-A (complex) and Track-B (real)
-#'   coefficients are accepted.
+#' @param coefficients Numeric array of shape `(2, lmax+1, lmax+1)` — the
+#'   `coefficients` element of one specimen's `spharm_from_*()` result
+#'   (real coefficients in pyshtools 4pi normalization).
 #' @param grid_size Integer. Latitude resolution of the reconstruction
 #'   grid; longitude resolution is `2 * grid_size`. Default 64. Larger
 #'   values give smoother visualisations at higher cost.
@@ -123,11 +112,12 @@ spharm_to_dataframe <- function(x, include_coeffs = TRUE) {
 #'     values from finite-degree truncation are clipped to zero.}
 #'   \item{lon}{Numeric vector of length `2 * grid_size`. Longitude
 #'     (radians, range `[0, 2*pi)`).}
-#'   \item{lat}{Numeric vector of length `grid_size`. Latitude (radians,
-#'     range `(-pi/2, pi/2)`; equator = 0).}
+#'   \item{lat}{Numeric vector of length `grid_size`. Latitude (radians;
+#'     the first row is the north pole, `pi/2`, and the south pole is
+#'     excluded; equator = 0).}
 #'   \item{xyz}{Numeric matrix of shape `(grid_size * 2 * grid_size, 3)`
-#'     - unit-sphere Cartesian coordinates for each grid cell, row-major
-#'     order matching `as.vector(density)`. Convenient input for
+#'     - unit-sphere Cartesian coordinates for each grid cell, in the same
+#'     (column-major) order as `as.vector(density)`. Convenient input for
 #'     `plotly::plot_ly(type = "surface", surfacecolor = ...)`.}
 #' }
 #'
@@ -167,14 +157,10 @@ spharm_reconstruct <- function(coefficients, grid_size = 64) {
     stop("`coefficients` must be a 3-D array of shape (2, lmax+1, lmax+1).",
          call. = FALSE)
   }
+  .check_real_coefficients(coefficients)
 
   .ensure_backend()
-  
-  # If complex, take real part (morphology pipeline returns complex with ~0 imag).
-  if (is.complex(coefficients)) {
-    coefficients <- Re(coefficients)
-  }
-  
+
   # Call Python: inverse SH transform onto a Driscoll-Healy grid.
   density <- sh_py$kde_to_spharm$reconstruct_from_coeffs(
     coefficients,
@@ -185,12 +171,14 @@ spharm_reconstruct <- function(coefficients, grid_size = 64) {
   n_lat <- nrow(density)
   n_lon <- ncol(density)
   
-  # DH grid sample positions (pyshtools convention: endpoint=FALSE).
-  colat <- seq(0, pi,        length.out = n_lat + 1L)[-1L]
-  lon   <- seq(0, 2 * pi,    length.out = n_lon + 1L)[-1L]
-  
-  # Build matched unit-sphere Cartesian grid, row-major to match
-  # as.vector(density).
+  # DH grid sample positions (pyshtools convention): the first row is the
+  # north pole and the south pole is excluded; longitudes start at 0 and
+  # exclude 2*pi.
+  colat <- (seq_len(n_lat) - 1L) * pi / n_lat
+  lon   <- (seq_len(n_lon) - 1L) * 2 * pi / n_lon
+
+  # Build matched unit-sphere Cartesian grid, in the same (column-major)
+  # order as as.vector(density).
   TH <- matrix(colat, n_lat, n_lon, byrow = FALSE)
   PH <- matrix(lon,   n_lat, n_lon, byrow = TRUE)
   xyz <- cbind(
@@ -205,4 +193,21 @@ spharm_reconstruct <- function(coefficients, grid_size = 64) {
     lat     = pi / 2 - colat,
     xyz     = xyz
   )
+}
+
+
+# ---- Internal helpers -------------------------------------------------------
+
+# Earlier versions of spharm_from_meshes() returned complex coefficients.
+# Their real part is not a valid real coefficient array, so refuse them
+# instead of silently producing wrong tables, reconstructions or viewers.
+#' @noRd
+.check_real_coefficients <- function(coefficients) {
+  if (is.complex(coefficients)) {
+    stop("Complex spherical harmonic coefficients are not supported.\n",
+         "  They come from a spharm_from_meshes() result made with an ",
+         "earlier version of spharmlithic; re-run spharm_from_meshes().",
+         call. = FALSE)
+  }
+  invisible(coefficients)
 }

@@ -7,10 +7,9 @@
 spharm_reconstruct(coefficients, grid_size = 64)
 }
 \arguments{
-\item{coefficients}{Numeric or complex array of shape
-\verb{(2, lmax+1, lmax+1)} — the \code{coefficients} element of one specimen's
-\verb{spharm_from_*()} result. Both Track-A (complex) and Track-B (real)
-coefficients are accepted.}
+\item{coefficients}{Numeric array of shape \verb{(2, lmax+1, lmax+1)} — the
+\code{coefficients} element of one specimen's \verb{spharm_from_*()} result
+(real coefficients in pyshtools 4pi normalization).}
 
 \item{grid_size}{Integer. Latitude resolution of the reconstruction
 grid; longitude resolution is \code{2 * grid_size}. Default 64. Larger
@@ -24,11 +23,12 @@ A list with:
 values from finite-degree truncation are clipped to zero.}
 \item{lon}{Numeric vector of length \code{2 * grid_size}. Longitude
 (radians, range \verb{[0, 2*pi)}).}
-\item{lat}{Numeric vector of length \code{grid_size}. Latitude (radians,
-range \verb{(-pi/2, pi/2)}; equator = 0).}
+\item{lat}{Numeric vector of length \code{grid_size}. Latitude (radians;
+the first row is the north pole, \code{pi/2}, and the south pole is
+excluded; equator = 0).}
 \item{xyz}{Numeric matrix of shape \verb{(grid_size * 2 * grid_size, 3)}
-- unit-sphere Cartesian coordinates for each grid cell, row-major
-order matching \code{as.vector(density)}. Convenient input for
+- unit-sphere Cartesian coordinates for each grid cell, in the same
+(column-major) order as \code{as.vector(density)}. Convenient input for
 \code{plotly::plot_ly(type = "surface", surfacecolor = ...)}.}
 }
 }

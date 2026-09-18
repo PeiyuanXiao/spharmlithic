@@ -30,6 +30,7 @@ test_that("spharm_from_meshes returns expected structure", {
   for (id in names(res)) {
     s <- res[[id]]
     expect_named(s, c("coefficients", "power_spectrum"))
+    expect_false(is.complex(s$coefficients))
     expect_equal(dim(s$coefficients), c(2L, 5L, 5L))  # (2, lmax+1, lmax+1)
     expect_length(s$power_spectrum, 5L)
     expect_true(all(s$power_spectrum >= 0))

@@ -245,19 +245,15 @@ export_spharm_html <- function(
 #' from an R 3-D array of shape `(2, lmax+1, lmax+1)`.
 #' This avoids `jsonlite` flattening or restructuring the nested array.
 #'
-#' @param coefficients A `(2, L+1, L+1)` numeric or complex array.
+#' @param coefficients A `(2, L+1, L+1)` numeric array.
 #' @param lmax_out Maximum degree to retain (may be <= original lmax).
 #' @param digits Rounding digits.
 #' @return A JSON string representing the 3-D array, or `NULL` on failure.
 #' @noRd
 .cilm_to_json <- function(coefficients, lmax_out, digits) {
   if (is.null(coefficients)) return(NULL)
-  
-  # Handle complex coefficients (morphology pipeline)
-  if (is.complex(coefficients)) {
-    coefficients <- Re(coefficients)
-  }
-  
+  .check_real_coefficients(coefficients)
+
   d <- dim(coefficients)
   if (is.null(d) || length(d) != 3L || d[1] != 2L) return(NULL)
   

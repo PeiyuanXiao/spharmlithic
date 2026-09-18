@@ -30,12 +30,13 @@ test_that(".cilm_to_json truncates to requested lmax", {
   expect_length(parsed[[2]], 4)
 })
 
-test_that(".cilm_to_json handles complex coefficients", {
-  coeff <- array(complex(real = rnorm(18), imaginary = 1e-15),
+test_that(".cilm_to_json rejects complex coefficients", {
+  coeff <- array(complex(real = rnorm(18), imaginary = 0.1),
                  dim = c(2, 3, 3))
-  json <- spharmlithic:::.cilm_to_json(coeff, lmax_out = 2, digits = 4)
-  expect_type(json, "character")
-  expect_true(nchar(json) > 0)
+  expect_error(
+    spharmlithic:::.cilm_to_json(coeff, lmax_out = 2, digits = 4),
+    "Complex"
+  )
 })
 
 test_that(".cilm_to_json returns NULL for invalid input", {
@@ -81,4 +82,32 @@ test_that("export_spharm_html errors when meta lacks ID column", {
                        out_path = tempfile()),
     "ID"
   )
+})
+
+
+# ---- Viewer JavaScript: Legendre functions ----------------------------------
+
+test_that("viewer computePlm() uses pyshtools 4pi normalization", {
+  skip_if_not_installed("V8")
+
+  html  <- readLines(system.file("templates", "spharm_viewer.html",
+                                 package = "spharmlithic"),
+                     encoding = "UTF-8")
+  start <- which(startsWith(html, "function computePlm"))
+  end   <- start - 1 + which(startsWith(html[start:length(html)], "}"))[1]
+  ctx   <- V8::v8()
+  ctx$eval(paste(html[start:end], collapse = "\n"))
+
+  th  <- c(0.3, 1.1, 2.4)
+  plm <- function(l, m) {
+    ctx$get(sprintf("Array.from(computePlm(2, %s)[%d][%d])",
+                    jsonlite::toJSON(th, digits = NA), l, m))
+  }
+
+  # Closed forms of the 4pi-normalized functions (no Condon-Shortley phase)
+  expect_equal(plm(1, 0), sqrt(3) * cos(th))
+  expect_equal(plm(1, 1), sqrt(3) * sin(th))
+  expect_equal(plm(2, 0), sqrt(5) / 2 * (3 * cos(th)^2 - 1))
+  expect_equal(plm(2, 1), sqrt(15) * sin(th) * cos(th))
+  expect_equal(plm(2, 2), sqrt(15) / 2 * sin(th)^2)
 })

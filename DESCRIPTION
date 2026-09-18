@@ -43,6 +43,7 @@ Suggests:
     rmarkdown,
     ggplot2,
     tidyr,
+    V8,
     vegan,
     compositions
 Config/testthat/edition: 3

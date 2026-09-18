@@ -21,9 +21,7 @@ A \code{tibble} with columns:
 \item{power_l0, power_l1, ..., power_lN}{Raw power per spherical
 harmonic degree (N = lmax).}
 \item{coeff_0001, coeff_0002, ...}{Flattened real-valued coefficients
-(only when \code{include_coeffs = TRUE}). For \code{\link[=spharm_from_meshes]{spharm_from_meshes()}},
-which returns complex coefficients with negligible imaginary parts,
-only the real part is retained.}
+(only when \code{include_coeffs = TRUE}).}
 }
 }
 \description{

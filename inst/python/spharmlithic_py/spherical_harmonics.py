@@ -89,8 +89,8 @@ def compute_spherical_harmonics(surface: np.ndarray) -> np.ndarray:
     Returns
     -------
     harmonics : np.ndarray, shape (2, lmax+1, lmax+1)
-        Complex coefficients in pyshtools '4pi' normalization, scaled so
-        c(0, 0) == 1.
+        Real coefficients in pyshtools '4pi' normalization (index 0 = cosine,
+        index 1 = sine terms), scaled so c(0, 0) == 1.
     """
     if surface.shape[1] % 2 or surface.shape[0] % 2:
         raise ValueError("Grid dimensions must be even")
@@ -102,7 +102,9 @@ def compute_spherical_harmonics(surface: np.ndarray) -> np.ndarray:
     else:
         raise ValueError("Grid must be (N, N) or (N, 2N)")
 
-    harmonics = shtools.SHExpandDHC(surface.copy(), sampling=sampling)
+    # Real transform: the radius is a real function, and downstream code
+    # (R helpers, HTML viewer) expects real cosine/sine coefficients.
+    harmonics = shtools.SHExpandDH(surface.copy(), sampling=sampling)
 
     c00 = harmonics[0, 0, 0]
     if np.abs(c00) < 1e-10:

@@ -38,6 +38,18 @@ jobs:
           install.packages(".", repos = NULL, type = "source")
           library(spharmlithic)
           install_spharmlithic_python(mesh = TRUE)
+          # Export the env's Python for the later steps: without it,
+          # reticulate does not find the env during R CMD check and the
+          # Python-backed tests are skipped.
+          py <- reticulate::conda_python("r-spharmlithic")
+          cat("RETICULATE_PYTHON=", py, "\n", sep = "",
+              file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+
+      - name: Check that reticulate finds the Python backend
+        shell: Rscript {0}
+        run: |
+          print(reticulate::py_config())
+          stopifnot(reticulate::py_module_available("pyshtools"))
 
       # ── R CMD check ──────────────────────────────────────
       - uses: r-lib/actions/check-r-package@v2

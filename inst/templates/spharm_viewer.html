@@ -204,7 +204,8 @@ function computePlm(lmax,theta){
   const plm=[];
   for(let l=0;l<=lmax;l++){plm[l]=[];for(let m=0;m<=l;m++)plm[l][m]=new Float64Array(nL);}
   for(let i=0;i<nL;i++)plm[0][0][i]=1.0;
-  for(let m=1;m<=lmax;m++){const f=Math.sqrt((2*m+1)/(2*m));for(let i=0;i<nL;i++)plm[m][m][i]=f*sinT[i]*plm[m-1][m-1][i];}
+  // 4pi normalization as in pyshtools: P11 = sqrt(3)*sin(theta); the extra sqrt(2) carries into every m >= 1
+  for(let m=1;m<=lmax;m++){const f=m===1?Math.sqrt(3):Math.sqrt((2*m+1)/(2*m));for(let i=0;i<nL;i++)plm[m][m][i]=f*sinT[i]*plm[m-1][m-1][i];}
   for(let m=0;m<lmax;m++){const f=Math.sqrt(2*m+3);for(let i=0;i<nL;i++)plm[m+1][m][i]=f*cosT[i]*plm[m][m][i];}
   for(let m=0;m<=lmax;m++)for(let l=m+2;l<=lmax;l++){
     const l2=l*l,m2=m*m;
