@@ -75,6 +75,14 @@ install_spharmlithic_python <- function(
   
   # ---- Install ----------------------------------------------------------
   if (method %in% c("auto", "conda")) {
+    # macOS: CRAN R ships its own OpenMP runtime (libomp), which data.table
+    # (imported via plotly) initialises when spharmlithic loads. conda-forge's
+    # default OpenBLAS on macOS brings a second copy (llvm-openmp), and two
+    # initialised copies abort R with "OMP: Error #15". The pthreads build of
+    # the same OpenBLAS loads no OpenMP runtime and gives identical results.
+    if (Sys.info()[["sysname"]] == "Darwin") {
+      conda_pkgs <- c(conda_pkgs, "libopenblas=*=*pthreads*")
+    }
     # Create env with conda-forge channel + Python pinned version
     reticulate::conda_create(
       envname        = envname,
