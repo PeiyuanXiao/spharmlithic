@@ -1,13 +1,14 @@
 # =============================================================================
 # Dockerfile for spharmlithic
 # Pre-built R + Python environment for spherical harmonic analysis of lithics.
-# Solves the macOS open3d crash by running in a Linux container.
+# Supported route for the mesh pipeline on macOS: natively, open3d and the
+# conda-forge stack load two OpenMP runtimes and R aborts (OMP: Error #15).
 #
 # Usage:
 #   docker build -t peiyuanxiao/spharmlithic .
 #   docker run -d -p 8787:8787 -v /path/to/your/data:/home/rstudio/data \
 #     peiyuanxiao/spharmlithic
-#   # Open http://localhost:8787  (user: rstudio, password: spharm)
+#   # Open http://localhost:8787  (user: rstudio, password: rstudio)
 #
 # Push to Docker Hub:
 #   docker push peiyuanxiao/spharmlithic
@@ -45,9 +46,13 @@ RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkg
       pyshtools open3d && \
     conda clean -afy
 
-# --- 4. Install spharmlithic R package from GitHub ----------------------------
+# --- 4. Install spharmlithic R package from this source tree -----------------
+#   Installed from the build context (run `docker build` from the package
+#   root), so the image always ships exactly the code it was built from.
+COPY . /tmp/spharmlithic
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')" && \
-    R -e "remotes::install_github('PeiyuanXiao/spharmlithic', dependencies = TRUE)"
+    R -e "remotes::install_local('/tmp/spharmlithic', dependencies = TRUE, upgrade = 'never')" && \
+    rm -rf /tmp/spharmlithic
 
 # --- 5. Configure R to find conda + Python env -------------------------------
 RUN echo 'Sys.setenv(RETICULATE_CONDA = "/opt/conda/bin/conda")' \
@@ -79,8 +84,8 @@ raw_data <- read_excel("~/examples/example_scars.xlsx")
 aligned  <- align_scar_batch(raw_data)
 
 # Statistics
-compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
-compute_EI(aligned$d_x, aligned$d_y, aligned$d_z)
+compute_spi(aligned$d_x, aligned$d_y, aligned$d_z)
+compute_ei(aligned$d_x, aligned$d_y, aligned$d_z)
 
 # Spherical harmonic decomposition
 scar_sh <- spharm_from_directions(aligned, lmax = 20)
@@ -108,7 +113,7 @@ RUN mkdir -p /home/rstudio/.config/rstudio && \
 #   PASSWORD and DISABLE_AUTH are set at runtime via -e or docker-compose.
 #   Defaults here for convenience; override with:
 #     docker run -e PASSWORD=yourpass ...
-ARG DEFAULT_PASSWORD=spharm
+ARG DEFAULT_PASSWORD=rstudio
 ENV PASSWORD=${DEFAULT_PASSWORD}
 ENV DISABLE_AUTH=false
 

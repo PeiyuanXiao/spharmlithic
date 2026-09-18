@@ -19,7 +19,7 @@ variables in columns (e.g., ILR coordinates).}
 \item{group}{A grouping variable with one value per row of \code{x}.}
 
 \item{permutations}{Number of permutations passed to
-\code{\link[vegan:adonis]{vegan::adonis2()}}. Default is 999.}
+\code{\link[vegan:adonis2]{vegan::adonis2()}}. Default is 999.}
 
 \item{p_adjust_method}{Method used by \code{\link[stats:p.adjust]{stats::p.adjust()}}.
 Default is \code{"holm"}.}
@@ -43,7 +43,7 @@ A data frame with one row per pairwise comparison containing:
 }
 \description{
 Perform pairwise PERMANOVA comparisons among all levels of a grouping
-variable using \code{\link[vegan:adonis]{vegan::adonis2()}}.
+variable using \code{\link[vegan:adonis2]{vegan::adonis2()}}.
 }
 \details{
 For each pair of groups, a distance matrix is calculated from the supplied

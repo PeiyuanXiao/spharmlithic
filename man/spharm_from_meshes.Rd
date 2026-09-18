@@ -64,6 +64,11 @@ zero-component normalized: all coefficients divided by \code{c(0, 0)}).
 \details{
 Requires the \strong{mesh} Python extension. Run
 \code{install_spharmlithic_python(mesh = TRUE)} once before first use.
+
+\strong{macOS:} not supported in a native installation. \code{open3d} and the
+conda-forge scientific stack each load their own copy of the OpenMP
+runtime, and the R session aborts with \code{OMP: Error #15}. Use the Docker
+image instead (see \code{vignette("Introduction", package = "spharmlithic")}).
 }
 \examples{
 \dontrun{

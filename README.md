@@ -56,8 +56,10 @@ use_spharmlithic_python("r-spharmlithic")
 #### Option B — Docker (recommended for macOS)
 
 A pre-built Docker image includes R, RStudio Server, and the full Python
-environment. This is the recommended because `open3d` can cause R
-session crashes.
+environment. It is the recommended setup on macOS, where
+`spharm_from_meshes()` is not supported natively: `open3d` and the
+conda-forge scientific stack load two copies of the OpenMP runtime,
+which aborts the R session with `OMP: Error #15`.
 
 ``` bash
 docker pull peiyuanxiao/spharmlithic
@@ -67,7 +69,7 @@ docker run -d -p 8787:8787 \
 ```
 
 Open <http://localhost:8787> in your browser (user: `rstudio`, password:
-`spharm`). Example data and a quick-start script are pre-loaded in
+`rstudio`). Example data and a quick-start script are pre-loaded in
 `~/examples/`.
 
 ------------------------------------------------------------------------
@@ -85,8 +87,8 @@ scar_path <- system.file("extdata", "example_scars.xlsx",
 raw_data  <- read_excel(scar_path)
 aligned   <- align_scar_batch(raw_data)
 
-compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
-compute_EI(aligned$d_x, aligned$d_y, aligned$d_z)
+compute_spi(aligned$d_x, aligned$d_y, aligned$d_z)
+compute_ei(aligned$d_x, aligned$d_y, aligned$d_z)
 
 sh_scar <- spharm_from_directions(aligned, lmax = 20)
 
@@ -114,9 +116,9 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 
 | Function | Description |
 |:---|:---|
-| `compute_SPI()` | Scar Pattern Index (length-weighted: Clarkson et al., 2006; non-weighted: Bretzke & Conard, 2012) |
+| `compute_spi()` | Scar Pattern Index (length-weighted: Clarkson et al., 2006; non-weighted: Bretzke & Conard, 2012) |
 | `compute_spi_angle()` | Angular conversion of SPI (`θ = arccos(SPI)`) |
-| `compute_EI()` | Elongation and Isotropy ratio from Lin et al. (2024) |
+| `compute_ei()` | Elongation and Isotropy ratio from Lin et al. (2024) |
 | `get_scar_length()` | Individual scar lengths from coordinate data |
 
 #### Spherical Harmonic Analysis
@@ -172,6 +174,11 @@ for analyzing site formation processes using artifact orientations.
 Wieczorek, M. A., & Meschede, M. (2018). SHTools: Tools for working with
 spherical harmonics. *Geochemistry, Geophysics, Geosystems*, 19(8),
 2574–2592.
+
+Xiao, P. Y., Li, H., & Marwick, B. (2027). Characterizing core
+morphology and scar patterning within a unified spherical harmonic
+framework. *Journal of Archaeological Method and Theory*, 34, 16.
+<https://doi.org/10.1007/s10816-026-09828-7>
 
 Ye, Z., Pei, S. W., Ma. D. D., Li, H., Marwick, B. (2026). Spherical
 harmonic analysis of faceted spheroids identifies shaping strategies and

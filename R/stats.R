@@ -1,9 +1,9 @@
 # ==============================================================================
 # stats.R
 # Directional statistics for 3-D scar orientation data:
-#   - compute_SPI       : Scar Pattern Index (Clarkson et al. 2006)
+#   - compute_spi       : Scar Pattern Index (Clarkson et al. 2006)
 #   - compute_spi_angle : SPI converted to expected pairwise angle
-#   - compute_EI        : Elongation / Isotropy from the orientation tensor
+#   - compute_ei        : Elongation / Isotropy from the orientation tensor
 # ==============================================================================
 
 #' Scar Pattern Index (Clarkson et al. 2006)
@@ -45,7 +45,7 @@
 #'   lens <- sqrt((aligned$e_x - aligned$s_x)^2 +
 #'                (aligned$e_y - aligned$s_y)^2 +
 #'                (aligned$e_z - aligned$s_z)^2)
-#'   compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+#'   compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
 #' }
 #'
 #' @references
@@ -59,24 +59,24 @@
 #'
 #' @examples
 #' # Perfectly aligned vectors along X
-#' compute_SPI(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
+#' compute_spi(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
 #'
 #' # Random-like distribution (close to 0)
 #' set.seed(1)
-#' compute_SPI(rnorm(50), rnorm(50), rnorm(50))
+#' compute_spi(rnorm(50), rnorm(50), rnorm(50))
 #'
 #' \dontrun{
 #' # Unweighted (default) — every scar counts equally
-#' compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z)
+#' compute_spi(aligned$d_x, aligned$d_y, aligned$d_z)
 #'
 #' # Length-weighted — longer scars contribute more
 #' lens <- get_scar_length(aligned)
-#' compute_SPI(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+#' compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
 #' }
 #'
-#' @seealso [compute_spi_angle()], [compute_EI()], [get_scar_length()]
+#' @seealso [compute_spi_angle()], [compute_ei()], [get_scar_length()]
 #' @export
-compute_SPI <- function(dx, dy, dz, lengths = NULL) {
+compute_spi <- function(dx, dy, dz, lengths = NULL) {
   if (!is.null(lengths)) {
     dx <- dx * lengths
     dy <- dy * lengths
@@ -97,7 +97,7 @@ compute_SPI <- function(dx, dy, dz, lengths = NULL) {
 #' SPI = 1 maps to 0 degrees (parallel scars); SPI = 0 maps to 90 degrees
 #' (uniformly random pairwise angles).
 #'
-#' @inheritParams compute_SPI
+#' @inheritParams compute_spi
 #' @param unit Either `"degrees"` (default) or `"radians"`.
 #'
 #' @return A single numeric value in \eqn{[0, 90]} degrees (or
@@ -114,14 +114,14 @@ compute_SPI <- function(dx, dy, dz, lengths = NULL) {
 #'
 #' @examples
 #' compute_spi_angle(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 0 (parallel)
-#' compute_spi_angle(c(1, 0),    c(0, 1),    c(0, 0))       # 90 (orthogonal pair)
+#' compute_spi_angle(c(1, 0),    c(0, 1),    c(0, 0))       # 45 (orthogonal pair)
 #'
-#' @seealso [compute_SPI()]
+#' @seealso [compute_spi()]
 #' @export
 compute_spi_angle <- function(dx, dy, dz, lengths = NULL,
                               unit = c("degrees", "radians")) {
   unit  <- match.arg(unit)
-  spi   <- compute_SPI(dx, dy, dz, lengths = lengths)
+  spi   <- compute_spi(dx, dy, dz, lengths = lengths)
   # Clamp to [-1, 1] to guard against floating-point overshoot before acos.
   angle <- acos(pmin(pmax(spi, -1), 1))
   if (unit == "degrees") angle * 180 / pi else angle
@@ -136,10 +136,11 @@ compute_spi_angle <- function(dx, dy, dz, lengths = NULL,
 #' descriptors:
 #' \deqn{E = 1 - \lambda_2 / \lambda_1, \quad I = \lambda_3 / \lambda_1.}
 #'
-#' @param ux,uy,uz Numeric vectors of equal length. The X, Y, Z components
-#'   of **unit** direction vectors. Non-unit vectors are accepted without
-#'   error but will produce meaningless results; normalisation is the
-#'   caller's responsibility.
+#' @param dx,dy,dz Numeric vectors of equal length. The X, Y, Z components
+#'   of **unit** direction vectors, typically the `d_x`, `d_y`, `d_z`
+#'   columns returned by [align_scar_batch()]. Non-unit vectors are accepted
+#'   without error but will produce meaningless results; normalisation is
+#'   the caller's responsibility.
 #'
 #' @return A one-row data frame with columns:
 #' \describe{
@@ -174,19 +175,19 @@ compute_spi_angle <- function(dx, dy, dz, lengths = NULL,
 #'
 #' @examples
 #' # Strongly elongated — vectors mostly aligned along X
-#' compute_EI(c(1, 1, 0.9), c(0, 0, 0.1), c(0, 0, 0))
+#' compute_ei(c(1, 1, 0.9), c(0, 0, 0.1), c(0, 0, 0))
 #'
 #' # Isotropic — vectors evenly distributed along all three axes
-#' ux <- c(1, -1,  0,  0,  0,  0)
-#' uy <- c(0,  0,  1, -1,  0,  0)
-#' uz <- c(0,  0,  0,  0,  1, -1)
-#' compute_EI(ux, uy, uz)   # I close to 1
+#' dx <- c(1, -1,  0,  0,  0,  0)
+#' dy <- c(0,  0,  1, -1,  0,  0)
+#' dz <- c(0,  0,  0,  0,  1, -1)
+#' compute_ei(dx, dy, dz)   # I close to 1
 #'
-#' @seealso [compute_SPI()], [align_morph_batch()]
+#' @seealso [compute_spi()], [align_morph_batch()]
 #' @export
-compute_EI <- function(ux, uy, uz) {
-  n      <- length(ux)
-  U      <- cbind(ux, uy, uz)
+compute_ei <- function(dx, dy, dz) {
+  n      <- length(dx)
+  U      <- cbind(dx, dy, dz)
   T_mat  <- (t(U) %*% U) / n
   eig    <- eigen(T_mat, symmetric = TRUE)
   lambda <- sort(eig$values, decreasing = TRUE)

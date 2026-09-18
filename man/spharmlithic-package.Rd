@@ -20,11 +20,11 @@ spherical harmonic decomposition for artifact shape and flaking scar vector
 
 \subsection{Classical orientation statistics}{
 \itemize{
-\item \code{\link[=compute_SPI]{compute_SPI()}} — Scar Pattern Index (Clarkson et al. 2006); supports
+\item \code{\link[=compute_spi]{compute_spi()}} — Scar Pattern Index (Clarkson et al. 2006); supports
 both unit-vector and length-weighted variants.
 \item \code{\link[=compute_spi_angle]{compute_spi_angle()}} — SPI converted to expected pairwise angle
 (Clarkson et al. 2006).
-\item \code{\link[=compute_EI]{compute_EI()}} — Elongation (E) and Isotropy (I) from the
+\item \code{\link[=compute_ei]{compute_ei()}} — Elongation (E) and Isotropy (I) from the
 orientation tensor (Lin et al. 2024).
 }
 }
@@ -74,6 +74,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Peiyuan Xiao \email{pyxiao@uw.edu}
   \item Ben Marwick \email{bmarwick@uw.edu}
 }
 

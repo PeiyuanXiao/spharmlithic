@@ -13,11 +13,11 @@
 #'   (morphological normal rotation -> longest-scar translation).
 #'
 #' ### Classical orientation statistics
-#' * [compute_SPI()] — Scar Pattern Index (Clarkson et al. 2006); supports
+#' * [compute_spi()] — Scar Pattern Index (Clarkson et al. 2006); supports
 #'   both unit-vector and length-weighted variants.
 #' * [compute_spi_angle()] — SPI converted to expected pairwise angle
 #'   (Clarkson et al. 2006).
-#' * [compute_EI()] — Elongation (E) and Isotropy (I) from the
+#' * [compute_ei()] — Elongation (E) and Isotropy (I) from the
 #'   orientation tensor (Lin et al. 2024).
 #'
 #' ### Spherical harmonic analysis (Python-backed)

@@ -37,7 +37,7 @@ guard against floating-point overshoot that would otherwise produce \code{NaN}.
 }
 \examples{
 compute_spi_angle(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 0 (parallel)
-compute_spi_angle(c(1, 0),    c(0, 1),    c(0, 0))       # 90 (orthogonal pair)
+compute_spi_angle(c(1, 0),    c(0, 1),    c(0, 0))       # 45 (orthogonal pair)
 
 }
 \references{
@@ -46,5 +46,5 @@ patterning on cores using 3D recording techniques. \emph{Journal of
 Archaeological Science}, \strong{33}(1), 132--142.
 }
 \seealso{
-\code{\link[=compute_SPI]{compute_SPI()}}
+\code{\link[=compute_spi]{compute_spi()}}
 }

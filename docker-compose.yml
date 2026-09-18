@@ -5,7 +5,7 @@ services:
     ports:
       - "8787:8787"
     environment:
-      - PASSWORD=${RSTUDIO_PASSWORD:-spharm}
+      - PASSWORD=${RSTUDIO_PASSWORD:-rstudio}
       - DISABLE_AUTH=${DISABLE_AUTH:-false}
     volumes:
       - ./data:/home/rstudio/data
