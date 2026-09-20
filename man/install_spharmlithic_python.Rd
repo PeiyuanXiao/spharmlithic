@@ -8,7 +8,7 @@ install_spharmlithic_python(
   envname = "r-spharmlithic",
   method = c("auto", "conda", "virtualenv"),
   mesh = FALSE,
-  python_version = ">=3.9,<3.13",
+  python_version = ">=3.11,<3.13",
   new_env = identical(envname, "r-spharmlithic"),
   restart_session = TRUE
 )
@@ -25,8 +25,13 @@ because \code{pyshtools} is easier to install via conda-forge).}
 (\code{trimesh}, \code{open3d}) needed for \code{\link[=spharm_from_meshes]{spharm_from_meshes()}}. Default
 \code{FALSE} (core only).}
 
-\item{python_version}{Character. Python version constraint passed to
-reticulate. Default \code{">=3.9,<3.13"}.}
+\item{python_version}{Character. Python version constraint. Default
+\code{">=3.11,<3.13"}. The lower bound is the oldest version the current
+\code{pyshtools}, \code{open3d}, \code{numpy} and \code{scipy} releases still publish
+wheels for; the upper bound is required because \code{pyshtools} has no
+Python 3.13 wheels. Both bounds now reach the installer: conda and
+virtualenv each take the newest version inside the range (3.12 at
+the time of writing).}
 
 \item{new_env}{Logical. If \code{TRUE} (default when \code{envname} is the
 package default), remove any existing environment with the same name

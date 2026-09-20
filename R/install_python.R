@@ -20,8 +20,13 @@
 #' @param mesh Logical. If `TRUE`, install the mesh-processing extension
 #'   (`trimesh`, `open3d`) needed for [spharm_from_meshes()]. Default
 #'   `FALSE` (core only).
-#' @param python_version Character. Python version constraint passed to
-#'   reticulate. Default `">=3.9,<3.13"`.
+#' @param python_version Character. Python version constraint. Default
+#'   `">=3.11,<3.13"`. The lower bound is the oldest version the current
+#'   `pyshtools`, `open3d`, `numpy` and `scipy` releases still publish
+#'   wheels for; the upper bound is required because `pyshtools` has no
+#'   Python 3.13 wheels. Both bounds now reach the installer: conda and
+#'   virtualenv each take the newest version inside the range (3.12 at
+#'   the time of writing).
 #' @param new_env Logical. If `TRUE` (default when `envname` is the
 #'   package default), remove any existing environment with the same name
 #'   first.
@@ -55,7 +60,7 @@ install_spharmlithic_python <- function(
     envname         = "r-spharmlithic",
     method          = c("auto", "conda", "virtualenv"),
     mesh            = FALSE,
-    python_version  = ">=3.9,<3.13",
+    python_version  = ">=3.11,<3.13",
     new_env         = identical(envname, "r-spharmlithic"),
     restart_session = TRUE) {
   
@@ -93,12 +98,16 @@ install_spharmlithic_python <- function(
     if (Sys.info()[["sysname"]] == "Darwin") {
       conda_pkgs <- c(conda_pkgs, "libopenblas=*=*pthreads*")
     }
-    # Create env with conda-forge channel + Python pinned version
+    # Create env with conda-forge channel. The Python constraint goes in
+    # `packages`, not `python_version`: reticulate renders that argument as
+    # a literal `python=<value>`, which cannot express a range, so only the
+    # lower bound survived and the env was pinned to it. conda_create()
+    # adds no python spec of its own when `packages` already carries one,
+    # so this way the whole range reaches the solver.
     reticulate::conda_create(
-      envname        = envname,
-      packages       = conda_pkgs,
-      python_version = sub("^>=", "", strsplit(python_version, ",")[[1]][1]),
-      channel        = "conda-forge"
+      envname  = envname,
+      packages = c(paste0("python", python_version), conda_pkgs),
+      channel  = "conda-forge"
     )
     # Install pip-only packages on top
     reticulate::conda_install(
@@ -108,9 +117,13 @@ install_spharmlithic_python <- function(
     )
   } else {
     # virtualenv path: install everything via pip
+    # `version`, not `python_version`: virtualenv_create() has no
+    # `python_version` argument, so the constraint fell into `...` and was
+    # dropped without a warning -- the venv got whichever interpreter
+    # virtualenv_starter() rated newest, EOL or not.
     reticulate::virtualenv_create(
-      envname        = envname,
-      python_version = python_version
+      envname = envname,
+      version = python_version
     )
     reticulate::virtualenv_install(
       envname  = envname,

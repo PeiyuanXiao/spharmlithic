@@ -40,7 +40,7 @@ ENV PATH=/opt/conda/bin:$PATH
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
     conda create -n r-spharmlithic -c conda-forge -y \
-      python=3.10 pip \
+      python=3.12 pip \
       numpy scipy pandas trimesh && \
     /opt/conda/envs/r-spharmlithic/bin/pip install --no-cache-dir \
       pyshtools open3d && \

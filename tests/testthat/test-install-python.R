@@ -79,6 +79,10 @@ test_that("conda install builds the env from conda-forge, then pip-only packages
 
   expect_identical(log$conda_create$envname, "r-spharmlithic")
   expect_identical(log$conda_create$channel, "conda-forge")
+  # The range has to reach the solver as a package spec; passing it as
+  # `python_version` would render as a literal `python=>=3.11,<3.13`.
+  expect_identical(log$conda_create$packages[[1]], "python>=3.11,<3.13")
+  expect_null(log$conda_create$python_version)
   expect_true(all(c("numpy", "scipy", "pandas") %in%
                     log$conda_create$packages))
   expect_false("trimesh" %in% log$conda_create$packages)
@@ -116,7 +120,10 @@ test_that("virtualenv install puts everything through pip, no conda specs", {
     install_spharmlithic_python(method = "virtualenv", mesh = TRUE,
                                 new_env = FALSE, restart_session = FALSE)
   )
-  expect_identical(log$virtualenv_create$python_version, ">=3.9,<3.13")
+  # virtualenv_create() takes `version`. A `python_version` argument lands
+  # in `...` and is discarded silently, so assert it is not used.
+  expect_identical(log$virtualenv_create$version, ">=3.11,<3.13")
+  expect_null(log$virtualenv_create$python_version)
   pkgs <- log$virtualenv_install$packages
   expect_identical(pkgs, c("numpy", "scipy", "pandas", "trimesh",
                            "pyshtools", "open3d"))
