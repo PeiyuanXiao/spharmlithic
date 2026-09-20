@@ -15,7 +15,7 @@ install_spharmlithic_python(
   envname = "r-spharmlithic",
   method = c("auto", "conda", "virtualenv"),
   mesh = FALSE,
-  python_version = ">=3.9,<3.13",
+  python_version = ">=3.11,<3.13",
   new_env = identical(envname, "r-spharmlithic"),
   restart_session = TRUE
 )
@@ -42,8 +42,12 @@ install_spharmlithic_python(
 
 - python_version:
 
-  Character. Python version constraint passed to reticulate. Default
-  `">=3.9,<3.13"`.
+  Character. Python version constraint. Default `">=3.11,<3.13"`. The
+  lower bound is the oldest version the current `pyshtools`, `open3d`,
+  `numpy` and `scipy` releases still publish wheels for; the upper bound
+  is required because `pyshtools` has no Python 3.13 wheels. Both bounds
+  now reach the installer: conda and virtualenv each take the newest
+  version inside the range (3.12 at the time of writing).
 
 - new_env:
 

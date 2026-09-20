@@ -61,7 +61,7 @@ install <code>trimesh</code> and <code>open3d</code> for the STL pipeline
 <span>  envname <span class="op">=</span> <span class="st">"r-spharmlithic"</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"conda"</span>, <span class="st">"virtualenv"</span><span class="op">)</span>,</span>
 <span>  mesh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  python_version <span class="op">=</span> <span class="st">"&gt;=3.9,&lt;3.13"</span>,</span>
+<span>  python_version <span class="op">=</span> <span class="st">"&gt;=3.11,&lt;3.13"</span>,</span>
 <span>  new_env <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">envname</span>, <span class="st">"r-spharmlithic"</span><span class="op">)</span>,</span>
 <span>  restart_session <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -89,8 +89,13 @@ because <code>pyshtools</code> is easier to install via conda-forge).</p></dd>
 
 
 <dt id="arg-python-version">python_version<a class="anchor" aria-label="anchor" href="#arg-python-version"></a></dt>
-<dd><p>Character. Python version constraint passed to
-reticulate. Default <code>"&gt;=3.9,&lt;3.13"</code>.</p></dd>
+<dd><p>Character. Python version constraint. Default
+<code>"&gt;=3.11,&lt;3.13"</code>. The lower bound is the oldest version the current
+<code>pyshtools</code>, <code>open3d</code>, <code>numpy</code> and <code>scipy</code> releases still publish
+wheels for; the upper bound is required because <code>pyshtools</code> has no
+Python 3.13 wheels. Both bounds now reach the installer: conda and
+virtualenv each take the newest version inside the range (3.12 at
+the time of writing).</p></dd>
 
 
 <dt id="arg-new-env">new_env<a class="anchor" aria-label="anchor" href="#arg-new-env"></a></dt>
