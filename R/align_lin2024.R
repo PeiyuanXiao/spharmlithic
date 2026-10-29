@@ -163,9 +163,10 @@ align_morph <- function(df_group) {
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
 #' @noRd
-build_panel_morph <- function(demo_id, raw_data) {
-  df <- dplyr::filter(raw_data, .data$ID == demo_id)
-  
+build_panel_morph <- function(demo_id, raw_data, id_col = "ID", outline = NULL) {
+  df <- raw_data[as.character(raw_data[[id_col]]) == as.character(demo_id), ,
+                 drop = FALSE]
+
   s0         <- as.matrix(df[, c("Start_X", "Start_Y", "Start_Z")])
   e0         <- as.matrix(df[, c("End_X",   "End_Y",   "End_Z"  )])
   normal_raw <- as.numeric(df[1, c("Norm_X", "Norm_Y", "Norm_Z")])
@@ -187,27 +188,35 @@ build_panel_morph <- function(demo_id, raw_data) {
   s2[, 1]   <- s1[, 1] - shift_x; s2[, 2] <- s1[, 2] - shift_y
   e2[, 1]   <- e1[, 1] - shift_x; e2[, 2] <- e1[, 2] - shift_y
   z_longest <- s2[longest_idx, 3]
-  
+
+  # the outline and its centre, moved through the same two steps
+  ol <- .outline_steps(outline, list(
+    function(P) P %*% t(R1),
+    function(P) sweep(P, 2, c(shift_x, shift_y, 0), "-")))
+
   p0 <- plotly::plot_ly() %>%
     add_scars_3d(s0[,1], s0[,2], s0[,3],
                  e0[,1], e0[,2], e0[,3],
                  highlight_idx = longest_idx) %>%
+    .add_outline_step(ol, 1L) %>%
     add_arrow_3d(center_raw, normal_raw, arr_scale) %>%
     add_tilted_plane_3d(center_raw, normal_raw, half_sz) %>%
     apply_panel_layout("<b>Step 0</b>: Raw data \u2014 arbitrary orientation")
-  
+
   p1 <- plotly::plot_ly() %>%
     add_scars_3d(s1[,1], s1[,2], s1[,3],
                  e1[,1], e1[,2], e1[,3],
                  highlight_idx = longest_idx) %>%
+    .add_outline_step(ol, 2L) %>%
     add_arrow_3d(center_r1, c(0, 0, 1), arr_scale) %>%
     add_plane_3d(center_r1[1], center_r1[2], center_r1[3], half_sz) %>%
     apply_panel_layout("<b>Step 1</b>: Rotate \u2014 normal aligned to Z-axis")
-  
+
   p2 <- plotly::plot_ly() %>%
     add_scars_3d(s2[,1], s2[,2], s2[,3],
                  e2[,1], e2[,2], e2[,3],
                  highlight_idx = longest_idx) %>%
+    .add_outline_step(ol, 3L) %>%
     add_arrow_3d(c(0, 0, z_longest), c(0, 0, 1), arr_scale) %>%
     add_plane_3d(0, 0, z_longest, half_sz) %>%
     apply_panel_layout(
@@ -222,9 +231,11 @@ build_panel_morph <- function(demo_id, raw_data) {
 #' Builds three-panel Lin 2024 alignment visualisations for every specimen in
 #' `raw_data` and writes a standalone interactive HTML file to `out_path`.
 #'
-#' @param raw_data A data frame with columns `ID`, `Start_X/Y/Z`,
-#'   `End_X/Y/Z`, `Norm_X/Y/Z`, `Pos_X/Y/Z`, and optionally `Length`.
+#' @param raw_data A data frame with columns `Start_X/Y/Z`, `End_X/Y/Z`,
+#'   `Norm_X/Y/Z`, `Pos_X/Y/Z`, the ID column named by `id_col`, and
+#'   optionally `Length`.
 #' @param out_path Character. File path for the output HTML.
+#' @inheritParams export_alignment_html_svd
 #'
 #' @return Invisibly, the `out_path` string.
 #'
@@ -240,15 +251,17 @@ build_panel_morph <- function(demo_id, raw_data) {
 #' export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
 #' }
 #'
-#' @seealso [export_alignment_html_svd()]
+#' @seealso [export_alignment_html_svd()], [plot_core()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON
 #' @export
-export_alignment_html_lin2024 <- function(raw_data, out_path) {
-  all_ids     <- unique(raw_data$ID)
-  panels_list <- lapply(as.character(all_ids), build_panel_morph,
-                        raw_data = raw_data)
+export_alignment_html_lin2024 <- function(raw_data, out_path, id_col = "ID",
+                                          outlines = NULL) {
+  if (!is.null(outlines)) outlines <- .check_outlines(outlines)
+  all_ids     <- unique(raw_data[[id_col]])
+  panels_list <- lapply(as.character(all_ids), function(id)
+    build_panel_morph(id, raw_data, id_col = id_col, outline = outlines[[id]]))
   names(panels_list) <- as.character(all_ids)
   
   js_data_lines <- sapply(as.character(all_ids), function(id) {
@@ -289,11 +302,13 @@ export_alignment_html_lin2024 <- function(raw_data, out_path) {
       htmltools::tags$p(
         style = "font-family:sans-serif; text-align:center; color:#666;
                  margin:0 0 12px; font-size:13px;",
-        htmltools::HTML(
+        htmltools::HTML(paste0(
           "&#9642; <b style='color:steelblue'>Blue</b> = Flaking scars &nbsp;|&nbsp;
            <b style='color:pink'>Pink</b> = Longest scar &nbsp;|&nbsp;
            <b style='color:red'>Red arrow</b> = Plane normal &nbsp;|&nbsp;
-           <b style='color:lightgray'>Gray plane</b> = Best fitting plane")
+           <b style='color:lightgray'>Gray plane</b> = Best fitting plane",
+          if (!is.null(outlines))
+            " &nbsp;|&nbsp; <b>Black line</b> = outline, <b>black point</b> = its centre"))
       ),
       
       htmltools::tags$div(

@@ -4,13 +4,26 @@
 \alias{export_alignment_html_lin2024}
 \title{Export an interactive Lin 2024 alignment HTML page}
 \usage{
-export_alignment_html_lin2024(raw_data, out_path)
+export_alignment_html_lin2024(
+  raw_data,
+  out_path,
+  id_col = "ID",
+  outlines = NULL
+)
 }
 \arguments{
-\item{raw_data}{A data frame with columns \code{ID}, \code{Start_X/Y/Z},
-\code{End_X/Y/Z}, \code{Norm_X/Y/Z}, \code{Pos_X/Y/Z}, and optionally \code{Length}.}
+\item{raw_data}{A data frame with columns \code{Start_X/Y/Z}, \code{End_X/Y/Z},
+\code{Norm_X/Y/Z}, \code{Pos_X/Y/Z}, the ID column named by \code{id_col}, and
+optionally \code{Length}.}
 
 \item{out_path}{Character. File path for the output HTML.}
+
+\item{id_col}{Name of the specimen ID column. Default \code{"ID"}.}
+
+\item{outlines}{Optional named list of core outlines (named by ID), as
+returned by \code{\link[=read_outline_iges]{read_outline_iges()}}, or planes fitted with
+\code{\link[=fit_intersection_plane]{fit_intersection_plane()}}. Each outline is drawn with its centre and
+moved through the same alignment steps as the scars of its core.}
 }
 \value{
 Invisibly, the \code{out_path} string.
@@ -33,5 +46,5 @@ export_alignment_html_lin2024(raw_data, "output/alignment_lin2024.html")
 
 }
 \seealso{
-\code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}
+\code{\link[=export_alignment_html_svd]{export_alignment_html_svd()}}, \code{\link[=plot_core]{plot_core()}}
 }

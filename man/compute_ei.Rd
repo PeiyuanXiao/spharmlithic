@@ -2,55 +2,82 @@
 % Please edit documentation in R/stats.R
 \name{compute_ei}
 \alias{compute_ei}
-\title{Elongation (E) and Isotropy (I) from the orientation tensor}
+\title{Elongation (ER) and Isotropy (IR) ratios from the orientation tensor}
 \usage{
-compute_ei(dx, dy, dz)
+compute_ei(
+  dx,
+  dy,
+  dz,
+  raw = TRUE,
+  rarefied = TRUE,
+  random_interval = TRUE,
+  m = 3,
+  max_comb = 2000,
+  seed = 2226
+)
 }
 \arguments{
-\item{dx, dy, dz}{Numeric vectors of equal length. The X, Y, Z components
-of \strong{unit} direction vectors, typically the \code{d_x}, \code{d_y}, \code{d_z}
-columns returned by \code{\link[=align_scar_batch]{align_scar_batch()}}. Non-unit vectors are accepted
-without error but will produce meaningless results; normalisation is
-the caller's responsibility.}
+\item{dx, dy, dz}{Numeric vectors of equal length: the X, Y and Z components
+of the scar direction vectors of \strong{one} core, for example
+\code{End_X - Start_X} etc., or the \code{d_x}, \code{d_y}, \code{d_z} columns returned by
+\code{\link[=align_scar_batch]{align_scar_batch()}}. The vectors are normalised to unit length inside the
+function; rows of zero length or with missing values are left out.}
+
+\item{raw}{Logical. Return the raw ratios (\code{ER_raw}, \code{IR_raw}) and the
+eigenvalues? Default \code{TRUE}.}
+
+\item{rarefied}{Logical. Return the rarefied ratios (\code{ER_rarefied},
+\code{IR_rarefied})? Default \code{TRUE}.}
+
+\item{random_interval}{Logical. Return the random intervals (\code{ER_lower},
+\code{ER_upper}, \code{IR_lower}, \code{IR_upper}) and the position of the raw ratios
+relative to them (\code{ER_vs_random}, \code{IR_vs_random})? Default \code{TRUE}.}
+
+\item{m}{Number of scars per combination for the rarefied value. Default 3.}
+
+\item{max_comb}{Largest number of combinations averaged. Above it,
+\code{max_comb} distinct combinations are drawn at random (a Monte Carlo
+approximation of the mean over all combinations). Default 2000.}
+
+\item{seed}{Seed for that random draw; the caller's random stream is
+restored afterwards. \code{NULL} draws from the current stream. Default 2226.}
 }
 \value{
-A one-row data frame with columns:
-\describe{
-\item{E}{Elongation index in \eqn{[0, 1]}: 1 = perfectly linear,
-0 = planar / isotropic.}
-\item{I}{Isotropy index in \eqn{[0, 1]}: 1 = perfectly isotropic,
-0 = linear / planar.}
-\item{lambda1, lambda2, lambda3}{The three eigenvalues, sorted in
-decreasing order.}
-}
+A one-row tibble with \code{n_scar}, then for ER and for IR the columns
+selected by \code{raw}, \code{rarefied} and \code{random_interval} (\verb{*_raw},
+\verb{*_rarefied}, \verb{*_lower}, \verb{*_upper}, \verb{*_vs_random}), and, with
+\code{raw = TRUE}, the eigenvalues \code{lambda1}, \code{lambda2}, \code{lambda3} of the
+orientation tensor of all scars. All values are \code{NA} for cores with
+fewer than three scars.
 }
 \description{
-Constructs the 3×3 orientation (fabric) tensor from unit direction
-vectors, computes its eigenvalues
-\eqn{\lambda_1 \ge \lambda_2 \ge \lambda_3}, and returns the shape
-descriptors:
-\deqn{E = 1 - \lambda_2 / \lambda_1, \quad I = \lambda_3 / \lambda_1.}
+Constructs the 3 x 3 orientation (fabric) tensor of the scar directions of
+one core, computes its eigenvalues
+\eqn{\lambda_1 \ge \lambda_2 \ge \lambda_3}, and returns the elongation
+and isotropy ratios
+\deqn{ER = 1 - \lambda_2 / \lambda_1, \quad IR = \lambda_3 / \lambda_1.}
+As for \code{\link[=compute_spi]{compute_spi()}}, each is returned raw, rarefied, and with its
+random interval at the core's scar count.
 }
 \details{
-Negative eigenvalues caused by numerical error are clamped to zero.
-Both \code{E} and \code{I} are returned as \code{NA} when \eqn{\lambda_1 \approx 0}
-(degenerate tensor, threshold \eqn{10^{-10}}).
+ER measures how far the scars are aligned along one axis, whether they run
+the same way or opposite ways; IR measures how far the scar directions
+spread into three dimensions (low IR: directions concentrated in a plane
+or along an axis). ER above the upper bound and IR below the lower bound
+of the random interval indicate directions more concentrated than random.
 
-The orientation tensor and the E/I descriptors follow Lin et al. (2024),
-whose implementation adapts the fabric analysis of McPherron (2018).
+Raw ER and IR shift with the scar count; compare cores and groups with the
+rarefied values (see \code{\link[=compute_spi]{compute_spi()}}). Negative eigenvalues caused by
+numerical error are clamped to zero, and both ratios are \code{NA} when
+\eqn{\lambda_1 \approx 0}.
 
-The one-row data frame return type is designed to play well with
-\code{\link[dplyr:group_modify]{dplyr::group_modify()}}, allowing direct per-specimen computation.
+\strong{Changes in 0.2.0.} The columns \code{E} and \code{I} are renamed \code{ER_raw} and
+\code{IR_raw}; the input vectors are normalised inside the function.
 }
 \examples{
-# Strongly elongated — vectors mostly aligned along X
-compute_ei(c(1, 1, 0.9), c(0, 0, 0.1), c(0, 0, 0))
-
-# Isotropic — vectors evenly distributed along all three axes
-dx <- c(1, -1,  0,  0,  0,  0)
-dy <- c(0,  0,  1, -1,  0,  0)
-dz <- c(0,  0,  0,  0,  1, -1)
-compute_ei(dx, dy, dz)   # I close to 1
+set.seed(1)
+d <- matrix(rnorm(45), 15, 3)
+compute_ei(d[, 1], d[, 2], d[, 3])
 
 }
 \references{
@@ -64,5 +91,5 @@ analyzing site formation processes using artifact orientations.
 \emph{PLOS ONE}, \strong{13}(1), e0190195.
 }
 \seealso{
-\code{\link[=compute_spi]{compute_spi()}}, \code{\link[=align_morph_batch]{align_morph_batch()}}
+\code{\link[=compute_spi]{compute_spi()}}, \code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=random_interval]{random_interval()}}
 }

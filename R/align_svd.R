@@ -166,9 +166,10 @@ align_scar <- function(df_group) {
 #' @importFrom plotly plot_ly
 #' @importFrom dplyr filter
 #' @noRd
-build_panel_scar <- function(demo_id, raw_data) {
-  df <- dplyr::filter(raw_data, .data$ID == demo_id)
-  
+build_panel_scar <- function(demo_id, raw_data, id_col = "ID", outline = NULL) {
+  df <- raw_data[as.character(raw_data[[id_col]]) == as.character(demo_id), ,
+                 drop = FALSE]
+
   s0 <- as.matrix(df[, c("Start_X", "Start_Y", "Start_Z")])
   e0 <- as.matrix(df[, c("End_X",   "End_Y",   "End_Z"  )])
   
@@ -218,27 +219,37 @@ build_panel_scar <- function(demo_id, raw_data) {
                         0,            0,           1), 3, 3, byrow = TRUE)
   s3 <- s2 %*% t(R2)
   e3 <- e2 %*% t(R2)
-  
+
+  # the outline and its centre, moved through the same three steps
+  ol <- .outline_steps(outline, list(
+    function(P) P %*% t(R1),
+    function(P) sweep(P, 2, center_r1, "-"),
+    function(P) P %*% t(R2)))
+
   p0 <- plotly::plot_ly() %>%
     add_scars_3d(s0[,1], s0[,2], s0[,3], e0[,1], e0[,2], e0[,3]) %>%
+    .add_outline_step(ol, 1L) %>%
     add_arrow_3d(center_raw, normal_svd, arr_scale) %>%
     add_tilted_plane_3d(center_raw, normal_svd, half_sz) %>%
     apply_panel_layout("<b>Step 0</b>: Raw data \u2014 SVD normal shown")
-  
+
   p1 <- plotly::plot_ly() %>%
     add_scars_3d(s1[,1], s1[,2], s1[,3], e1[,1], e1[,2], e1[,3]) %>%
+    .add_outline_step(ol, 2L) %>%
     add_arrow_3d(center_r1, c(0, 0, 1), arr_scale) %>%
     add_plane_3d(center_r1[1], center_r1[2], center_r1[3], half_sz) %>%
     apply_panel_layout("<b>Step 1</b>: Rotate \u2014 SVD normal aligned to Z-axis")
-  
+
   p2 <- plotly::plot_ly() %>%
     add_scars_3d(s2[,1], s2[,2], s2[,3], e2[,1], e2[,2], e2[,3]) %>%
+    .add_outline_step(ol, 3L) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
     apply_panel_layout("<b>Step 2</b>: Translate \u2014 center moved to origin")
-  
+
   p3 <- plotly::plot_ly() %>%
     add_scars_3d(s3[,1], s3[,2], s3[,3], e3[,1], e3[,2], e3[,3]) %>%
+    .add_outline_step(ol, 4L) %>%
     add_arrow_3d(c(0, 0, 0), c(0, 0, 1), arr_scale) %>%
     add_arrow_3d(c(0, 0, 0), c(1, 0, 0), arr_scale, color = "orange") %>%
     add_plane_3d(0, 0, 0, half_sz) %>%
@@ -254,9 +265,15 @@ build_panel_scar <- function(demo_id, raw_data) {
 #' `raw_data` and writes a standalone interactive HTML file to `out_path`.
 #' The page contains a drop-down menu to switch between specimens.
 #'
-#' @param raw_data A data frame with columns `ID`, `Start_X/Y/Z`, `End_X/Y/Z`.
+#' @param raw_data A data frame with columns `Start_X/Y/Z`, `End_X/Y/Z` and
+#'   the ID column named by `id_col`.
 #' @param out_path Character. File path for the output HTML (e.g.
 #'   `"output/scar_alignment_svd.html"`).
+#' @param id_col Name of the specimen ID column. Default `"ID"`.
+#' @param outlines Optional named list of core outlines (named by ID), as
+#'   returned by [read_outline_iges()], or planes fitted with
+#'   [fit_intersection_plane()]. Each outline is drawn with its centre and
+#'   moved through the same alignment steps as the scars of its core.
 #'
 #' @return Invisibly, the `out_path` string.
 #'
@@ -265,23 +282,34 @@ build_panel_scar <- function(demo_id, raw_data) {
 #' requires no R session to view.  All specimen panels are serialised to
 #' JSON at export time; switching specimens in the browser is instant.
 #'
+#' Alignment is for viewing and for [spharm_from_directions()]; the
+#' scar-pattern indices of [spi_ei_batch()], [cpi_pra_batch()] and
+#' [spharm_spatiodirection()] do not change when a core is rotated or moved,
+#' and do not need it.
+#'
 #' For the Lin 2024 morphology-based equivalent, see
 #' [export_alignment_html_lin2024()].
 #'
 #' @examples
 #' \dontrun{
 #' export_alignment_html_svd(raw_data, "output/alignment_svd.html")
+#'
+#' # With the outlines of the peripherally exploited cores
+#' export_alignment_html_svd(raw_data, "output/alignment_svd.html",
+#'                           outlines = read_outline_iges(files))
 #' }
 #'
-#' @seealso [export_alignment_html_lin2024()]
+#' @seealso [export_alignment_html_lin2024()], [plot_core()]
 #'
 #' @importFrom htmltools tagList tags browsable save_html HTML
 #' @importFrom jsonlite toJSON
 #' @export
-export_alignment_html_svd <- function(raw_data, out_path) {
-  all_ids     <- unique(raw_data$ID)
-  panels_list <- lapply(as.character(all_ids), build_panel_scar,
-                        raw_data = raw_data)
+export_alignment_html_svd <- function(raw_data, out_path, id_col = "ID",
+                                      outlines = NULL) {
+  if (!is.null(outlines)) outlines <- .check_outlines(outlines)
+  all_ids     <- unique(raw_data[[id_col]])
+  panels_list <- lapply(as.character(all_ids), function(id)
+    build_panel_scar(id, raw_data, id_col = id_col, outline = outlines[[id]]))
   names(panels_list) <- as.character(all_ids)
   
   js_data_lines <- sapply(as.character(all_ids), function(id) {
@@ -323,11 +351,13 @@ export_alignment_html_svd <- function(raw_data, out_path) {
       htmltools::tags$p(
         style = "font-family:sans-serif; text-align:center; color:#666;
                  margin:0 0 12px; font-size:13px;",
-        htmltools::HTML(
+        htmltools::HTML(paste0(
           "&#9642; <b style='color:steelblue'>Blue</b> = Flaking scars &nbsp;|&nbsp;
            <b style='color:red'>Red arrow</b> = SVD normal &nbsp;|&nbsp;
            <b style='color:orange'>Orange arrow</b> = PCA main axis (X) &nbsp;|&nbsp;
-           <b style='color:lightgray'>Gray plane</b> = SVD best-fit plane")
+           <b style='color:lightgray'>Gray plane</b> = SVD best-fit plane",
+          if (!is.null(outlines))
+            " &nbsp;|&nbsp; <b>Black line</b> = outline, <b>black point</b> = its centre"))
       ),
       
       htmltools::tags$div(

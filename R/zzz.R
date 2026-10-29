@@ -2,7 +2,8 @@
 # zzz.R
 # Package hooks:
 #   .onLoad   — silent setup: lazily imports the bundled Python module.
-#   .onAttach — user-facing startup message if the backend is unavailable.
+# There is no startup message: only the spherical harmonic functions need the
+# Python backend, and they say so through .ensure_backend() when it is missing.
 # ==============================================================================
 
 #' @noRd
@@ -42,23 +43,15 @@ sh_py <- NULL
     stop(
       "spharmlithic: Python backend not initialised.\n",
       "  Run install_spharmlithic_python() to set it up, or\n",
-      "  use_spharmlithic_python('r-spharmlithic') to point at an existing env.",
+      "  use_spharmlithic_python('r-spharmlithic') to point at an existing env.\n",
+      "  If you are reloading within an active session, call ",
+      "use_spharmlithic_python() to restore the backend.\n",
+      "  (The scar-pattern indices, e.g. spi_ei_batch(), cpi_pra_batch() and ",
+      "spharm_spatiodirection(), do not need Python.)",
       call. = FALSE
     )
   }
   invisible(TRUE)
-}
-
-.onAttach <- function(libname, pkgname) {
-  if (is.null(sh_py)) {
-    packageStartupMessage(
-      "spharmlithic: Python backend not initialised.\n",
-      "  Run install_spharmlithic_python() to set it up,\n",
-      "  or use_spharmlithic_python('my_env') to point at an existing env.\n",
-      "  If you are reloading within an active session, call ",
-      "use_spharmlithic_python() to restore the backend."
-    )
-  }
 }
 
 # Re-export the magrittr pipe so users don't need library(magrittr).

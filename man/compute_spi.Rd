@@ -4,68 +4,107 @@
 \alias{compute_spi}
 \title{Scar Pattern Index (Clarkson et al. 2006)}
 \usage{
-compute_spi(dx, dy, dz, lengths = NULL)
+compute_spi(
+  dx,
+  dy,
+  dz,
+  lengths = NULL,
+  raw = TRUE,
+  rarefied = TRUE,
+  random_interval = TRUE,
+  m = 3,
+  max_comb = 2000,
+  seed = 2226
+)
 }
 \arguments{
-\item{dx, dy, dz}{Numeric vectors of equal length. The X, Y, Z components
-of the scar direction vectors. These are typically unit direction
-vectors returned by \code{\link[=align_scar_batch]{align_scar_batch()}} (columns \code{d_x}, \code{d_y}, \code{d_z}).}
+\item{dx, dy, dz}{Numeric vectors of equal length: the X, Y and Z components
+of the scar direction vectors of \strong{one} core, for example
+\code{End_X - Start_X} etc., or the \code{d_x}, \code{d_y}, \code{d_z} columns returned by
+\code{\link[=align_scar_batch]{align_scar_batch()}}. The vectors are normalised to unit length inside the
+function; rows of zero length or with missing values are left out.}
 
-\item{lengths}{Optional numeric vector of scar lengths. If provided,
-each direction vector is scaled by its length before summation,
-reproducing the original length-weighted SPI of Clarkson et al. (2006).
-If \code{NULL} (the default), all scars contribute equally regardless of
-length, following the unit-vector variant of Bretzke & Conard (2012).}
+\item{lengths}{Optional numeric vector of scar lengths, one per vector. If
+given, each unit direction is weighted by its length, reproducing the
+length-weighted SPI of Clarkson et al. (2006). The rarefied value and the
+random interval are defined for unweighted SPI only and are \code{NA} when
+\code{lengths} is given.}
+
+\item{raw}{Logical. Return the raw SPI (\code{SPI_raw})? Default \code{TRUE}.}
+
+\item{rarefied}{Logical. Return the rarefied SPI (\code{SPI_rarefied})? Default
+\code{TRUE}.}
+
+\item{random_interval}{Logical. Return the random interval at the core's
+scar count (\code{SPI_lower}, \code{SPI_upper}) and the position of the raw SPI
+relative to it (\code{SPI_vs_random})? Default \code{TRUE}.}
+
+\item{m}{Number of scars per combination for the rarefied value. Default 3.}
+
+\item{max_comb}{Largest number of combinations averaged. Above it,
+\code{max_comb} distinct combinations are drawn at random (a Monte Carlo
+approximation of the mean over all combinations). Default 2000.}
+
+\item{seed}{Seed for that random draw; the caller's random stream is
+restored afterwards. \code{NULL} draws from the current stream. Default 2226.}
 }
 \value{
-A single numeric value in \eqn{[0, 1]}. Values close to 1
-indicate strong preferred orientation; values close to 0 indicate
-isotropic / random patterning.
+A one-row tibble with \code{n_scar} (the number of scars used) and the
+columns selected by \code{raw}, \code{rarefied} and \code{random_interval}:
+\code{SPI_raw}, \code{SPI_rarefied}, \code{SPI_lower}, \code{SPI_upper} and \code{SPI_vs_random}
+(\code{"within"} or \code{"outside"}). All values are \code{NA} for cores with fewer
+than three scars.
 }
 \description{
-Computes the ratio of the resultant vector magnitude to the total scar
-length, on a scale from 0 (random orientation) to 1 (perfect alignment).
+Computes the Scar Pattern Index of one core: the length of the resultant
+of its scar directions divided by the number of scars, from 0 (directions
+cancel out) to 1 (all scars run the same way). By default the function
+returns three readings:
 }
 \details{
-\strong{Default behaviour:} unweighted (Bretzke & Conard 2012) — all scars
-contribute equally regardless of length. Pass \code{lengths} to get the
-length-weighted SPI (Clarkson et al. 2006).
-
-Two variants of SPI are supported:
 \itemize{
-\item \strong{Length-weighted} (Clarkson et al. 2006): pass raw scar
-displacement vectors so that longer scars contribute proportionally
-more to the resultant, or equivalently pass unit vectors together
-with \code{lengths}. This reproduces the original definition.
-\item \strong{Unweighted} (Bretzke & Conard 2012): leave \code{lengths = NULL}.
-Every scar contributes equally regardless of length — useful when
-scar lengths are unreliable or when only direction matters.
+\item \strong{raw} SPI, computed from all scars together;
+\item \strong{rarefied} SPI, the mean SPI over every combination of \code{m} scars
+(Xiao et al., in prep.). Its expectation does not change with the scar
+count, so it is the value to use when comparing cores or groups of
+cores;
+\item the \strong{random interval} at the core's scar count: the central 95\% of
+the SPI of cores whose scar directions are uniform on the sphere, and
+whether the raw SPI lies \code{"within"} or \code{"outside"} it.
 }
 
-To reproduce the length-weighted definition from aligned batch output:
-\preformatted{
-  lens <- sqrt((aligned$e_x - aligned$s_x)^2 +
-               (aligned$e_y - aligned$s_y)^2 +
-               (aligned$e_z - aligned$s_z)^2)
-  compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
-}
+\strong{Which value for which question.} Raw SPI shifts with the scar count:
+the fewer the scars, the less their directions cancel out, even when they
+are random. A single core is therefore judged by comparing its raw SPI
+with the random interval at its own scar count; cores and groups of cores
+are compared with the rarefied SPI, whose expectation does not depend on
+the scar count (Xiao et al., in prep.).
+
+\strong{Reading the random interval.} SPI above the upper bound indicates scar
+directions more concentrated on one side than random directions produce
+at this scar count. SPI below the lower bound is typical of opposed
+(bidirectional) flaking, whose two sets of removals cancel out. A value
+\code{"within"} the interval cannot be told apart from random directions at
+this scar count. See \code{\link[=random_interval]{random_interval()}}.
+
+\strong{Changes in 0.2.0.} The function returns a one-row tibble instead of a
+single number, and normalises the input vectors itself: raw displacement
+vectors (end minus start) now give the unweighted SPI, and the
+length-weighted SPI is requested with \code{lengths}.
 }
 \examples{
-# Perfectly aligned vectors along X
-compute_spi(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
-
-# Random-like distribution (close to 0)
+# Twelve scars running broadly the same way
 set.seed(1)
-compute_spi(rnorm(50), rnorm(50), rnorm(50))
+d <- matrix(rnorm(36, sd = 0.4), 12, 3)
+d[, 1] <- d[, 1] + 1
+compute_spi(d[, 1], d[, 2], d[, 3])
 
-\dontrun{
-# Unweighted (default) — every scar counts equally
-compute_spi(aligned$d_x, aligned$d_y, aligned$d_z)
+# Raw SPI only
+compute_spi(d[, 1], d[, 2], d[, 3], rarefied = FALSE, random_interval = FALSE)
 
-# Length-weighted — longer scars contribute more
-lens <- get_scar_length(aligned)
-compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
-}
+# Length-weighted SPI (Clarkson et al. 2006)
+compute_spi(d[, 1], d[, 2], d[, 3], lengths = runif(12, 5, 30),
+            rarefied = FALSE, random_interval = FALSE)
 
 }
 \references{
@@ -76,7 +115,11 @@ Archaeological Science}, \strong{33}(1), 132--142.
 Bretzke, K., & Conard, N. J. (2012). Evaluating morphological variability
 in lithic assemblages using 3D models of stone artifacts. \emph{Journal of
 Archaeological Science}, \strong{39}(12), 3741--3749.
+
+Hurlbert, S. H. (1971). The nonconcept of species diversity: a critique
+and alternative parameters. \emph{Ecology}, \strong{52}(4), 577--586.
 }
 \seealso{
-\code{\link[=compute_spi_angle]{compute_spi_angle()}}, \code{\link[=compute_ei]{compute_ei()}}, \code{\link[=get_scar_length]{get_scar_length()}}
+\code{\link[=compute_ei]{compute_ei()}}, \code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=random_interval]{random_interval()}},
+\code{\link[=compute_spi_angle]{compute_spi_angle()}}
 }

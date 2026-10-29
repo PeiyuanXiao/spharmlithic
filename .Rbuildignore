@@ -18,3 +18,5 @@ __pycache__
 ^docs$
 ^pkgdown$
 ^codecov\.yml$
+^dev$
+^data-raw$

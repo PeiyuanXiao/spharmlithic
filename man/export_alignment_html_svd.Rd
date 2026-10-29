@@ -4,13 +4,21 @@
 \alias{export_alignment_html_svd}
 \title{Export an interactive SVD alignment HTML page}
 \usage{
-export_alignment_html_svd(raw_data, out_path)
+export_alignment_html_svd(raw_data, out_path, id_col = "ID", outlines = NULL)
 }
 \arguments{
-\item{raw_data}{A data frame with columns \code{ID}, \code{Start_X/Y/Z}, \code{End_X/Y/Z}.}
+\item{raw_data}{A data frame with columns \code{Start_X/Y/Z}, \code{End_X/Y/Z} and
+the ID column named by \code{id_col}.}
 
 \item{out_path}{Character. File path for the output HTML (e.g.
 \code{"output/scar_alignment_svd.html"}).}
+
+\item{id_col}{Name of the specimen ID column. Default \code{"ID"}.}
+
+\item{outlines}{Optional named list of core outlines (named by ID), as
+returned by \code{\link[=read_outline_iges]{read_outline_iges()}}, or planes fitted with
+\code{\link[=fit_intersection_plane]{fit_intersection_plane()}}. Each outline is drawn with its centre and
+moved through the same alignment steps as the scars of its core.}
 }
 \value{
 Invisibly, the \code{out_path} string.
@@ -25,15 +33,24 @@ The exported HTML is fully self-contained (Plotly loaded from CDN) and
 requires no R session to view.  All specimen panels are serialised to
 JSON at export time; switching specimens in the browser is instant.
 
+Alignment is for viewing and for \code{\link[=spharm_from_directions]{spharm_from_directions()}}; the
+scar-pattern indices of \code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=cpi_pra_batch]{cpi_pra_batch()}} and
+\code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}} do not change when a core is rotated or moved,
+and do not need it.
+
 For the Lin 2024 morphology-based equivalent, see
 \code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}.
 }
 \examples{
 \dontrun{
 export_alignment_html_svd(raw_data, "output/alignment_svd.html")
+
+# With the outlines of the peripherally exploited cores
+export_alignment_html_svd(raw_data, "output/alignment_svd.html",
+                          outlines = read_outline_iges(files))
 }
 
 }
 \seealso{
-\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}
+\code{\link[=export_alignment_html_lin2024]{export_alignment_html_lin2024()}}, \code{\link[=plot_core]{plot_core()}}
 }

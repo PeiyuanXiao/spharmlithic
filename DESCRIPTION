@@ -28,14 +28,17 @@ Imports:
     dplyr,
     readr,
     forcats,
+    grDevices,
     rlang,
     htmltools,
     jsonlite,
     magrittr,
     plotly,
     reticulate (>= 1.41),
+    stats,
     tibble,
-    utils
+    utils,
+    vegan
 Suggests:
     readxl,
     rstudioapi,
@@ -45,7 +48,6 @@ Suggests:
     ggplot2,
     tidyr,
     V8,
-    vegan,
     compositions
 Config/testthat/edition: 3
 SystemRequirements: Python (>= 3.11, < 3.13)
