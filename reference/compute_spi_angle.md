@@ -1,8 +1,8 @@
 # Convert SPI to a scar-pattern angle (Clarkson et al. 2006)
 
-Converts the Scar Pattern Index into the expected pairwise angle between
-two randomly-selected scars, following Clarkson et al.'s (2006)
-interpretation: \\\theta = \arccos(\mathrm{SPI})\\.
+Converts the raw Scar Pattern Index of one core into an angle, \\\theta
+= \arccos(\mathrm{SPI})\\, following Clarkson et al. (2006). SPI = 1
+maps to 0 degrees (parallel scars) and SPI = 0 to 90 degrees.
 
 ## Usage
 
@@ -14,19 +14,20 @@ compute_spi_angle(dx, dy, dz, lengths = NULL, unit = c("degrees", "radians"))
 
 - dx, dy, dz:
 
-  Numeric vectors of equal length. The X, Y, Z components of the scar
-  direction vectors. These are typically unit direction vectors returned
-  by
-  [`align_scar_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/align_scar_batch.md)
-  (columns `d_x`, `d_y`, `d_z`).
+  Numeric vectors of equal length: the X, Y and Z components of the scar
+  direction vectors of **one** core, for example `End_X - Start_X` etc.,
+  or the `d_x`, `d_y`, `d_z` columns returned by
+  [`align_scar_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/align_scar_batch.md).
+  The vectors are normalised to unit length inside the function; rows of
+  zero length or with missing values are left out.
 
 - lengths:
 
-  Optional numeric vector of scar lengths. If provided, each direction
-  vector is scaled by its length before summation, reproducing the
-  original length-weighted SPI of Clarkson et al. (2006). If `NULL` (the
-  default), all scars contribute equally regardless of length, following
-  the unit-vector variant of Bretzke & Conard (2012).
+  Optional numeric vector of scar lengths, one per vector. If given,
+  each unit direction is weighted by its length, reproducing the
+  length-weighted SPI of Clarkson et al. (2006). The rarefied value and
+  the random interval are defined for unweighted SPI only and are `NA`
+  when `lengths` is given.
 
 - unit:
 
@@ -39,8 +40,14 @@ radians).
 
 ## Details
 
-SPI = 1 maps to 0 degrees (parallel scars); SPI = 0 maps to 90 degrees
-(uniformly random pairwise angles).
+Clarkson et al. (2006) read this angle as the mean angle between any two
+scars. That reading is only approximate: SPI includes each scar paired
+with itself. Over the distinct pairs of n unit vectors the mean cosine
+is \\(n \\ \mathrm{SPI}^2 - 1) / (n - 1)\\, which is not
+\\\mathrm{SPI}\\; it is the degree-1 direction feature of
+[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+(`dir_1`, up to the factor \\\sqrt{3/2}\\). The angle is computed from
+the raw SPI and, like it, shifts with the scar count.
 
 Before applying [`acos()`](https://rdrr.io/r/base/Trig.html), the SPI
 value is clamped to \\\[-1, 1\]\\ to guard against floating-point

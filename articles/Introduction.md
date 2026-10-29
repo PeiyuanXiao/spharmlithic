@@ -313,7 +313,10 @@ spi <- compute_spi(aligned_svd$d_x,
                    aligned_svd$d_y, 
                    aligned_svd$d_z)
 spi
-#> [1] 0.2373782
+#> # A tibble: 1 × 6
+#>   n_scar SPI_raw SPI_rarefied SPI_lower SPI_upper SPI_vs_random
+#>    <int>   <dbl>        <dbl>     <dbl>     <dbl> <chr>        
+#> 1     44   0.237        0.551    0.0407     0.265 within
 ```
 
 For the original, length-weighted SPI (Clarkson et al. 2006), pass scar
@@ -326,8 +329,12 @@ spi_w <- compute_spi(aligned_svd$d_x,
                      aligned_svd$d_y, 
                      aligned_svd$d_z,
                      lengths = lens)
+#> Length-weighted SPI: the rarefied value and the random interval are defined for unweighted SPI only and are NA.
 spi_w
-#> [1] 0.2665681
+#> # A tibble: 1 × 6
+#>   n_scar SPI_raw SPI_rarefied SPI_lower SPI_upper SPI_vs_random
+#>    <int>   <dbl>        <dbl>     <dbl>     <dbl> <chr>        
+#> 1     44   0.267           NA        NA        NA NA
 ```
 
 An angular variant is also available, this converts the Scar Pattern
@@ -356,8 +363,12 @@ ei <- compute_ei(aligned_svd$d_x,
                  aligned_svd$d_y, 
                  aligned_svd$d_z)
 ei
-#>           E         I   lambda1  lambda2   lambda3
-#> 1 0.3699931 0.3725705 0.4993565 0.314598 0.1860455
+#> # A tibble: 1 × 14
+#>   n_scar ER_raw ER_rarefied ER_lower ER_upper ER_vs_random IR_raw IR_rarefied
+#>    <int>  <dbl>       <dbl>    <dbl>    <dbl> <chr>         <dbl>       <dbl>
+#> 1     44  0.370       0.589   0.0429    0.397 within        0.373      0.0681
+#> # ℹ 6 more variables: IR_lower <dbl>, IR_upper <dbl>, IR_vs_random <chr>,
+#> #   lambda1 <dbl>, lambda2 <dbl>, lambda3 <dbl>
 ```
 
 #### Per-specimen statistics

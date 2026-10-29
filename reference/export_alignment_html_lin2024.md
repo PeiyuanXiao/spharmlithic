@@ -7,19 +7,37 @@ in `raw_data` and writes a standalone interactive HTML file to
 ## Usage
 
 ``` r
-export_alignment_html_lin2024(raw_data, out_path)
+export_alignment_html_lin2024(
+  raw_data,
+  out_path,
+  id_col = "ID",
+  outlines = NULL
+)
 ```
 
 ## Arguments
 
 - raw_data:
 
-  A data frame with columns `ID`, `Start_X/Y/Z`, `End_X/Y/Z`,
-  `Norm_X/Y/Z`, `Pos_X/Y/Z`, and optionally `Length`.
+  A data frame with columns `Start_X/Y/Z`, `End_X/Y/Z`, `Norm_X/Y/Z`,
+  `Pos_X/Y/Z`, the ID column named by `id_col`, and optionally `Length`.
 
 - out_path:
 
   Character. File path for the output HTML.
+
+- id_col:
+
+  Name of the specimen ID column. Default `"ID"`.
+
+- outlines:
+
+  Optional named list of core outlines (named by ID), as returned by
+  [`read_outline_iges()`](https://peiyuanxiao.github.io/spharmlithic/reference/read_outline_iges.md),
+  or planes fitted with
+  [`fit_intersection_plane()`](https://peiyuanxiao.github.io/spharmlithic/reference/fit_intersection_plane.md).
+  Each outline is drawn with its centre and moved through the same
+  alignment steps as the scars of its core.
 
 ## Value
 
@@ -36,7 +54,8 @@ For the SVD-based equivalent, see
 
 ## See also
 
-[`export_alignment_html_svd()`](https://peiyuanxiao.github.io/spharmlithic/reference/export_alignment_html_svd.md)
+[`export_alignment_html_svd()`](https://peiyuanxiao.github.io/spharmlithic/reference/export_alignment_html_svd.md),
+[`plot_core()`](https://peiyuanxiao.github.io/spharmlithic/reference/plot_core.md)
 
 ## Examples
 

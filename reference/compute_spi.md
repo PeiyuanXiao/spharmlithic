@@ -1,62 +1,115 @@
 # Scar Pattern Index (Clarkson et al. 2006)
 
-Computes the ratio of the resultant vector magnitude to the total scar
-length, on a scale from 0 (random orientation) to 1 (perfect alignment).
+Computes the Scar Pattern Index of one core: the length of the resultant
+of its scar directions divided by the number of scars, from 0
+(directions cancel out) to 1 (all scars run the same way). By default
+the function returns three readings:
 
 ## Usage
 
 ``` r
-compute_spi(dx, dy, dz, lengths = NULL)
+compute_spi(
+  dx,
+  dy,
+  dz,
+  lengths = NULL,
+  raw = TRUE,
+  rarefied = TRUE,
+  random_interval = TRUE,
+  m = 3,
+  max_comb = 2000,
+  seed = 2226
+)
 ```
 
 ## Arguments
 
 - dx, dy, dz:
 
-  Numeric vectors of equal length. The X, Y, Z components of the scar
-  direction vectors. These are typically unit direction vectors returned
-  by
-  [`align_scar_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/align_scar_batch.md)
-  (columns `d_x`, `d_y`, `d_z`).
+  Numeric vectors of equal length: the X, Y and Z components of the scar
+  direction vectors of **one** core, for example `End_X - Start_X` etc.,
+  or the `d_x`, `d_y`, `d_z` columns returned by
+  [`align_scar_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/align_scar_batch.md).
+  The vectors are normalised to unit length inside the function; rows of
+  zero length or with missing values are left out.
 
 - lengths:
 
-  Optional numeric vector of scar lengths. If provided, each direction
-  vector is scaled by its length before summation, reproducing the
-  original length-weighted SPI of Clarkson et al. (2006). If `NULL` (the
-  default), all scars contribute equally regardless of length, following
-  the unit-vector variant of Bretzke & Conard (2012).
+  Optional numeric vector of scar lengths, one per vector. If given,
+  each unit direction is weighted by its length, reproducing the
+  length-weighted SPI of Clarkson et al. (2006). The rarefied value and
+  the random interval are defined for unweighted SPI only and are `NA`
+  when `lengths` is given.
+
+- raw:
+
+  Logical. Return the raw SPI (`SPI_raw`)? Default `TRUE`.
+
+- rarefied:
+
+  Logical. Return the rarefied SPI (`SPI_rarefied`)? Default `TRUE`.
+
+- random_interval:
+
+  Logical. Return the random interval at the core's scar count
+  (`SPI_lower`, `SPI_upper`) and the position of the raw SPI relative to
+  it (`SPI_vs_random`)? Default `TRUE`.
+
+- m:
+
+  Number of scars per combination for the rarefied value. Default 3.
+
+- max_comb:
+
+  Largest number of combinations averaged. Above it, `max_comb` distinct
+  combinations are drawn at random (a Monte Carlo approximation of the
+  mean over all combinations). Default 2000.
+
+- seed:
+
+  Seed for that random draw; the caller's random stream is restored
+  afterwards. `NULL` draws from the current stream. Default 2226.
 
 ## Value
 
-A single numeric value in \\\[0, 1\]\\. Values close to 1 indicate
-strong preferred orientation; values close to 0 indicate isotropic /
-random patterning.
+A one-row tibble with `n_scar` (the number of scars used) and the
+columns selected by `raw`, `rarefied` and `random_interval`: `SPI_raw`,
+`SPI_rarefied`, `SPI_lower`, `SPI_upper` and `SPI_vs_random` (`"within"`
+or `"outside"`). All values are `NA` for cores with fewer than three
+scars.
 
 ## Details
 
-**Default behaviour:** unweighted (Bretzke & Conard 2012) — all scars
-contribute equally regardless of length. Pass `lengths` to get the
-length-weighted SPI (Clarkson et al. 2006).
+- **raw** SPI, computed from all scars together;
 
-Two variants of SPI are supported:
+- **rarefied** SPI, the mean SPI over every combination of `m` scars
+  (Xiao et al., in prep.). Its expectation does not change with the scar
+  count, so it is the value to use when comparing cores or groups of
+  cores;
 
-- **Length-weighted** (Clarkson et al. 2006): pass raw scar displacement
-  vectors so that longer scars contribute proportionally more to the
-  resultant, or equivalently pass unit vectors together with `lengths`.
-  This reproduces the original definition.
+- the **random interval** at the core's scar count: the central 95% of
+  the SPI of cores whose scar directions are uniform on the sphere, and
+  whether the raw SPI lies `"within"` or `"outside"` it.
 
-- **Unweighted** (Bretzke & Conard 2012): leave `lengths = NULL`. Every
-  scar contributes equally regardless of length — useful when scar
-  lengths are unreliable or when only direction matters.
+**Which value for which question.** Raw SPI shifts with the scar count:
+the fewer the scars, the less their directions cancel out, even when
+they are random. A single core is therefore judged by comparing its raw
+SPI with the random interval at its own scar count; cores and groups of
+cores are compared with the rarefied SPI, whose expectation does not
+depend on the scar count (Xiao et al., in prep.).
 
-To reproduce the length-weighted definition from aligned batch output:
+**Reading the random interval.** SPI above the upper bound indicates
+scar directions more concentrated on one side than random directions
+produce at this scar count. SPI below the lower bound is typical of
+opposed (bidirectional) flaking, whose two sets of removals cancel out.
+A value `"within"` the interval cannot be told apart from random
+directions at this scar count. See
+[`random_interval()`](https://peiyuanxiao.github.io/spharmlithic/reference/random_interval.md).
 
-
-      lens <- sqrt((aligned$e_x - aligned$s_x)^2 +
-                   (aligned$e_y - aligned$s_y)^2 +
-                   (aligned$e_z - aligned$s_z)^2)
-      compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
+**Changes in 0.2.0.** The function returns a one-row tibble instead of a
+single number, and normalises the input vectors itself: raw displacement
+vectors (end minus start) now give the unweighted SPI, and the
+length-weighted SPI is requested with `lengths`.
 
 ## References
 
@@ -68,30 +121,41 @@ Bretzke, K., & Conard, N. J. (2012). Evaluating morphological
 variability in lithic assemblages using 3D models of stone artifacts.
 *Journal of Archaeological Science*, **39**(12), 3741–3749.
 
+Hurlbert, S. H. (1971). The nonconcept of species diversity: a critique
+and alternative parameters. *Ecology*, **52**(4), 577–586.
+
 ## See also
 
-[`compute_spi_angle()`](https://peiyuanxiao.github.io/spharmlithic/reference/compute_spi_angle.md),
 [`compute_ei()`](https://peiyuanxiao.github.io/spharmlithic/reference/compute_ei.md),
-[`get_scar_length()`](https://peiyuanxiao.github.io/spharmlithic/reference/get_scar_length.md)
+[`spi_ei_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/spi_ei_batch.md),
+[`random_interval()`](https://peiyuanxiao.github.io/spharmlithic/reference/random_interval.md),
+[`compute_spi_angle()`](https://peiyuanxiao.github.io/spharmlithic/reference/compute_spi_angle.md)
 
 ## Examples
 
 ``` r
-# Perfectly aligned vectors along X
-compute_spi(c(1, 1, 1), c(0, 0, 0), c(0, 0, 0))   # 1
-#> [1] 1
-
-# Random-like distribution (close to 0)
+# Twelve scars running broadly the same way
 set.seed(1)
-compute_spi(rnorm(50), rnorm(50), rnorm(50))
-#> [1] 0.1509766
+d <- matrix(rnorm(36, sd = 0.4), 12, 3)
+d[, 1] <- d[, 1] + 1
+compute_spi(d[, 1], d[, 2], d[, 3])
+#> # A tibble: 1 × 6
+#>   n_scar SPI_raw SPI_rarefied SPI_lower SPI_upper SPI_vs_random
+#>    <int>   <dbl>        <dbl>     <dbl>     <dbl> <chr>        
+#> 1     12   0.902        0.929    0.0790     0.500 outside      
 
-if (FALSE) { # \dontrun{
-# Unweighted (default) — every scar counts equally
-compute_spi(aligned$d_x, aligned$d_y, aligned$d_z)
+# Raw SPI only
+compute_spi(d[, 1], d[, 2], d[, 3], rarefied = FALSE, random_interval = FALSE)
+#> # A tibble: 1 × 2
+#>   n_scar SPI_raw
+#>    <int>   <dbl>
+#> 1     12   0.902
 
-# Length-weighted — longer scars contribute more
-lens <- get_scar_length(aligned)
-compute_spi(aligned$d_x, aligned$d_y, aligned$d_z, lengths = lens)
-} # }
+# Length-weighted SPI (Clarkson et al. 2006)
+compute_spi(d[, 1], d[, 2], d[, 3], lengths = runif(12, 5, 30),
+            rarefied = FALSE, random_interval = FALSE)
+#> # A tibble: 1 × 2
+#>   n_scar SPI_raw
+#>    <int>   <dbl>
+#> 1     12   0.918
 ```
