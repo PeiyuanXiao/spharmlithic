@@ -49,7 +49,10 @@ test_that("centripetal scars read CPI 180 and their dip as PRA", {
   res <- cpi_pra_batch(d, list(disc = disc_outline()), quiet = TRUE)
   expect_equal(res$CPI_mean, 180, tolerance = 1e-8)
   expect_equal(res$PRA_mean, 20, tolerance = 1e-8)
-  expect_equal(res$CPI_GMD, 0, tolerance = 1e-8)
+  # acos() is ill-conditioned near 180 degrees: rounding of order 1e-16 in the
+  # cosine becomes up to about 1e-6 degrees in the angle, and the size varies
+  # by platform (1.4e-7 on macOS arm64).
+  expect_equal(res$CPI_GMD, 0, tolerance = 1e-6)
   expect_equal(res$PRA_GMD, 0, tolerance = 1e-8)
   expect_true(res$frame_ok)
 })
