@@ -100,6 +100,6 @@ fit_intersection_plane(loop)
 #>   centre (area centroid): 2.306e-15  8.783e-16  2.276e-16 
 #>   normal:                 0.0995  2.204e-18  -0.995 
 #>   flatness:               3.31e-17 
-#>   rms out of plane:       5.575e-16 
+#>   rms out of plane:       5.55e-16 
 #>   outline:                200 points, diagonal 72.36 
 ```
