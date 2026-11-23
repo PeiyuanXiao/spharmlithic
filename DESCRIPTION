@@ -1,6 +1,6 @@
 Package: spharmlithic
 Title: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns
-Version: 0.1.0
+Version: 0.2.0
 Authors@R:
     c(
       person("Peiyuan", "Xiao", , "pyxiao@uw.edu", role = c("aut", "cre"),
@@ -16,7 +16,15 @@ Description: A complete toolkit for the geometric alignment, directional
     tensor), and a Python-backed spherical harmonic pipeline (von
     Mises-Fisher kernel density estimation followed by Driscoll-Healy
     spherical harmonic expansion via pyshtools), supporting both
-    direction-vector and mesh-based inputs.
+    direction-vector and mesh-based inputs. It also provides scar
+    pattern measures that can be compared between cores with different
+    scar counts: raw and rarefied SPI, elongation ratio (ER) and
+    isotropy ratio (IR) with their random intervals, the Centripetality
+    Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited
+    cores, spatiodirectional spherical harmonic features from pairs of
+    different scars, and comparisons of groups of cores with Welch-type
+    tests. These functions are written in R and do not need the Python
+    back-end.
 License: MIT + file LICENSE
 URL: https://github.com/PeiyuanXiao/spharmlithic, https://peiyuanxiao.github.io/spharmlithic/
 BugReports: https://github.com/PeiyuanXiao/spharmlithic/issues

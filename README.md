@@ -6,9 +6,9 @@
 
 <!-- badges: start -->
 
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License:
@@ -16,7 +16,8 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 [![R ≥
 4.1](https://img.shields.io/badge/R-%E2%89%A5%204.1-276DC3?logo=r)](https://cran.r-project.org/)
 [![R-CMD-check](https://github.com/PeiyuanXiao/spharmlithic/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PeiyuanXiao/spharmlithic/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/PeiyuanXiao/spharmlithic/graph/badge.svg)](https://app.codecov.io/gh/PeiyuanXiao/spharmlithic)
+[![Codecov test
+coverage](https://codecov.io/gh/PeiyuanXiao/spharmlithic/graph/badge.svg)](https://app.codecov.io/gh/PeiyuanXiao/spharmlithic)
 <!-- badges: end -->
 
 **spharmlithic** is an R package for the quantitative analysis of 3D
@@ -27,6 +28,9 @@ removals). The package brings together two coordinate-alignment
 pipelines, descriptive statistics (e.g. SPI, Elongation/Isotropy),
 interactive 3D visualisation, and a Python back-end for spherical
 harmonic decomposition — all in a single, script-based workflow.
+
+Version 0.2.0 adds scar pattern measures that can be compared between
+cores with different scar counts (see *Scar pattern indices* below).
 
 Documentation: <https://peiyuanxiao.github.io/spharmlithic/>
 
@@ -85,6 +89,25 @@ Open `http://localhost:8787` in your browser (user: `rstudio`, password:
 ``` r
 library(spharmlithic)
 library(readxl)
+
+# ── Scar pattern indices (no Python needed) ───────────────
+scar_path <- system.file("extdata", "example_scars.xlsx",
+                         package = "spharmlithic")
+scars <- read_excel(scar_path)
+
+# Raw and rarefied SPI, ER and IR, with random intervals
+spi_ei_batch(scars)
+
+# Spatiodirectional SP-SPHARM features (pairs of different scars)
+spharm_spatiodirection(scars)
+
+# CPI and PRA also need the outline of each core: see ?cpi_pra_batch.
+# Group comparisons: see ?compare_indices and ?compare_groups.
+```
+
+``` r
+library(spharmlithic)
+library(readxl)
 use_spharmlithic_python("r-spharmlithic")
 
 # ── Scar pattern analysis ─────────────────────────────────
@@ -127,6 +150,30 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 | `compute_ei()` | Elongation and Isotropy ratio from Lin et al. (2024) |
 | `get_scar_length()` | Individual scar lengths from coordinate data |
 
+#### Scar pattern indices
+
+| Function | Description |
+|:---|:---|
+| `check_scars()` | Check a scar table before analysis |
+| `spi_ei_batch()` | Raw and rarefied SPI, ER and IR for every core, with random intervals |
+| `random_interval()` | Random interval of SPI, ER or IR at a scar count |
+| `plot_random_interval()` | Plot raw index values against their random interval |
+| `read_outline_iges()` | Read core outlines from IGES files |
+| `fit_intersection_plane()` | Fit the plane of intersection of a core to its outline |
+| `cpi_pra_batch()` | CPI and PRA for every peripherally exploited core |
+| `cpi_pra_per_scar()` | CPI and PRA of every scar of one core |
+| `spharm_spatiodirection()` | Spatiodirectional SP-SPHARM features of every core |
+| `compare_indices()` | Compare groups of cores on single indices |
+| `compare_groups()` | Compare the overall scar patterns of groups of cores |
+
+`spharm_from_directions()` describes the scar pattern of each core as
+recorded, in the same spherical harmonic framework as core morphology
+(Xiao et al., 2027). Because each scar is also paired with itself in
+this power spectrum, its expected shape changes with scar count. To
+compare groups of cores whose scar counts differ,
+`spharm_spatiodirection()` uses pairs of different scars only and adds
+scar positions (Xiao et al., submitted).
+
 #### Spherical Harmonic Analysis
 
 | Function                   | Description                                   |
@@ -142,6 +189,8 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 | `export_spharm_html()` | Interactive Three.js viewer for SH reconstructions |
 | `export_alignment_html_svd()` | SVD alignment as self-contained HTML |
 | `export_alignment_html_lin2024()` | Lin et al (2024) alignment as self-contained HTML |
+| `plot_core()` | Plot one core in 3-D with its outline |
+| `export_outline_html()` | Export every core and its outline to an interactive HTML page |
 
 #### Python Environment
 
@@ -153,8 +202,9 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 For detailed usage, see the two vignettes:
 `vignette("Introduction", package = "spharmlithic")` (from artefacts to
 spherical harmonic coefficients) and
-`vignette("Statistics", package = "spharmlithic")` (PCA, PERMANOVA, and tests
-of standardisation on the results).
+`vignette("Statistics", package = "spharmlithic")` (PCA, PERMANOVA, and
+tests of standardisation on the results). Examples for the scar pattern
+indices are in their help pages.
 
 ------------------------------------------------------------------------
 
@@ -170,10 +220,15 @@ patterning on cores using 3D recording techniques. *Journal of
 Archaeological Science*, 33(1), 132–142.
 <https://doi.org/10.1016/j.jas.2005.07.007>
 
+Hamidi, B., Wallace, K., Vasu, C., & Alekseyenko, A. V. (2019).
+W<sub>d</sub><sup>\*</sup>-test: robust distance-based multivariate
+analysis of variance. *Microbiome*, 7, 51.
+<https://doi.org/10.1186/s40168-019-0659-9>
+
 Lin, S. C., Clarkson, C., Julianto, I. M. A., Ferdianto, A., Jatmiko, &
-Sutikna, T. (2024). A new method for quantifying flake scar organisation on cores
-using orientation statistics. *Journal of Archaeological Science*, 167,
-105998. <https://doi.org/10.1016/j.jas.2024.105998>
+Sutikna, T. (2024). A new method for quantifying flake scar organisation
+on cores using orientation statistics. *Journal of Archaeological
+Science*, 167, 105998. <https://doi.org/10.1016/j.jas.2024.105998>
 
 McPherron, S. P. (2018). Additional statistical and graphical methods
 for analyzing site formation processes using artifact orientations.
@@ -204,6 +259,12 @@ If you use **spharmlithic** in your research, please cite it as:
 > Xiao, P. Y., Marwick, B. (2026). spharmlithic: Spherical Harmonic
 > Analysis of Lithic Morphology and Flaking Scar Patterns. R package.
 > https://github.com/PeiyuanXiao/spharmlithic
+
+If you use the scar pattern indices, please also cite:
+
+> Xiao, P.-Y., Li, H., Marwick, B. (submitted). Counting what counts:
+> Measuring centripetality and controlling for scar count in core scar
+> pattern analysis. *Journal of Archaeological Science*.
 
 ------------------------------------------------------------------------
 
