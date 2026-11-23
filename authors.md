@@ -28,13 +28,13 @@ Archaeological Method and Theory*, **34**, 16.
     }
 
 Xiao P, Marwick B (2026). *spharmlithic: Spherical Harmonic Analysis of
-Lithic Morphology and Flaking Scar Patterns*. R package version 0.1.0,
+Lithic Morphology and Flaking Scar Patterns*. R package version 0.2.0,
 <https://github.com/PeiyuanXiao/spharmlithic>.
 
     @Manual{,
       title = {spharmlithic: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns},
       author = {Peiyuan Xiao and Ben Marwick},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.2.0},
       url = {https://github.com/PeiyuanXiao/spharmlithic},
     }
