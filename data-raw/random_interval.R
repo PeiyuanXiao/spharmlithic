@@ -5,7 +5,7 @@
 #   Rscript data-raw/random_interval.R        # from the package root
 #
 # Source: results/baseline/baseline_quantiles_fine.csv of the article
-# repository (Xiao, Li and Marwick, in prep.; CRF_ROOT, default
+# repository (Xiao, Li and Marwick, submitted; CRF_ROOT, default
 # H:/Core_reduction_framework), written there by analysis/scripts/baseline.R:
 #   SPI      the exact distribution of the resultant length of n unit vectors
 #            uniform on the sphere (Rayleigh's random flight), n = 3..200

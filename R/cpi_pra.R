@@ -11,7 +11,7 @@
 
 # A start cloud sits this close to its own outline when the two share a
 # coordinate frame, as a fraction of the outline's bounding-box diagonal.
-# Measured over 26 experimental peripheral cores (Xiao et al., in prep.):
+# Measured over 26 experimental peripheral cores (Xiao et al., submitted):
 # in frame 0.2-0.6 %, out of frame 16.7-56.6 %.
 .FRAME_OK_FRAC <- 0.03
 # The fraction of starts the frame check keeps: a start whose true
@@ -152,7 +152,7 @@ print.intersection_plane <- function(x, digits = 4, ...) {
 #' not change with the scar count, and they can be compared directly between
 #' cores and groups (for example with [compare_indices()]); the median,
 #' interquartile range and standard deviation do not have this property
-#' (Xiao et al., in prep.).
+#' (Xiao et al., submitted).
 #'
 #' **When to use.** CPI and PRA describe cores flaked from their periphery
 #' whose plane of intersection can be identified, such as discoidal and

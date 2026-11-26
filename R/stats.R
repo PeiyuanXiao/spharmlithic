@@ -17,7 +17,7 @@
 #'
 #' * **raw** SPI, computed from all scars together;
 #' * **rarefied** SPI, the mean SPI over every combination of `m` scars
-#'   (Xiao et al., in prep.). Its expectation does not change with the scar
+#'   (Xiao et al., submitted). Its expectation does not change with the scar
 #'   count, so it is the value to use when comparing cores or groups of
 #'   cores;
 #' * the **random interval** at the core's scar count: the central 95% of
@@ -59,7 +59,7 @@
 #' are random. A single core is therefore judged by comparing its raw SPI
 #' with the random interval at its own scar count; cores and groups of cores
 #' are compared with the rarefied SPI, whose expectation does not depend on
-#' the scar count (Xiao et al., in prep.).
+#' the scar count (Xiao et al., submitted).
 #'
 #' **Reading the random interval.** SPI above the upper bound indicates scar
 #' directions more concentrated on one side than random directions produce
@@ -149,11 +149,12 @@ compute_spi <- function(dx, dy, dz, lengths = NULL, raw = TRUE, rarefied = TRUE,
 #' @details
 #' Clarkson et al. (2006) read this angle as the mean angle between any two
 #' scars. That reading is only approximate: SPI includes each scar paired
-#' with itself. Over the distinct pairs of n unit vectors the mean cosine is
-#' \eqn{(n \, \mathrm{SPI}^2 - 1) / (n - 1)}, which is not \eqn{\mathrm{SPI}};
-#' it is the degree-1 direction feature of [spharm_spatiodirection()]
-#' (`dir_1`, up to the factor \eqn{\sqrt{3/2}}). The angle is computed from
-#' the raw SPI and, like it, shifts with the scar count.
+#' with itself. Over the pairs of different scars, the mean cosine between
+#' the n unit vectors is \eqn{(n \, \mathrm{SPI}^2 - 1) / (n - 1)}, which is
+#' not \eqn{\mathrm{SPI}}; it is the degree-1 direction feature of
+#' [spharm_rarefied()] (`dir_1`, up to the factor \eqn{\sqrt{3/2}}). The
+#' angle is computed from the raw SPI and, like it, shifts with the scar
+#' count.
 #'
 #' Before applying `acos()`, the SPI value is clamped to \eqn{[-1, 1]} to
 #' guard against floating-point overshoot that would otherwise produce `NaN`.

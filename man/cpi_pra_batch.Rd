@@ -76,7 +76,7 @@ averages over single scars or pairs of scars, so their expectations do
 not change with the scar count, and they can be compared directly between
 cores and groups (for example with \code{\link[=compare_indices]{compare_indices()}}); the median,
 interquartile range and standard deviation do not have this property
-(Xiao et al., in prep.).
+(Xiao et al., submitted).
 
 \strong{When to use.} CPI and PRA describe cores flaked from their periphery
 whose plane of intersection can be identified, such as discoidal and

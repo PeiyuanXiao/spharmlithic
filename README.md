@@ -98,8 +98,8 @@ scars <- read_excel(scar_path)
 # Raw and rarefied SPI, ER and IR, with random intervals
 spi_ei_batch(scars)
 
-# Spatiodirectional SP-SPHARM features (pairs of different scars)
-spharm_spatiodirection(scars)
+# Rarefied SP-SPHARM features (pairs of different scars)
+spharm_rarefied(scars)
 
 # CPI and PRA also need the outline of each core: see ?cpi_pra_batch.
 # Group comparisons: see ?compare_indices and ?compare_groups.
@@ -162,7 +162,7 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 | `fit_intersection_plane()` | Fit the plane of intersection of a core to its outline |
 | `cpi_pra_batch()` | CPI and PRA for every peripherally exploited core |
 | `cpi_pra_per_scar()` | CPI and PRA of every scar of one core |
-| `spharm_spatiodirection()` | Spatiodirectional SP-SPHARM features of every core |
+| `spharm_rarefied()` | Rarefied SP-SPHARM features of every core |
 | `compare_indices()` | Compare groups of cores on single indices |
 | `compare_groups()` | Compare the overall scar patterns of groups of cores |
 
@@ -170,9 +170,11 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 recorded, in the same spherical harmonic framework as core morphology
 (Xiao et al., 2027). Because each scar is also paired with itself in
 this power spectrum, its expected shape changes with scar count. To
-compare groups of cores whose scar counts differ,
-`spharm_spatiodirection()` uses pairs of different scars only and adds
-scar positions (Xiao et al., submitted).
+compare groups of cores whose scar counts differ, `spharm_rarefied()`
+computes rarefied SP-SPHARM from pairs of different scars only and adds
+scar positions (Xiao et al., submitted): `features = "dir"` gives the
+direction-only version (6 features), and the default the full version
+(22 features).
 
 #### Spherical Harmonic Analysis
 

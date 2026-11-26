@@ -69,7 +69,7 @@
 #' spi_ei_batch(scars, min_length = 8, keep = "Typology", random_interval = FALSE)
 #'
 #' @seealso [compute_spi()], [compute_ei()], [random_interval()],
-#'   [cpi_pra_batch()], [spharm_spatiodirection()], [compare_indices()]
+#'   [cpi_pra_batch()], [spharm_rarefied()], [compare_indices()]
 #' @export
 spi_ei_batch <- function(data, id_col = "ID", start_cols = c("Start_X", "Start_Y", "Start_Z"),
                          end_cols = c("End_X", "End_Y", "End_Z"), min_length = 0,

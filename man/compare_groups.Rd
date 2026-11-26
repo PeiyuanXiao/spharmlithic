@@ -17,13 +17,13 @@ compare_groups(
 }
 \arguments{
 \item{x}{A data frame or numeric matrix with one row per core, such as
-the output of \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}.}
+the output of \code{\link[=spharm_rarefied]{spharm_rarefied()}}.}
 
 \item{group}{The groups: the name of a column of \code{x}, or a vector with one
 value per row of \code{x}.}
 
 \item{features}{Names of the columns of \code{x} to compare. Default: the
-features recorded by \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}} (attribute
+features recorded by \code{\link[=spharm_rarefied]{spharm_rarefied()}} (attribute
 \code{"features"}), else the columns named like its features (\code{dir_1},
 \code{start_2}, ...), else all numeric columns except \code{n_scar}.}
 
@@ -60,7 +60,7 @@ Printing the object shows both tables and the notes.
 }
 \description{
 Tests whether groups of cores differ in their scar patterns as a whole,
-using a set of features such as those of \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}. Three
+using a set of features such as those of \code{\link[=spharm_rarefied]{spharm_rarefied()}}. Three
 permutation tests on Euclidean distances are reported side by side, for
 all groups together and for every pair of groups:
 }
@@ -80,13 +80,15 @@ printed result points out where this applies.
 
 Rows with a missing feature or group are left out, and so are groups with
 fewer than two cores; a message says which. The features of
-\code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}} do not change with the scar count, so the
+\code{\link[=spharm_rarefied]{spharm_rarefied()}} do not change with the scar count, so the
 scar count should not be added as a covariate.
 
 The \eqn{W_d^*} statistic is computed in the package and agrees with
 \code{WdStar::WdS()} (Hamidi et al. 2019); its p value is the proportion of
 permutations of the group labels, the observed one included, with a
-statistic at least as large.
+statistic at least as large. Statistics within a relative difference of
+\eqn{10^{-9}} of the observed one count as ties, so that rounding error
+does not make the p value depend on the platform.
 }
 \examples{
 set.seed(1)
@@ -111,6 +113,6 @@ Holm, S. (1979). A simple sequentially rejective multiple test procedure.
 \emph{Scandinavian Journal of Statistics}, \strong{6}(2), 65--70.
 }
 \seealso{
-\code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}, \code{\link[=compare_indices]{compare_indices()}},
+\code{\link[=spharm_rarefied]{spharm_rarefied()}}, \code{\link[=compare_indices]{compare_indices()}},
 \code{\link[=pairwise_permanova]{pairwise_permanova()}}
 }

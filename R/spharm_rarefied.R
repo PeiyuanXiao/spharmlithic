@@ -1,9 +1,11 @@
 # ==============================================================================
-# spatiodirection.R
-# Spatiodirectional SP-SPHARM: a holistic description of the scar pattern of
-# a core from the removal directions, the start positions and their
-# correspondence, computed as pair means of Legendre polynomials (base R; no
-# Python needed).
+# spharm_rarefied.R
+# Rarefied SP-SPHARM: a holistic description of the scar pattern of a core
+# from the removal directions, the start positions and their correspondence,
+# computed as means of Legendre polynomials over single scars and pairs of
+# different scars (base R; no Python needed). The internal constants (.SD_*)
+# and helpers (.sd_features(), .pair_mean(), .pair_mean_cross()) keep their
+# earlier names.
 # ==============================================================================
 
 .SD_LMAX  <- 6L
@@ -12,18 +14,30 @@
 .SD_FEATURES <- unlist(.SD_BLOCKS, use.names = FALSE)
 .SD_UNIT_TOL <- 1e-6
 
-#' Spatiodirectional SP-SPHARM features of every core
+#' Rarefied SP-SPHARM features of every core
 #'
+#' @description
 #' Describes the scar pattern of each core as a whole, with no feature
-#' specified in advance, by 22 rotation-invariant features computed from the
-#' removal directions of its scars, the positions of their starts, and the
-#' correspondence between the two (Xiao et al., in prep.; extending
-#' SP-SPHARM of Xiao et al., 2027). Use the features to compare the overall
-#' scar patterns of groups of cores with [compare_groups()].
+#' specified in advance, by rarefied SP-SPHARM: rotation-invariant features
+#' computed from the removal directions of its scars, the positions of their
+#' starts, and the correspondence between the two (Xiao et al., submitted;
+#' extending SP-SPHARM of Xiao et al., 2027). Every feature is a mean over
+#' single scars or pairs of different scars, so cores with different scar
+#' counts can be compared directly. Two versions are used:
+#'
+#' * the **direction-only version**, `features = "dir"`: the 6 direction
+#'   features `dir_1` to `dir_6`;
+#' * the **full version**, the default (all four blocks): 22 features from
+#'   the directions, the start positions and their correspondence.
+#'
+#' Use the features to compare the overall scar patterns of groups of cores
+#' with [compare_groups()].
 #'
 #' @inheritParams spi_ei_batch
 #' @param features Which blocks of features to return; any of `"dir"`,
-#'   `"start"`, `"same"`, `"diff"` (default: all four, 22 features).
+#'   `"start"`, `"same"`, `"diff"`. The default, all four blocks, gives the
+#'   full version (22 features); `"dir"` alone gives the direction-only
+#'   version (6 features).
 #'
 #' @return A tibble with one row per core: the ID column, the `keep`
 #'   columns, `n_scar` (scars used) and the features. The names of the
@@ -38,7 +52,7 @@
 #' \eqn{P_l} of the cosine between two vectors:
 #'
 #' * `dir_l` (l = 1..6), direction-direction pairs: the mean of
-#'   \eqn{P_l(\hat v_i \cdot \hat v_j)} over the distinct pairs of scars
+#'   \eqn{P_l(\hat v_i \cdot \hat v_j)} over the pairs of different scars
 #'   \eqn{i \ne j}. These describe the directional relationships among the
 #'   scars; `dir_1` is the mean cosine between the directions of two
 #'   different scars.
@@ -60,11 +74,18 @@
 #'
 #' **Scar count.** Pairing each scar with itself contributes a term that
 #' depends only on the scar count, so those self-pairs are left out: every
-#' feature is a mean over single scars or distinct pairs of scars (a
+#' feature is a mean over single scars or pairs of different scars (a
 #' U-statistic), and its expectation does not change with the scar count.
 #' For the same reason `start_1` and `diff_1`, which contain a term of
 #' order \eqn{1/(n-1)}, are not returned. Compare cores with different scar
 #' counts directly; do not add the scar count as a covariate.
+#'
+#' **Rarefaction.** For the direction features, averaging over pairs of
+#' different scars is rarefaction to subsets of two scars. With the same
+#' degree weights, the mean power spectrum over all subsets of any fixed
+#' number of scars \eqn{m} is \eqn{(m - 1)/m} times `dir_l` plus a constant,
+#' so comparisons between groups of cores give the same result as power
+#' spectra of subsets of any fixed number of scars.
 #'
 #' The features use only angles between the vectors of a core, so they do
 #' not change when the core is rotated or moved: raw and aligned coordinates
@@ -87,21 +108,22 @@
 #'   data.frame(ID = paste0("core", i), Start_X = s[, 1], Start_Y = s[, 2],
 #'              Start_Z = s[, 3], End_X = e[, 1], End_Y = e[, 2], End_Z = e[, 3])
 #' }))
-#' sp <- spharm_spatiodirection(scars)
+#' # Full version: 22 features
+#' sp <- spharm_rarefied(scars)
 #' sp
 #' attr(sp, "features")
 #'
-#' # Direction features only
-#' spharm_spatiodirection(scars, features = "dir")
+#' # Direction-only version: 6 features
+#' spharm_rarefied(scars, features = "dir")
 #'
 #' @seealso [compare_groups()], [spi_ei_batch()], [cpi_pra_batch()]
 #' @export
-spharm_spatiodirection <- function(data, id_col = "ID",
-                                   start_cols = c("Start_X", "Start_Y", "Start_Z"),
-                                   end_cols = c("End_X", "End_Y", "End_Z"),
-                                   min_length = 0, keep = NULL,
-                                   features = c("dir", "start", "same", "diff"),
-                                   quiet = FALSE) {
+spharm_rarefied <- function(data, id_col = "ID",
+                            start_cols = c("Start_X", "Start_Y", "Start_Z"),
+                            end_cols = c("End_X", "End_Y", "End_Z"),
+                            min_length = 0, keep = NULL,
+                            features = c("dir", "start", "same", "diff"),
+                            quiet = FALSE) {
   .check_scar_table(data, id_col, start_cols, end_cols, keep, min_length = min_length)
   .check_flag(quiet, "quiet")
   if (!is.character(features) || !length(features) ||
@@ -142,7 +164,7 @@ spharm_spatiodirection <- function(data, id_col = "ID",
 }
 
 # For every degree l, sqrt((2l + 1) / 2) times the mean of P_l(u_i . u_j) over
-# the distinct pairs of the unit rows of U; NA when n < 3.
+# the pairs of different scars (the unit rows of U); NA when n < 3.
 .pair_mean <- function(U, lmax = .SD_LMAX) {
   out <- rep(NA_real_, lmax)
   n <- nrow(U)

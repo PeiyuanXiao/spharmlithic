@@ -110,5 +110,5 @@ spi_ei_batch(scars, min_length = 8, keep = "Typology", random_interval = FALSE)
 }
 \seealso{
 \code{\link[=compute_spi]{compute_spi()}}, \code{\link[=compute_ei]{compute_ei()}}, \code{\link[=random_interval]{random_interval()}},
-\code{\link[=cpi_pra_batch]{cpi_pra_batch()}}, \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}, \code{\link[=compare_indices]{compare_indices()}}
+\code{\link[=cpi_pra_batch]{cpi_pra_batch()}}, \code{\link[=spharm_rarefied]{spharm_rarefied()}}, \code{\link[=compare_indices]{compare_indices()}}
 }

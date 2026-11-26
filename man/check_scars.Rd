@@ -54,5 +54,5 @@ check_scars(d)
 
 }
 \seealso{
-\code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=cpi_pra_batch]{cpi_pra_batch()}}, \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}
+\code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=cpi_pra_batch]{cpi_pra_batch()}}, \code{\link[=spharm_rarefied]{spharm_rarefied()}}
 }

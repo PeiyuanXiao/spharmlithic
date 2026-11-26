@@ -11,7 +11,7 @@
 #
 # For n = 3..200 all three are read from the table .random_interval_table
 # (R/sysdata.rda, built by data-raw/random_interval.R from the tables of
-# Xiao et al., in prep.); SPI above 200 is computed from its exact
+# Xiao et al., submitted); SPI above 200 is computed from its exact
 # distribution; ER and IR above 200 are not available (NA).
 # ==============================================================================
 

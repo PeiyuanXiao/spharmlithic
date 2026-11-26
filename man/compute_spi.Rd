@@ -65,7 +65,7 @@ returns three readings:
 \itemize{
 \item \strong{raw} SPI, computed from all scars together;
 \item \strong{rarefied} SPI, the mean SPI over every combination of \code{m} scars
-(Xiao et al., in prep.). Its expectation does not change with the scar
+(Xiao et al., submitted). Its expectation does not change with the scar
 count, so it is the value to use when comparing cores or groups of
 cores;
 \item the \strong{random interval} at the core's scar count: the central 95\% of
@@ -78,7 +78,7 @@ the fewer the scars, the less their directions cancel out, even when they
 are random. A single core is therefore judged by comparing its raw SPI
 with the random interval at its own scar count; cores and groups of cores
 are compared with the rarefied SPI, whose expectation does not depend on
-the scar count (Xiao et al., in prep.).
+the scar count (Xiao et al., submitted).
 
 \strong{Reading the random interval.} SPI above the upper bound indicates scar
 directions more concentrated on one side than random directions produce

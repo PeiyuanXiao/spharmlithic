@@ -66,7 +66,7 @@ differences in scar count can leave groups with unequal variances.
 
 The standardised mean difference is the difference between the group
 means divided by the square root of the mean of the two group variances;
-its absolute value is the effect size reported by Xiao et al. (in prep.).
+its absolute value is the effect size reported by Xiao et al. (submitted).
 The 95\% interval is a percentile bootstrap stratified by group: each
 group is resampled with replacement within itself.
 

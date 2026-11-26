@@ -35,7 +35,7 @@ JSON at export time; switching specimens in the browser is instant.
 
 Alignment is for viewing and for \code{\link[=spharm_from_directions]{spharm_from_directions()}}; the
 scar-pattern indices of \code{\link[=spi_ei_batch]{spi_ei_batch()}}, \code{\link[=cpi_pra_batch]{cpi_pra_batch()}} and
-\code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}} do not change when a core is rotated or moved,
+\code{\link[=spharm_rarefied]{spharm_rarefied()}} do not change when a core is rotated or moved,
 and do not need it.
 
 For the Lin 2024 morphology-based equivalent, see

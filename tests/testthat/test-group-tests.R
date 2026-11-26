@@ -50,9 +50,35 @@ test_that("two-group W*d is |mean1 - mean2|^2 / (s1 / n1 + s2 / n2)", {
   expect_null(res$pairwise)
 })
 
-test_that("compare_groups finds the features of spharm_spatiodirection", {
+test_that("W*d counts permutations that tie the observed statistic", {
+  # Four cores at the corners of a square, two groups of two. Pairing the
+  # corners along the bottom and top sides or along the left and right sides
+  # gives the same W*d in exact arithmetic (W*d = 2), but the offsets of the
+  # square make the two computed values differ in the last bits (on one
+  # platform 1.9999999999999991 and 2.0000000000000013); pairing them across
+  # the diagonals gives 0. Every permutation that pairs the corners along
+  # two sides must therefore count as a tie, whichever pairing is observed.
+  X <- cbind(c(0.1, 0.4, 0.4, 0.1), c(0.2, 0.2, 0.5, 0.5))
+  d <- stats::dist(X)
+  D2 <- as.matrix(d)^2
+  f_tb <- factor(c("A", "A", "B", "B"))
+  f_lr <- factor(c("A", "B", "B", "A"))
+  expect_equal(.wd_stat(D2, f_tb), 2, tolerance = 1e-12)
+  expect_equal(.wd_stat(D2, f_lr), 2, tolerance = 1e-12)
+  expect_equal(.wd_stat(D2, factor(c("A", "B", "A", "B"))), 0)
+  nrep <- 199
+  for (f in list(f_tb, f_lr)) {
+    set.seed(5)
+    lab <- matrix(as.character(f)[replicate(nrep, sample(4))], 4)
+    n_tie <- sum(lab[1, ] != lab[3, ])       # not paired across a diagonal
+    set.seed(5)
+    expect_equal(.wd_test(d, f, nrep)$p, (1 + n_tie) / (nrep + 1))
+  }
+})
+
+test_that("compare_groups finds the features of spharm_rarefied", {
   d <- make_cores(n = c(8, 9, 10, 11, 12, 13), lean = c(0, 0, 0, 1, 1, 1))
-  sp <- spharm_spatiodirection(d, quiet = TRUE)
+  sp <- spharm_rarefied(d, quiet = TRUE)
   sp$grp <- rep(c("x", "y"), each = 3)
   res <- compare_groups(sp, "grp", permutations = 9)
   expect_equal(res$features, attr(sp, "features"))

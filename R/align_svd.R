@@ -284,7 +284,7 @@ build_panel_scar <- function(demo_id, raw_data, id_col = "ID", outline = NULL) {
 #'
 #' Alignment is for viewing and for [spharm_from_directions()]; the
 #' scar-pattern indices of [spi_ei_batch()], [cpi_pra_batch()] and
-#' [spharm_spatiodirection()] do not change when a core is rotated or moved,
+#' [spharm_rarefied()] do not change when a core is rotated or moved,
 #' and do not need it.
 #'
 #' For the Lin 2024 morphology-based equivalent, see

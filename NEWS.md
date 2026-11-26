@@ -1,3 +1,17 @@
+# spharmlithic 0.2.1
+
+## Breaking changes
+
+* `spharm_spatiodirection()` is renamed `spharm_rarefied()`. The old name is removed; the arguments and the output are unchanged.
+
+## Documentation
+
+* The documentation uses the terms of the article: rarefied SP-SPHARM, in a direction-only version (`features = "dir"`, 6 features) and a full version (the default, 22 features).
+
+## Bug fixes
+
+* `compare_groups()`: the W\*d permutation test now counts a permuted statistic within a relative 1e-9 of the observed one as a tie. Statistics that are equal in exact arithmetic can differ by about 1e-16 after rounding, so the p value used to vary between platforms.
+
 # spharmlithic 0.2.0
 
 ## New features

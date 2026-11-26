@@ -33,11 +33,12 @@ SPI = 1 maps to 0 degrees (parallel scars) and SPI = 0 to 90 degrees.
 \details{
 Clarkson et al. (2006) read this angle as the mean angle between any two
 scars. That reading is only approximate: SPI includes each scar paired
-with itself. Over the distinct pairs of n unit vectors the mean cosine is
-\eqn{(n \, \mathrm{SPI}^2 - 1) / (n - 1)}, which is not \eqn{\mathrm{SPI}};
-it is the degree-1 direction feature of \code{\link[=spharm_spatiodirection]{spharm_spatiodirection()}}
-(\code{dir_1}, up to the factor \eqn{\sqrt{3/2}}). The angle is computed from
-the raw SPI and, like it, shifts with the scar count.
+with itself. Over the pairs of different scars, the mean cosine between
+the n unit vectors is \eqn{(n \, \mathrm{SPI}^2 - 1) / (n - 1)}, which is
+not \eqn{\mathrm{SPI}}; it is the degree-1 direction feature of
+\code{\link[=spharm_rarefied]{spharm_rarefied()}} (\code{dir_1}, up to the factor \eqn{\sqrt{3/2}}). The
+angle is computed from the raw SPI and, like it, shifts with the scar
+count.
 
 Before applying \code{acos()}, the SPI value is clamped to \eqn{[-1, 1]} to
 guard against floating-point overshoot that would otherwise produce \code{NaN}.

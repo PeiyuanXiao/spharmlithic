@@ -10,7 +10,7 @@
 #' Compare the overall scar patterns of groups of cores
 #'
 #' Tests whether groups of cores differ in their scar patterns as a whole,
-#' using a set of features such as those of [spharm_spatiodirection()]. Three
+#' using a set of features such as those of [spharm_rarefied()]. Three
 #' permutation tests on Euclidean distances are reported side by side, for
 #' all groups together and for every pair of groups:
 #'
@@ -26,11 +26,11 @@
 #' printed result points out where this applies.
 #'
 #' @param x A data frame or numeric matrix with one row per core, such as
-#'   the output of [spharm_spatiodirection()].
+#'   the output of [spharm_rarefied()].
 #' @param group The groups: the name of a column of `x`, or a vector with one
 #'   value per row of `x`.
 #' @param features Names of the columns of `x` to compare. Default: the
-#'   features recorded by [spharm_spatiodirection()] (attribute
+#'   features recorded by [spharm_rarefied()] (attribute
 #'   `"features"`), else the columns named like its features (`dir_1`,
 #'   `start_2`, ...), else all numeric columns except `n_scar`.
 #' @param permutations Number of permutations of each test. Default 999.
@@ -62,13 +62,15 @@
 #' @details
 #' Rows with a missing feature or group are left out, and so are groups with
 #' fewer than two cores; a message says which. The features of
-#' [spharm_spatiodirection()] do not change with the scar count, so the
+#' [spharm_rarefied()] do not change with the scar count, so the
 #' scar count should not be added as a covariate.
 #'
 #' The \eqn{W_d^*} statistic is computed in the package and agrees with
 #' `WdStar::WdS()` (Hamidi et al. 2019); its p value is the proportion of
 #' permutations of the group labels, the observed one included, with a
-#' statistic at least as large.
+#' statistic at least as large. Statistics within a relative difference of
+#' \eqn{10^{-9}} of the observed one count as ties, so that rounding error
+#' does not make the p value depend on the platform.
 #'
 #' @references
 #' Anderson, M. J. (2001). A new method for non-parametric multivariate
@@ -91,7 +93,7 @@
 #'                 f2 = rnorm(24, sd = rep(c(1, 3, 1), each = 8)))
 #' compare_groups(x, "group", permutations = 199)
 #'
-#' @seealso [spharm_spatiodirection()], [compare_indices()],
+#' @seealso [spharm_rarefied()], [compare_indices()],
 #'   [pairwise_permanova()]
 #' @export
 compare_groups <- function(x, group, features = NULL, permutations = 999,
@@ -242,7 +244,7 @@ print.spharmlithic_group_comparison <- function(x, digits = 4, ...) {
 #'
 #' The standardised mean difference is the difference between the group
 #' means divided by the square root of the mean of the two group variances;
-#' its absolute value is the effect size reported by Xiao et al. (in prep.).
+#' its absolute value is the effect size reported by Xiao et al. (submitted).
 #' The 95% interval is a percentile bootstrap stratified by group: each
 #' group is resampled with replacement within itself.
 #'
@@ -482,13 +484,24 @@ print.spharmlithic_index_comparison <- function(x, digits = 4, ...) {
   Ws / W / (k - 1) / (1 + (2 * (k - 2) / (k^2 - 1)) * h)
 }
 
-# Permutation test: the labels are permuted `nrep` times; the p value counts
-# the observed statistic among the permutations.
+# Relative tolerance for ties in the W*d permutation test. A permutation that
+# reproduces the observed grouping of the cores (up to the names of groups of
+# equal size, such as the two halves of a balanced two-group design) gives a
+# statistic equal to the observed one in exact arithmetic, but the two can
+# differ by about 1e-16 when the floating-point sums are taken in a different
+# order, so a strict `>=` counts such ties on some platforms and not on
+# others. Statistics within this relative distance of the observed one are
+# counted as ties, as in fl_p() of the article's analysis code.
+.WD_TIE_TOL <- 1e-9
+
+# Permutation test: the labels are permuted `nrep` times; the p value is the
+# proportion of the statistics, the observed one included, that are at least
+# as large as the observed one, ties within .WD_TIE_TOL included.
 .wd_test <- function(d, f, nrep) {
   D2 <- as.matrix(d)^2
   N <- length(f)
   st <- c(.wd_stat(D2, f), replicate(nrep, .wd_stat(D2, f[sample(N)])))
-  list(statistic = st[1], p = sum(st >= st[1]) / (nrep + 1))
+  list(statistic = st[1], p = sum(st >= st[1] - .WD_TIE_TOL * abs(st[1])) / (nrep + 1))
 }
 
 # ---- standardised mean difference ---------------------------------------------------

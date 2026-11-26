@@ -25,7 +25,7 @@
 #'                 End_Z = 0)
 #' check_scars(d)
 #'
-#' @seealso [spi_ei_batch()], [cpi_pra_batch()], [spharm_spatiodirection()]
+#' @seealso [spi_ei_batch()], [cpi_pra_batch()], [spharm_rarefied()]
 #' @export
 check_scars <- function(data, id_col = "ID", start_cols = c("Start_X", "Start_Y", "Start_Z"),
                         end_cols = c("End_X", "End_Y", "End_Z"), min_length = 0,

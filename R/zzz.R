@@ -47,7 +47,7 @@ sh_py <- NULL
       "  If you are reloading within an active session, call ",
       "use_spharmlithic_python() to restore the backend.\n",
       "  (The scar-pattern indices, e.g. spi_ei_batch(), cpi_pra_batch() and ",
-      "spharm_spatiodirection(), do not need Python.)",
+      "spharm_rarefied(), do not need Python.)",
       call. = FALSE
     )
   }
