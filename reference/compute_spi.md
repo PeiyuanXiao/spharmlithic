@@ -83,9 +83,9 @@ scars.
 - **raw** SPI, computed from all scars together;
 
 - **rarefied** SPI, the mean SPI over every combination of `m` scars
-  (Xiao et al., in prep.). Its expectation does not change with the scar
-  count, so it is the value to use when comparing cores or groups of
-  cores;
+  (Xiao et al., submitted). Its expectation does not change with the
+  scar count, so it is the value to use when comparing cores or groups
+  of cores;
 
 - the **random interval** at the core's scar count: the central 95% of
   the SPI of cores whose scar directions are uniform on the sphere, and
@@ -96,7 +96,7 @@ the fewer the scars, the less their directions cancel out, even when
 they are random. A single core is therefore judged by comparing its raw
 SPI with the random interval at its own scar count; cores and groups of
 cores are compared with the rarefied SPI, whose expectation does not
-depend on the scar count (Xiao et al., in prep.).
+depend on the scar count (Xiao et al., submitted).
 
 **Reading the random interval.** SPI above the upper bound indicates
 scar directions more concentrated on one side than random directions

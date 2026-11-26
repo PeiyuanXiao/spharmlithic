@@ -93,9 +93,9 @@ can leave groups with unequal variances.
 
 The standardised mean difference is the difference between the group
 means divided by the square root of the mean of the two group variances;
-its absolute value is the effect size reported by Xiao et al. (in
-prep.). The 95% interval is a percentile bootstrap stratified by group:
-each group is resampled with replacement within itself.
+its absolute value is the effect size reported by Xiao et al.
+(submitted). The 95% interval is a percentile bootstrap stratified by
+group: each group is resampled with replacement within itself.
 
 **Which columns.** Raw SPI, ER and IR shift with the scar count; compare
 groups with the rarefied values (`*_rarefied`). A message is given when

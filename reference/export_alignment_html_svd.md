@@ -51,7 +51,7 @@ the scar-pattern indices of
 [`spi_ei_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/spi_ei_batch.md),
 [`cpi_pra_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/cpi_pra_batch.md)
 and
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
 do not change when a core is rotated or moved, and do not need it.
 
 For the Lin 2024 morphology-based equivalent, see

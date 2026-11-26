@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">spharmlithic</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,26 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/v0.2.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="spharmlithic-021">spharmlithic 0.2.1<a class="anchor" aria-label="anchor" href="#spharmlithic-021"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-2-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-1"></a></h3>
+<ul><li>
+<code>spharm_spatiodirection()</code> is renamed <code><a href="../reference/spharm_rarefied.html">spharm_rarefied()</a></code>. The old name is removed; the arguments and the output are unchanged.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-2-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-1"></a></h3>
+<ul><li>The documentation uses the terms of the article: rarefied SP-SPHARM, in a direction-only version (<code>features = "dir"</code>, 6 features) and a full version (the default, 22 features).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-1"></a></h3>
+<ul><li>
+<code><a href="../reference/compare_groups.html">compare_groups()</a></code>: the W*d permutation test now counts a permuted statistic within a relative 1e-9 of the observed one as a tie. Statistics that are equal in exact arithmetic can differ by about 1e-16 after rounding, so the p value used to vary between platforms.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="spharmlithic-020">spharmlithic 0.2.0<a class="anchor" aria-label="anchor" href="#spharmlithic-020"></a></h2>
 <div class="section level3">
@@ -46,7 +63,7 @@
 <li>
 <code><a href="../reference/read_outline_iges.html">read_outline_iges()</a></code>, <code><a href="../reference/fit_intersection_plane.html">fit_intersection_plane()</a></code>, <code><a href="../reference/cpi_pra_batch.html">cpi_pra_batch()</a></code> and <code><a href="../reference/cpi_pra_per_scar.html">cpi_pra_per_scar()</a></code> compute the Centripetality Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited cores.</li>
 <li>
-<code><a href="../reference/spharm_spatiodirection.html">spharm_spatiodirection()</a></code> computes spatiodirectional SP-SPHARM features from pairs of different scars and from scar positions.</li>
+<code>spharm_spatiodirection()</code> computes spatiodirectional SP-SPHARM features from pairs of different scars and from scar positions.</li>
 <li>
 <code><a href="../reference/compare_indices.html">compare_indices()</a></code> and <code><a href="../reference/compare_groups.html">compare_groups()</a></code> compare groups of cores on single indices and on their overall scar patterns.</li>
 <li>

@@ -61,7 +61,7 @@ columns, `n_rows` (rows in the table), `n_missing`, `n_zero`, `n_short`
 
 [`spi_ei_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/spi_ei_batch.md),
 [`cpi_pra_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/cpi_pra_batch.md),
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
 
 ## Examples
 

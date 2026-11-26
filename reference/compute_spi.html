@@ -13,7 +13,7 @@ returns three readings:"><meta property="og:image" content="https://peiyuanxiao.
 
     <a class="navbar-brand me-2" href="../index.html">spharmlithic</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ returns three readings:"><meta property="og:image" content="https://peiyuanxiao.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Scar Pattern Index (Clarkson et al. 2006)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/v0.2.0/R/stats.R" class="external-link"><code>R/stats.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/main/R/stats.R" class="external-link"><code>R/stats.R</code></a></small>
       <div class="d-none name"><code>compute_spi.Rd</code></div>
     </div>
 
@@ -129,7 +129,7 @@ than three scars.</p>
 
 <ul><li><p><strong>raw</strong> SPI, computed from all scars together;</p></li>
 <li><p><strong>rarefied</strong> SPI, the mean SPI over every combination of <code>m</code> scars
-(Xiao et al., in prep.). Its expectation does not change with the scar
+(Xiao et al., submitted). Its expectation does not change with the scar
 count, so it is the value to use when comparing cores or groups of
 cores;</p></li>
 <li><p>the <strong>random interval</strong> at the core's scar count: the central 95% of
@@ -140,7 +140,7 @@ the fewer the scars, the less their directions cancel out, even when they
 are random. A single core is therefore judged by comparing its raw SPI
 with the random interval at its own scar count; cores and groups of cores
 are compared with the rarefied SPI, whose expectation does not depend on
-the scar count (Xiao et al., in prep.).</p>
+the scar count (Xiao et al., submitted).</p>
 <p><strong>Reading the random interval.</strong> SPI above the upper bound indicates scar
 directions more concentrated on one side than random directions produce
 at this scar count. SPI below the lower bound is typical of opposed

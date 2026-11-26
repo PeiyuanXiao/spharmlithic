@@ -2,7 +2,7 @@
 
 Tests whether groups of cores differ in their scar patterns as a whole,
 using a set of features such as those of
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md).
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md).
 Three permutation tests on Euclidean distances are reported side by
 side, for all groups together and for every pair of groups:
 
@@ -27,7 +27,7 @@ compare_groups(
 
   A data frame or numeric matrix with one row per core, such as the
   output of
-  [`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md).
+  [`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md).
 
 - group:
 
@@ -38,7 +38,7 @@ compare_groups(
 
   Names of the columns of `x` to compare. Default: the features recorded
   by
-  [`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+  [`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
   (attribute `"features"`), else the columns named like its features
   (`dir_1`, `start_2`, ...), else all numeric columns except `n_scar`.
 
@@ -114,14 +114,16 @@ printed result points out where this applies.
 
 Rows with a missing feature or group are left out, and so are groups
 with fewer than two cores; a message says which. The features of
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
 do not change with the scar count, so the scar count should not be added
 as a covariate.
 
 The \\W_d^\*\\ statistic is computed in the package and agrees with
 `WdStar::WdS()` (Hamidi et al. 2019); its p value is the proportion of
 permutations of the group labels, the observed one included, with a
-statistic at least as large.
+statistic at least as large. Statistics within a relative difference of
+\\10^{-9}\\ of the observed one count as ties, so that rounding error
+does not make the p value depend on the platform.
 
 ## References
 
@@ -140,7 +142,7 @@ procedure. *Scandinavian Journal of Statistics*, **6**(2), 65–70.
 
 ## See also
 
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md),
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md),
 [`compare_indices()`](https://peiyuanxiao.github.io/spharmlithic/reference/compare_indices.md),
 [`pairwise_permanova()`](https://peiyuanxiao.github.io/spharmlithic/reference/pairwise_permanova.md)
 

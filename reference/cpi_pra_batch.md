@@ -99,7 +99,7 @@ do not change with the scar count, and they can be compared directly
 between cores and groups (for example with
 [`compare_indices()`](https://peiyuanxiao.github.io/spharmlithic/reference/compare_indices.md));
 the median, interquartile range and standard deviation do not have this
-property (Xiao et al., in prep.).
+property (Xiao et al., submitted).
 
 **When to use.** CPI and PRA describe cores flaked from their periphery
 whose plane of intersection can be identified, such as discoidal and

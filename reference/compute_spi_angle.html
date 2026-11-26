@@ -11,7 +11,7 @@ SPI = 1 maps to 0 degrees (parallel scars) and SPI = 0 to 90 degrees."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">spharmlithic</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ SPI = 1 maps to 0 degrees (parallel scars) and SPI = 0 to 90 degrees."><meta pro
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Convert SPI to a scar-pattern angle (Clarkson et al. 2006)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/v0.2.0/R/stats.R" class="external-link"><code>R/stats.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/PeiyuanXiao/spharmlithic/blob/main/R/stats.R" class="external-link"><code>R/stats.R</code></a></small>
       <div class="d-none name"><code>compute_spi_angle.Rd</code></div>
     </div>
 
@@ -85,11 +85,12 @@ random interval are defined for unweighted SPI only and are <code>NA</code> when
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Clarkson et al. (2006) read this angle as the mean angle between any two
 scars. That reading is only approximate: SPI includes each scar paired
-with itself. Over the distinct pairs of n unit vectors the mean cosine is
-\((n \, \mathrm{SPI}^2 - 1) / (n - 1)\), which is not \(\mathrm{SPI}\);
-it is the degree-1 direction feature of <code><a href="spharm_spatiodirection.html">spharm_spatiodirection()</a></code>
-(<code>dir_1</code>, up to the factor \(\sqrt{3/2}\)). The angle is computed from
-the raw SPI and, like it, shifts with the scar count.</p>
+with itself. Over the pairs of different scars, the mean cosine between
+the n unit vectors is \((n \, \mathrm{SPI}^2 - 1) / (n - 1)\), which is
+not \(\mathrm{SPI}\); it is the degree-1 direction feature of
+<code><a href="spharm_rarefied.html">spharm_rarefied()</a></code> (<code>dir_1</code>, up to the factor \(\sqrt{3/2}\)). The
+angle is computed from the raw SPI and, like it, shifts with the scar
+count.</p>
 <p>Before applying <code><a href="https://rdrr.io/r/base/Trig.html" class="external-link">acos()</a></code>, the SPI value is clamped to \([-1, 1]\) to
 guard against floating-point overshoot that would otherwise produce <code>NaN</code>.</p>
     </div>

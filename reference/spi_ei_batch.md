@@ -129,7 +129,7 @@ combinations of scars.
 [`compute_ei()`](https://peiyuanxiao.github.io/spharmlithic/reference/compute_ei.md),
 [`random_interval()`](https://peiyuanxiao.github.io/spharmlithic/reference/random_interval.md),
 [`cpi_pra_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/cpi_pra_batch.md),
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md),
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md),
 [`compare_indices()`](https://peiyuanxiao.github.io/spharmlithic/reference/compare_indices.md)
 
 ## Examples

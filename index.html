@@ -15,8 +15,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns">
-<meta name="description" content="A complete toolkit for the geometric alignment, directional statistics, and spherical harmonic analysis of three-dimensional lithic flaking scar orientation data. Provides two alignment pipelines (SVD and Lin 2024), classical orientation statistics (SPI with Clarkson length weighting, elongation/isotropy from the orientation tensor), and a Python-backed spherical harmonic pipeline (von Mises-Fisher kernel density estimation followed by Driscoll-Healy spherical harmonic expansion via pyshtools), supporting both direction-vector and mesh-based inputs. It also provides scar pattern measures that can be compared between cores with different scar counts: raw and rarefied SPI, elongation ratio (ER) and isotropy ratio (IR) with their random intervals, the Centripetality Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited cores, spatiodirectional spherical harmonic features from pairs of different scars, and comparisons of groups of cores with Welch-type tests. These functions are written in R and do not need the Python back-end.">
-<meta property="og:description" content="A complete toolkit for the geometric alignment, directional statistics, and spherical harmonic analysis of three-dimensional lithic flaking scar orientation data. Provides two alignment pipelines (SVD and Lin 2024), classical orientation statistics (SPI with Clarkson length weighting, elongation/isotropy from the orientation tensor), and a Python-backed spherical harmonic pipeline (von Mises-Fisher kernel density estimation followed by Driscoll-Healy spherical harmonic expansion via pyshtools), supporting both direction-vector and mesh-based inputs. It also provides scar pattern measures that can be compared between cores with different scar counts: raw and rarefied SPI, elongation ratio (ER) and isotropy ratio (IR) with their random intervals, the Centripetality Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited cores, spatiodirectional spherical harmonic features from pairs of different scars, and comparisons of groups of cores with Welch-type tests. These functions are written in R and do not need the Python back-end.">
+<meta name="description" content="A complete toolkit for the geometric alignment, directional statistics, and spherical harmonic analysis of three-dimensional lithic flaking scar orientation data. Provides two alignment pipelines (SVD and Lin 2024), classical orientation statistics (SPI with Clarkson length weighting, elongation/isotropy from the orientation tensor), and a Python-backed spherical harmonic pipeline (von Mises-Fisher kernel density estimation followed by Driscoll-Healy spherical harmonic expansion via pyshtools), supporting both direction-vector and mesh-based inputs. It also provides scar pattern measures that can be compared between cores with different scar counts: raw and rarefied SPI, elongation ratio (ER) and isotropy ratio (IR) with their random intervals, the Centripetality Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited cores, rarefied spherical harmonic features (rarefied SP-SPHARM) from pairs of different scars, and comparisons of groups of cores with Welch-type tests. These functions are written in R and do not need the Python back-end.">
+<meta property="og:description" content="A complete toolkit for the geometric alignment, directional statistics, and spherical harmonic analysis of three-dimensional lithic flaking scar orientation data. Provides two alignment pipelines (SVD and Lin 2024), classical orientation statistics (SPI with Clarkson length weighting, elongation/isotropy from the orientation tensor), and a Python-backed spherical harmonic pipeline (von Mises-Fisher kernel density estimation followed by Driscoll-Healy spherical harmonic expansion via pyshtools), supporting both direction-vector and mesh-based inputs. It also provides scar pattern measures that can be compared between cores with different scar counts: raw and rarefied SPI, elongation ratio (ER) and isotropy ratio (IR) with their random intervals, the Centripetality Index (CPI) and Plane-Relative Angle (PRA) of peripherally exploited cores, rarefied spherical harmonic features (rarefied SP-SPHARM) from pairs of different scars, and comparisons of groups of cores with Welch-type tests. These functions are written in R and do not need the Python back-end.">
 <meta property="og:image" content="https://peiyuanxiao.github.io/spharmlithic/logo.png">
 </head>
 <body>
@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="index.html">spharmlithic</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,8 +119,8 @@
 <span><span class="co"># Raw and rarefied SPI, ER and IR, with random intervals</span></span>
 <span><span class="fu"><a href="reference/spi_ei_batch.html">spi_ei_batch</a></span><span class="op">(</span><span class="va">scars</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Spatiodirectional SP-SPHARM features (pairs of different scars)</span></span>
-<span><span class="fu"><a href="reference/spharm_spatiodirection.html">spharm_spatiodirection</a></span><span class="op">(</span><span class="va">scars</span><span class="op">)</span></span>
+<span><span class="co"># Rarefied SP-SPHARM features (pairs of different scars)</span></span>
+<span><span class="fu"><a href="reference/spharm_rarefied.html">spharm_rarefied</a></span><span class="op">(</span><span class="va">scars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CPI and PRA also need the outline of each core: see ?cpi_pra_batch.</span></span>
 <span><span class="co"># Group comparisons: see ?compare_indices and ?compare_groups.</span></span></code></pre></div>
@@ -254,8 +254,8 @@
 <td align="left">CPI and PRA of every scar of one core</td>
 </tr>
 <tr>
-<td align="left"><code><a href="reference/spharm_spatiodirection.html">spharm_spatiodirection()</a></code></td>
-<td align="left">Spatiodirectional SP-SPHARM features of every core</td>
+<td align="left"><code><a href="reference/spharm_rarefied.html">spharm_rarefied()</a></code></td>
+<td align="left">Rarefied SP-SPHARM features of every core</td>
 </tr>
 <tr>
 <td align="left"><code><a href="reference/compare_indices.html">compare_indices()</a></code></td>
@@ -267,7 +267,7 @@
 </tr>
 </tbody>
 </table>
-<p><code><a href="reference/spharm_from_directions.html">spharm_from_directions()</a></code> describes the scar pattern of each core as recorded, in the same spherical harmonic framework as core morphology (Xiao et al., 2027). Because each scar is also paired with itself in this power spectrum, its expected shape changes with scar count. To compare groups of cores whose scar counts differ, <code><a href="reference/spharm_spatiodirection.html">spharm_spatiodirection()</a></code> uses pairs of different scars only and adds scar positions (Xiao et al., submitted).</p>
+<p><code><a href="reference/spharm_from_directions.html">spharm_from_directions()</a></code> describes the scar pattern of each core as recorded, in the same spherical harmonic framework as core morphology (Xiao et al., 2027). Because each scar is also paired with itself in this power spectrum, its expected shape changes with scar count. To compare groups of cores whose scar counts differ, <code><a href="reference/spharm_rarefied.html">spharm_rarefied()</a></code> computes rarefied SP-SPHARM from pairs of different scars only and adds scar positions (Xiao et al., submitted): <code>features = "dir"</code> gives the direction-only version (6 features), and the default the full version (22 features).</p>
 </div>
 <div class="section level4">
 <h4 id="spherical-harmonic-analysis">Spherical Harmonic Analysis<a class="anchor" aria-label="anchor" href="#spherical-harmonic-analysis"></a>

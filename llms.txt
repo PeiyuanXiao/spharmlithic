@@ -83,8 +83,8 @@ scars <- read_excel(scar_path)
 # Raw and rarefied SPI, ER and IR, with random intervals
 spi_ei_batch(scars)
 
-# Spatiodirectional SP-SPHARM features (pairs of different scars)
-spharm_spatiodirection(scars)
+# Rarefied SP-SPHARM features (pairs of different scars)
+spharm_rarefied(scars)
 
 # CPI and PRA also need the outline of each core: see ?cpi_pra_batch.
 # Group comparisons: see ?compare_indices and ?compare_groups.
@@ -148,7 +148,7 @@ export_spharm_html(morph = sh_morph, scar = sh_scar,
 | [`fit_intersection_plane()`](https://peiyuanxiao.github.io/spharmlithic/reference/fit_intersection_plane.md) | Fit the plane of intersection of a core to its outline |
 | [`cpi_pra_batch()`](https://peiyuanxiao.github.io/spharmlithic/reference/cpi_pra_batch.md) | CPI and PRA for every peripherally exploited core |
 | [`cpi_pra_per_scar()`](https://peiyuanxiao.github.io/spharmlithic/reference/cpi_pra_per_scar.md) | CPI and PRA of every scar of one core |
-| [`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md) | Spatiodirectional SP-SPHARM features of every core |
+| [`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md) | Rarefied SP-SPHARM features of every core |
 | [`compare_indices()`](https://peiyuanxiao.github.io/spharmlithic/reference/compare_indices.md) | Compare groups of cores on single indices |
 | [`compare_groups()`](https://peiyuanxiao.github.io/spharmlithic/reference/compare_groups.md) | Compare the overall scar patterns of groups of cores |
 
@@ -158,9 +158,11 @@ spherical harmonic framework as core morphology (Xiao et al., 2027).
 Because each scar is also paired with itself in this power spectrum, its
 expected shape changes with scar count. To compare groups of cores whose
 scar counts differ,
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
-uses pairs of different scars only and adds scar positions (Xiao et al.,
-submitted).
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
+computes rarefied SP-SPHARM from pairs of different scars only and adds
+scar positions (Xiao et al., submitted): `features = "dir"` gives the
+direction-only version (6 features), and the default the full version
+(22 features).
 
 #### Spherical Harmonic Analysis
 
@@ -355,12 +357,12 @@ details.
 - [`spharm_from_meshes()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_from_meshes.md)
   : Spherical harmonic analysis from STL meshes
 
+- [`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
+  : Rarefied SP-SPHARM features of every core
+
 - [`spharm_reconstruct()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_reconstruct.md)
   : Inverse spherical harmonic transform: coefficients to spherical
   density
-
-- [`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
-  : Spatiodirectional SP-SPHARM features of every core
 
 - [`spharm_to_dataframe()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_to_dataframe.md)
   : Flatten SPHARM result list into a wide-format data frame

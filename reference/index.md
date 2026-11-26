@@ -91,12 +91,12 @@
 - [`spharm_from_meshes()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_from_meshes.md)
   : Spherical harmonic analysis from STL meshes
 
+- [`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
+  : Rarefied SP-SPHARM features of every core
+
 - [`spharm_reconstruct()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_reconstruct.md)
   : Inverse spherical harmonic transform: coefficients to spherical
   density
-
-- [`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
-  : Spatiodirectional SP-SPHARM features of every core
 
 - [`spharm_to_dataframe()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_to_dataframe.md)
   : Flatten SPHARM result list into a wide-format data frame

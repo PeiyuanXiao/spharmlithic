@@ -42,10 +42,10 @@ radians).
 
 Clarkson et al. (2006) read this angle as the mean angle between any two
 scars. That reading is only approximate: SPI includes each scar paired
-with itself. Over the distinct pairs of n unit vectors the mean cosine
-is \\(n \\ \mathrm{SPI}^2 - 1) / (n - 1)\\, which is not
-\\\mathrm{SPI}\\; it is the degree-1 direction feature of
-[`spharm_spatiodirection()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_spatiodirection.md)
+with itself. Over the pairs of different scars, the mean cosine between
+the n unit vectors is \\(n \\ \mathrm{SPI}^2 - 1) / (n - 1)\\, which is
+not \\\mathrm{SPI}\\; it is the degree-1 direction feature of
+[`spharm_rarefied()`](https://peiyuanxiao.github.io/spharmlithic/reference/spharm_rarefied.md)
 (`dir_1`, up to the factor \\\sqrt{3/2}\\). The angle is computed from
 the raw SPI and, like it, shifts with the scar count.
 

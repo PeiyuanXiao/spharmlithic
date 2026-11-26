@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/PeiyuanXiao/spharmlithic/blob/v0.2.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/PeiyuanXiao/spharmlithic/blob/main/inst/CITATION)
 
 Xiao P, Li H, Marwick B (2027). “Characterizing Core Morphology and Scar
 Patterning Within a Unified Spherical Harmonic Framework.” *Journal of
@@ -28,13 +28,13 @@ Archaeological Method and Theory*, **34**, 16.
     }
 
 Xiao P, Marwick B (2026). *spharmlithic: Spherical Harmonic Analysis of
-Lithic Morphology and Flaking Scar Patterns*. R package version 0.2.0,
+Lithic Morphology and Flaking Scar Patterns*. R package version 0.2.1,
 <https://github.com/PeiyuanXiao/spharmlithic>.
 
     @Manual{,
       title = {spharmlithic: Spherical Harmonic Analysis of Lithic Morphology and Flaking Scar Patterns},
       author = {Peiyuan Xiao and Ben Marwick},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.2.1},
       url = {https://github.com/PeiyuanXiao/spharmlithic},
     }
