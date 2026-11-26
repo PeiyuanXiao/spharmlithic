@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/PeiyuanXiao/spharmlithic/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/PeiyuanXiao/spharmlithic/blob/v0.2.1/inst/CITATION)
 
 Xiao P, Li H, Marwick B (2027). “Characterizing Core Morphology and Scar
 Patterning Within a Unified Spherical Harmonic Framework.” *Journal of
